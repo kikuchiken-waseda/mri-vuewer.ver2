@@ -1,8 +1,20 @@
-# mri-vuewer.dev
+# MRIViewer: ver2
 
-DEMO: https://qh73xe.github.io/mri-vuewer.dev/
+このアプリケーションは MRI 動画を始めとする調音運動系動画のアノテーションツールです.
+類似のアプリケーションとしては Praat や ELAN などが存在しますが,
+動画を前提とし, 音声のスペクトルグラムをうまく表示できる適当なツールが存在しないため,
+新規に作成しました．
 
-## Project setup
+APP: https://kikuchiken-waseda.github.io/mri-vuewer.ver2/
+旧版: https://kikuchiken-waseda.github.io/MRIVuewer/
+
+## 動作環境
+OS: linux, windows, mac,
+推奨ブラウザ: google chrome
+動画ファイル: mp4
+
+## 開発者情報
+### Project setup
 ```
 yarn install
 ```

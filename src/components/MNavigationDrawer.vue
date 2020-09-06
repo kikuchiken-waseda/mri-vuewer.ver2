@@ -128,16 +128,6 @@
         <template v-slot:activator>
           <v-list-item-title>DEVELOP</v-list-item-title>
         </template>
-        <v-list-item
-          @click="item.to"
-          v-for="item in developPages"
-          :key="item.title"
-          link
-        >
-          <v-list-item-content>
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
       </v-list-group>
     </v-list>
 
@@ -176,27 +166,6 @@ export default {
       set(val) {
         this.$store.commit("setDrawer", val);
       }
-    },
-    developPages: function() {
-      if (process.env.NODE_ENV) {
-        return this.$router.options.routes
-          .filter(x => {
-            if (x.develop) return true;
-            return false;
-          })
-          .map((x, i) => {
-            if (x.name == this.$route.name) {
-              this.current = i;
-              x.current = true;
-            }
-            x.title = x.name;
-            x.to = () => {
-              this.to({ name: x.name });
-            };
-            return x;
-          });
-      }
-      return [];
     },
     pages: function() {
       return this.$router.options.routes
