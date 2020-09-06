@@ -1,0 +1,75 @@
+<template>
+  <m-card-dialog
+    titleColor="grey darken-4"
+    :title="$vuetify.lang.t(title)"
+    v-model="dialog"
+  >
+    <template v-slot:activator="{ on, attrs }">
+      <slot name="activator" :on="on" :attrs="attrs"></slot>
+    </template>
+    <template v-slot:toolbar-actions>
+      <m-video-upload-menu @click="$emit('upload-click', $event)" />
+      <m-video-download-menu @click="$emit('download-click', $event)" />
+    </template>
+    <v-card tile>
+      <v-img
+        v-if="src"
+        :src="src"
+        class="white--text align-end"
+        gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
+        height="200px"
+      >
+        <v-card-title class="py-0">{{ videoName }}</v-card-title>
+        <v-card-title class="py-0">
+          {{ duration }} sec: {{ fps }} fps [{{ originSize.width }} x
+          {{ originSize.height }}]
+        </v-card-title>
+      </v-img>
+      <m-video-stream-list :video-stream="videoStream" />
+      <v-divider inset></v-divider>
+      <m-audio-stream-list :audio-stream="audioStream" />
+    </v-card>
+  </m-card-dialog>
+</template>
+<script>
+import MCardDialog from "@/components/base/dialog/MCardDialog";
+import MVideoDownloadMenu from "@/components/menus/MVideoDownloadMenu";
+import MVideoUploadMenu from "@/components/menus/MVideoUploadMenu";
+import MVideoStreamList from "@/components/list/MVideoStreamList";
+import MAudioStreamList from "@/components/list/MAudioStreamList";
+import MVideoMixin from "@/mixins/MVideoMixin.js";
+export default {
+  name: "m-detail-dialog",
+  mixins: [MVideoMixin],
+  components: {
+    MCardDialog,
+    MVideoDownloadMenu,
+    MVideoUploadMenu,
+    MVideoStreamList,
+    MAudioStreamList
+  },
+  data: () => ({
+    title: "$vuetify.forms.detail.title"
+  }),
+  props: {
+    value: {
+      type: Boolean
+    },
+    src: {
+      default: null
+    }
+  },
+  computed: {
+    dialog: {
+      get() {
+        return this.value;
+      },
+      set(val) {
+        this.$emit("input", val);
+      }
+    }
+  }
+};
+</script>
+
+<style scoped></style>
