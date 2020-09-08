@@ -6,7 +6,7 @@
         <v-icon>mdi-palette</v-icon>
       </v-btn>
     </template>
-    <v-color-picker v-model="picker" flat />
+    <v-color-picker v-model="picker" flat show-swatches />
   </v-menu>
 </template>
 <script>

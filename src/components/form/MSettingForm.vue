@@ -39,20 +39,20 @@
             {{ t(`${locale}.waveform.cursorColor.label`) }}:
             {{ cursorColor }}
           </label>
-          <v-color-picker v-model="cursorColor" />
+          <v-color-picker v-model="cursorColor" show-swatches />
         </v-col>
         <v-col sm="4" class="text-truncate">
           <label>
             {{ t(`${locale}.waveform.waveColor.label`) }}: {{ waveColor }}
           </label>
-          <v-color-picker v-model="waveColor" />
+          <v-color-picker v-model="waveColor" show-swatches />
         </v-col>
         <v-col sm="4" class="text-truncate">
           <label>
             {{ t(`${locale}.waveform.progressColor.label`) }}:
             {{ progressColor }}
           </label>
-          <v-color-picker v-model="progressColor" />
+          <v-color-picker v-model="progressColor" show-swatches />
         </v-col>
       </v-row>
       <v-checkbox

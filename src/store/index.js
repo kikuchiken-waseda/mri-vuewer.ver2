@@ -19,7 +19,7 @@ export default new Vuex.Store({
     appVersion: "2.0",
     author: "qh73xe",
     devYear: "2017-2020",
-    github: "https://github.com/qh73xe/mri-vuewer.dev",
+    github: "https://github.com/kikuchiken-waseda/mri-vuewer.ver2",
     drawer: false
   },
   mutations: {

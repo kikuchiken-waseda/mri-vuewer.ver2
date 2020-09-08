@@ -6,7 +6,8 @@
     :search="keyword"
     hide-default-footer
     sort-by="time"
-    class="elevation-1"
+    :style="`max-height: ${videoHeight - 64 || 0}px`"
+    class="overflow-y-auto"
   >
     <template v-slot:item.time="{ item }">
       <span class="d-inline-block text-truncate" style="max-width: 30px;">
@@ -39,6 +40,17 @@
         <v-icon>
           mdi-format-horizontal-align-right
         </v-icon>
+      </v-btn>
+      <v-btn
+        v-if="tier && tier.type == 'point'"
+        class="mr-1"
+        fab
+        dark
+        x-small
+        color="orange"
+        @click="$emit('click-image-edit', item.time)"
+      >
+        <v-icon>mdi-selection-drag</v-icon>
       </v-btn>
       <v-btn
         v-if="tier && tier.type == 'interval'"
@@ -91,6 +103,9 @@ export default {
   },
   mixins: [MWavesurferMixin],
   props: {
+    videoHeight: {
+      default: null
+    },
     title: {
       type: String
     },

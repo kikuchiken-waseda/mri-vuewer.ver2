@@ -57,7 +57,11 @@
       >
         {{ props.item.color }}
         <template v-slot:input>
-          <v-color-picker label="Edit" v-model="props.item.color" />
+          <v-color-picker
+            label="Edit"
+            v-model="props.item.color"
+            show-swatches
+          />
           <v-text-field v-model="props.item.color" label="Edit" single-line />
         </template>
       </v-edit-dialog>
