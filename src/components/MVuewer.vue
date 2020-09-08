@@ -464,14 +464,21 @@ export default {
     },
     onSpectrogramRenderEnd() {
       if (this.textgrid) {
-        this.isSyncing = true;
-        for (const key in this.textgrid) {
-          this.wavesurfer.addTier(key, this.textgrid[key].type);
-          for (const val of this.textgrid[key].values) {
-            if (val) this.wavesurfer.addTierValue(key, val);
+        if (this.current.frame.i == null) {
+          this.isSyncing = true;
+          for (const key in this.textgrid) {
+            this.wavesurfer.addTier(key, this.textgrid[key].type);
+            for (const val of this.textgrid[key].values) {
+              if (val) this.wavesurfer.addTierValue(key, val);
+            }
           }
+          // start が指定されている場合そこに移動
+          const start = Number(this.$route.query.start);
+          if (start) {
+            this.wavesurfer.seekTo(start / this.wavesurfer.getDuration());
+          }
+          this.isSyncing = false;
         }
-        this.isSyncing = false;
       }
       this.isLoading = false;
     },

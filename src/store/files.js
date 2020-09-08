@@ -172,5 +172,35 @@ export default {
         }
       });
     }
+  },
+  getters: {
+    records: function(state) {
+      const records = [];
+      let id = 0;
+      for (const f of state.files) {
+        for (const key in f.textgrid) {
+          const tier = f.textgrid[key];
+          for (const i in tier.values) {
+            const record = tier.values[i];
+            const item = {
+              fileId: f.id,
+              fileName: f.name,
+              fps: f.fps,
+              duration: f.duration,
+              src: f.source,
+              tier: key,
+              type: tier.type,
+              index: i,
+              id: id,
+              time: record.time,
+              text: record.text
+            };
+            records.push(item);
+            id++;
+          }
+        }
+      }
+      return records;
+    }
   }
 };
