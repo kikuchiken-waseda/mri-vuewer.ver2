@@ -39,6 +39,7 @@
         scrollParent
         showTextGrid
         textgrid-max-height="100px"
+        :drawingContextAttributes="drawingContextAttributes"
         :source="videoElm"
         :skipLength="skipLength"
         :minPxPerSec="minPxPerSec"
@@ -89,6 +90,7 @@
 
     <template v-slot:bottom>
       <m-speed-dial
+        @click-setting="onClickSetting"
         @click-detail="onClickDetail"
         @click-ruler="onClickRuler"
         @click-image-edit="onClickImageEdit"
@@ -102,6 +104,7 @@
         @download-click="onDownloadClick"
         @upload-click="onUploadClick"
       />
+      <m-setting-dialog v-model="dialog.setting.show" />
       <m-tier-dialog v-model="dialog.tier.show" :tiers="tiers" />
       <m-tier-edit-dialog v-model="dialog.tierEdit.show" :tiers="tiers" />
       <m-tier-delete-dialog v-model="dialog.tierDelete.show" :tiers="tiers" />
@@ -144,6 +147,7 @@ import MTierEditDialog from "@/components/dialogs/MTierEditDialog";
 import MTierDeleteDialog from "@/components/dialogs/MTierDeleteDialog";
 import MRulerDialog from "@/components/dialogs/MRulerDialog";
 import MImageEditDialog from "@/components/dialogs/MImageEditDialog";
+import MSettingDialog from "@/components/dialogs/MSettingDialog";
 import MSpeedDial from "@/components/MSpeedDial";
 import MSettingMixin from "@/mixins/MSettingMixin";
 import MSnackbarMixin from "@/mixins/MSnackbarMixin";
@@ -164,6 +168,7 @@ export default {
     MTierDeleteDialog,
     MRulerDialog,
     MImageEditDialog,
+    MSettingDialog,
     MVuwerActions
   },
   props: {
@@ -213,26 +218,18 @@ export default {
     isSyncing: false, // 過去データを反映中か否か
     lazyRular: false,
     lazyImageEdit: false,
+    minPxPerSec: 100,
+    drawingContextAttributes: {
+      desynchronized: false
+    },
     dialog: {
-      detail: {
-        show: false
-      },
-      // TIER 編集ダイアログ
-      tier: {
-        show: false
-      },
-      tierEdit: {
-        show: false
-      },
-      tierDelete: {
-        show: false
-      },
-      ruler: {
-        show: false
-      },
-      imageEdit: {
-        show: false
-      }
+      detail: { show: false },
+      tier: { show: false },
+      tierEdit: { show: false },
+      tierDelete: { show: false },
+      ruler: { show: false },
+      imageEdit: { show: false },
+      setting: { show: false }
     },
     current: {
       // 現在フォーカスが当たっている TIER 情報
@@ -313,6 +310,13 @@ export default {
         }
       },
       deep: true
+    },
+    $minPxPerSec: function(val) {
+      if ((val > 100) & (val < 500)) {
+        if (val % 50 == 0) {
+          this.wavesurfer.zoom(val);
+        }
+      }
     }
   },
   methods: {
@@ -571,6 +575,9 @@ export default {
     onClickDetail: function() {
       this.dialog.detail.show = true;
     },
+    onClickSetting: function() {
+      this.dialog.setting.show = true;
+    },
     onClickRuler: function(payload) {
       if (payload) {
         this.lazyRular = true;
@@ -626,6 +633,7 @@ export default {
   mounted: function() {
     this.$frames = [];
     this.$frames = this.frames;
+    this.minPxPerSec = this.$minPxPerSec;
     this.$store.dispatch("search/show");
   },
   beforeDestroy: function() {

@@ -62,7 +62,7 @@ export default {
         v =>
           v.length == 0 ||
           (v && v.length <= 50) ||
-          this.$vuetify.lang.t(`${locale}.less`, 50)
+          this.$vuetify.lang.t(`${locale}.shorter`, 50)
       ];
     }
   },

@@ -13,29 +13,16 @@
         <v-icon v-else>mdi-apps</v-icon>
       </v-btn>
     </template>
-
-    <v-btn @click="$emit('click-detail')" fab dark small>
-      <v-icon>mdi-eye</v-icon>
-    </v-btn>
-
-    <v-btn @click="$emit('click-ruler')" fab dark small color="orange">
-      <v-icon>mdi-ruler</v-icon>
-    </v-btn>
-
-    <v-btn @click="$emit('click-image-edit')" fab dark small color="orange">
-      <v-icon>mdi-selection-drag</v-icon>
-    </v-btn>
-
-    <v-btn @click="$emit('click-tier-edit')" fab dark small color="green">
-      <v-icon>mdi-pencil</v-icon>
-    </v-btn>
-
-    <v-btn @click="$emit('click-tier-add')" fab dark small color="indigo">
-      <v-icon>mdi-plus</v-icon>
-    </v-btn>
-
-    <v-btn @click="$emit('click-tier-delete')" fab dark small color="red">
-      <v-icon>mdi-delete</v-icon>
+    <v-btn
+      v-for="(item, key) in btns"
+      :key="key"
+      @click="$emit(item.event)"
+      fab
+      dark
+      small
+      :color="item.color"
+    >
+      <v-icon>{{ item.icon }}</v-icon>
     </v-btn>
   </v-speed-dial>
 </template>
@@ -43,7 +30,20 @@
 export default {
   name: "m-speed-dial",
   data: () => ({
-    fab: false
+    fab: false,
+    btns: [
+      { event: "click-detail", color: "black", icon: "mdi-eye" },
+      { event: "click-setting", color: "black", icon: "mdi-cog" },
+      { event: "click-ruler", color: "orange", icon: "mdi-ruler" },
+      {
+        event: "click-image-edit",
+        color: "orange",
+        icon: "mdi-selection-drag"
+      },
+      { event: "click-tier-edit", color: "green", icon: "mdi-pencil" },
+      { event: "click-tier-add", color: "indigo", icon: "mdi-plus" },
+      { event: "click-tier-delete", color: "red", icon: "mdi-delete" }
+    ]
   })
 };
 </script>

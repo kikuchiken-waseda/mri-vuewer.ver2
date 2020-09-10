@@ -65,6 +65,16 @@ export default {
     },
     onValidated: function(payload) {
       this.addTier(payload.name, payload.type);
+      if (payload.ref) {
+        const ref = this.$store.state.current.textgrid[payload.ref];
+        for (const val of ref.values) {
+          const record = {
+            text: "",
+            time: val.time
+          };
+          this.addTierValue(payload.name, record);
+        }
+      }
       this.close();
     }
   }

@@ -50,7 +50,9 @@ export default {
       return [
         v => !!v || this.$vuetify.lang.t(`${locale}.required`),
         v =>
-          !!v || v.length <= 10 || this.$vuetify.lang.t(`${locale}.less`, 10),
+          !!v ||
+          v.length <= 10 ||
+          this.$vuetify.lang.t(`${locale}.shorter`, 10),
         v => this.checkName(v)
       ];
     }

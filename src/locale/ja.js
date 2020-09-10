@@ -13,6 +13,8 @@ const TEXTGRID = {
     name: "時系列転記層",
     option: {
       name: "転記層名",
+      showRef: "時刻情報をコピーする",
+      ref: "対象転記層",
       type: "転記層の種類"
     },
     interval: "境界転記層",
@@ -82,9 +84,12 @@ export default {
     positiveInteger: "この項目は正の整数です!",
     positiveIntegerOrError: "この項目は正の整数または -1 です",
     positiveFloat: "この項目は正の数値です!",
+    more: "この項目は {0} より大きい必要があります",
+    less: "この項目は {0} より小さい必要があります",
+    times: "この項目は {0} の倍数です",
     maxVideoSize: `登録可能な ${VIDEO} ファイルサイズは ${store.state.setting.maxVideoSize} MB までです!`,
     hasArrayBuffer: "想定外の ${VIDEO} ファイルです [No Array buffer]!",
-    less: "この値は {0} 文字以下です.",
+    shorter: "この値は {0} 文字以下です.",
     alreadyExists: "この値は既に存在しています.",
     notExist: "この値は存在しません"
   },
@@ -238,8 +243,12 @@ export default {
         label: "波形表示設定",
         minPxPerSec: {
           label: "pixels per sec",
-          hint:
-            "1 sec を何ピクセルで表示するか? 大まかに時刻方向の拡大比率になります"
+          hint: `
+          1 sec を何ピクセルで表示するか?
+          大まかに時刻方向の拡大比率になります.
+          この値は50 の倍数である必要があり
+          100 - 500 までの値を取ります. 
+          `
         },
         cursorColor: {
           label: "カーソル色"

@@ -1,35 +1,11 @@
 <template>
   <v-form ref="form">
-    <div class="mb-4">
-      <label>{{ t(`${locale}.loading.label`) }}</label>
-      <v-checkbox
-        class="mt-0"
-        hide-details
-        v-model="shouldGetVideoInfo"
-        :label="t(`${locale}.loading.shouldGetVideoInfo.label`)"
-      />
-      <v-icon small>mdi-information</v-icon>
-      <span
-        class="caption ml-1"
-        v-text="t(`${locale}.loading.shouldGetVideoInfo.hint`)"
-      />
-    </div>
-    <v-text-field
-      v-model="maxVideoSize"
-      suffix="MB"
-      :rules="rules.positiveIntegerRules"
-      :label="t(`${locale}.loading.maxVideoSize.label`)"
-      :hint="t(`${locale}.loading.maxVideoSize.hint`)"
-    />
-
-    <v-divider />
-
-    <div class="my-5">
+    <div>
       <label>{{ t(`${locale}.waveform.label`) }}</label>
       <v-text-field
-        v-model="minPxPerSec"
+        v-model="$minPxPerSec"
         suffix="px/sec"
-        :rules="rules.positiveIntegerRules"
+        :rules="minPxPerSecRule"
         :label="t(`${locale}.waveform.minPxPerSec.label`)"
         :hint="t(`${locale}.waveform.minPxPerSec.hint`)"
       />
@@ -111,10 +87,6 @@
         :label="`${t(`${locale}.textgrid.deleteRecordKey.label`)}`"
       />
     </div>
-
-    <v-btn block @click="setDefaultSetting" color="error">
-      Reset setting
-    </v-btn>
   </v-form>
 </template>
 <script>
@@ -132,6 +104,31 @@ export default {
     }
   },
   computed: {
+    minPxPerSecRule: function() {
+      const rules = [];
+      for (const r of this.rules.positiveIntegerRules) {
+        rules.push(r);
+      }
+      rules.push(
+        v =>
+          !v ||
+          Number(v) > 100 ||
+          this.$vuetify.lang.t("$vuetify.validations.more", 100)
+      );
+      rules.push(
+        v =>
+          !v ||
+          Number(v) < 500 ||
+          this.$vuetify.lang.t("$vuetify.validations.less", 500)
+      );
+      rules.push(
+        v =>
+          !v ||
+          Number(v) % 50 == 0 ||
+          this.$vuetify.lang.t("$vuetify.validations.times", 50)
+      );
+      return rules;
+    },
     addRecordKeyChoice: function() {
       return [
         {

@@ -46,6 +46,10 @@
           <m-setting-from />
         </v-card-text>
       </m-t-card>
+
+      <v-btn class="my-5" block @click="setDefaultSetting" color="error">
+        Reset setting
+      </v-btn>
     </v-col>
   </m-view-layout>
 </template>
@@ -69,6 +73,9 @@ export default {
     fields: [] // メタデータに登録されているフィールド名
   }),
   methods: {
+    setDefaultSetting: function() {
+      this.$store.dispatch("setting/setDefault");
+    },
     onAddField: function(key) {
       this.fields.push(key);
     },

@@ -55,9 +55,12 @@ export default {
     positiveInteger: "This is a positive integer field!",
     positiveIntegerOrError: "This is a positive integer or -1 field!",
     positiveFloat: "This is a positive float field!",
+    more: "This value is more then {0}",
+    less: "This value is less then {0}",
+    times: "This value is a multiple of {0}",
     maxVideoSize: `Video size should be less than ${store.state.setting.maxVideoSize} MB!`,
     hasArrayBuffer: "This is an unexpected video file [No Array buffer]!",
-    less: "This field must be less than {0} characters",
+    shorter: "This field must be less than {0} characters",
     alreadyExists: "This value alredy exists",
     notExist: "This value does not exist"
   },
@@ -272,6 +275,8 @@ export default {
       name: "Tier",
       option: {
         name: "Tier Name",
+        showRef: "Copy Times",
+        ref: "Ref Tier Name",
         type: "Tier Type"
       },
       interval: "Interval Tier",

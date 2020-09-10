@@ -31,18 +31,20 @@ export default {
         this.$store.commit("setting/setShouldGetFrameInfo", val);
       }
     },
-    minPxPerSec: {
+    $minPxPerSec: {
       get() {
         return this.$store.state.setting.minPxPerSec;
       },
       set(val) {
         const type = typeof val;
+        let minPxPerSec = null;
         if (type == "number") {
-          this.$store.commit("setting/setMinPxPerSec", val);
+          minPxPerSec = val;
         } else if (type == "string") {
-          if (Number(val)) {
-            this.$store.commit("setting/setMinPxPerSec", Number(val));
-          }
+          minPxPerSec = Number(val);
+        }
+        if (minPxPerSec) {
+          this.$store.commit("setting/setMinPxPerSec", minPxPerSec);
         }
       }
     },
