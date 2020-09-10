@@ -93,6 +93,24 @@ export default {
     },
     downloadTextGrid: function(filename) {
       if (this.$ws) this.$ws.downloadTextGrid(filename);
+    },
+    // Event 発火
+    $fire: function(event) {
+      if (this.$ws) {
+        const el = this.$ws.wavesurfer;
+        if (el) {
+          const i = Object.keys(el.handlers || {}).findIndex(x => x == event);
+          if (i != -1) {
+            el.fireEvent(event);
+          } else {
+            const el = this.$ws.wavesurfer.drawer;
+            const i = Object.keys(el.handlers || {}).findIndex(x => x == event);
+            if (i != -1) {
+              el.fireEvent(event);
+            }
+          }
+        }
+      }
     }
   }
 };

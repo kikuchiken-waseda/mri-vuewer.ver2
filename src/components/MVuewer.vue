@@ -28,62 +28,70 @@
       />
     </template>
     <v-card>
-      <wave-surfer
-        ref="wavesurfer"
-        backend="MediaElement"
-        splitChannels
-        normalize
-        responsive
-        scrollParent
-        showTextGrid
-        textgrid-max-height="100px"
-        :drawingContextAttributes="drawingContextAttributes"
-        :source="videoElm"
-        :skipLength="skipLength"
-        :minPxPerSec="minPxPerSec"
-        :freqRate="freqRate"
-        :targetChannel="targetChannel"
-        :spectrogramHeight="spectrogramHeight"
-        :showTimeLine="showTimeLine"
-        :showSpectrogram="showSpectrogram"
-        :showFreqLabel="showFreqLabel"
-        :cursorColor="cursorColor"
-        :waveColor="waveColor"
-        :progressColor="progressColor"
-        @spectrogram-render-start="onSpectrogramRenderStart"
-        @spectrogram-render-end="onSpectrogramRenderEnd"
-        @textgrid-click="onTextGridClick"
-        @textgrid-dblclick="onTextGridDblClick"
-        @textgrid-update="onTextGridUpdate"
-        @textgrid-current-update="onTextGridCurrentUpdate"
-        @textgrid-keydown="onTextGridKeydown"
+      <m-w-context-menu
+        @click-image-edit="onClickImageEdit"
+        @click-tier-add="onClickTierAdd"
+        @click-tier-edit="onClickTierEdit"
+        @click-tier-delete="onClickTierDelete"
+        @click-download="onDownloadClick"
       >
-        <template v-slot:textform>
-          <v-text-field
-            dense
-            hide-details
-            outlined
-            ref="input"
-            label="text"
-            v-if="showTextField"
-            v-model="current.tier.item.text"
-            :disabled="current.tier.key == null"
-            @keydown.enter="onUpdateRecordText"
-          />
-        </template>
+        <wave-surfer
+          ref="wavesurfer"
+          backend="MediaElement"
+          splitChannels
+          normalize
+          responsive
+          scrollParent
+          showTextGrid
+          textgrid-max-height="100px"
+          :drawingContextAttributes="drawingContextAttributes"
+          :source="videoElm"
+          :skipLength="skipLength"
+          :minPxPerSec="minPxPerSec"
+          :freqRate="freqRate"
+          :targetChannel="targetChannel"
+          :spectrogramHeight="spectrogramHeight"
+          :showTimeLine="showTimeLine"
+          :showSpectrogram="showSpectrogram"
+          :showFreqLabel="showFreqLabel"
+          :cursorColor="cursorColor"
+          :waveColor="waveColor"
+          :progressColor="progressColor"
+          @spectrogram-render-start="onSpectrogramRenderStart"
+          @spectrogram-render-end="onSpectrogramRenderEnd"
+          @textgrid-click="onTextGridClick"
+          @textgrid-dblclick="onTextGridDblClick"
+          @textgrid-update="onTextGridUpdate"
+          @textgrid-current-update="onTextGridCurrentUpdate"
+          @textgrid-keydown="onTextGridKeydown"
+        >
+          <template v-slot:textform>
+            <v-text-field
+              dense
+              hide-details
+              outlined
+              ref="input"
+              label="text"
+              v-if="showTextField"
+              v-model="current.tier.item.text"
+              :disabled="current.tier.key == null"
+              @keydown.enter="onUpdateRecordText"
+            />
+          </template>
 
-        <div class="text-center" v-if="isLoading">
-          <v-progress-circular
-            :size="100"
-            :width="10"
-            color="primary"
-            indeterminate
-          />
-          <div class="font-weight-light subtitle-1">
-            Sound Analyzing ...
+          <div class="text-center" v-if="isLoading">
+            <v-progress-circular
+              :size="100"
+              :width="10"
+              color="primary"
+              indeterminate
+            />
+            <div class="font-weight-light subtitle-1">
+              Sound Analyzing ...
+            </div>
           </div>
-        </div>
-      </wave-surfer>
+        </wave-surfer>
+      </m-w-context-menu>
     </v-card>
 
     <template v-slot:bottom>
@@ -147,6 +155,7 @@ import MVuwerLayout from "@/components/layouts/MVuwerLayout";
 import MVideoArray from "@/components/video/MVideoArray";
 import MTextGrid from "@/components/MTextGrid";
 import MVuwerActions from "@/components/actions/MVuewerActions";
+import MWContextMenu from "@/components/contextmenus/MWContextMenu";
 import MDetailDialog from "@/components/dialogs/MDetailDialog";
 import MTierDialog from "@/components/dialogs/MTierDialog";
 import MTierEditDialog from "@/components/dialogs/MTierEditDialog";
@@ -168,6 +177,7 @@ export default {
     MVideoArray,
     MTextGrid,
     WaveSurfer,
+    MWContextMenu,
     MSpeedDial,
     MDetailDialog,
     MTierDialog,
