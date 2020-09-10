@@ -303,7 +303,7 @@ export default {
     }
   },
   watch: {
-    textgrid: {
+    $textgrid: {
       handler: function(val, oldVal) {
         if (val && val != oldVal) {
           this.tiers = [];
