@@ -8,7 +8,6 @@
         :frameOffset="frameOffset"
         :frames="$frames"
         :origin-size="originSize"
-        @resize="onResize"
         @loadeddata="onLoadeddata"
         @frame-updated="onFrameUpdated"
       />
@@ -28,7 +27,6 @@
         :video-height="videoHeight"
       />
     </template>
-
     <v-card>
       <wave-surfer
         ref="wavesurfer"
@@ -104,6 +102,14 @@
         @download-click="onDownloadClick"
         @upload-click="onUploadClick"
       />
+      <m-textgrid-dialog
+        v-model="dialog.textgrid.show"
+        v-if="$store.state.current.layout.mini"
+        :frames="$frames"
+        :textgrid="$textgrid"
+        @click-image-edit="onClickImageEdit"
+        @click-ruler="onClickRuler"
+      />
       <m-setting-dialog v-model="dialog.setting.show" />
       <m-tier-dialog v-model="dialog.tier.show" :tiers="tiers" />
       <m-tier-edit-dialog v-model="dialog.tierEdit.show" :tiers="tiers" />
@@ -148,6 +154,7 @@ import MTierDeleteDialog from "@/components/dialogs/MTierDeleteDialog";
 import MRulerDialog from "@/components/dialogs/MRulerDialog";
 import MImageEditDialog from "@/components/dialogs/MImageEditDialog";
 import MSettingDialog from "@/components/dialogs/MSettingDialog";
+import MTextgridDialog from "@/components/dialogs/MTextgridDialog";
 import MSpeedDial from "@/components/MSpeedDial";
 import MSettingMixin from "@/mixins/MSettingMixin";
 import MSnackbarMixin from "@/mixins/MSnackbarMixin";
@@ -169,6 +176,7 @@ export default {
     MRulerDialog,
     MImageEditDialog,
     MSettingDialog,
+    MTextgridDialog,
     MVuwerActions
   },
   props: {
@@ -224,6 +232,7 @@ export default {
     },
     dialog: {
       detail: { show: false },
+      textgrid: { show: false },
       tier: { show: false },
       tierEdit: { show: false },
       tierDelete: { show: false },
@@ -293,7 +302,9 @@ export default {
     showTextField: function() {
       if (this.videoElm) {
         if (this.$textgrid) {
-          return Object.keys(this.$textgrid).length > -1;
+          if (!this.isLoading) {
+            return Object.keys(this.$textgrid).length > -1;
+          }
         }
       }
       return false;
@@ -573,7 +584,11 @@ export default {
       }
     },
     onClickDetail: function() {
-      this.dialog.detail.show = true;
+      if (this.$store.state.current.layout.mini) {
+        this.dialog.textgrid.show = true;
+      } else {
+        this.dialog.detail.show = true;
+      }
     },
     onClickSetting: function() {
       this.dialog.setting.show = true;

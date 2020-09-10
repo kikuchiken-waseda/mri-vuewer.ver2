@@ -14,6 +14,7 @@
     <m-video
       flat
       ref="video"
+      v-resize="onResize"
       @loadeddata="onLoadeddata"
       @timeupdate="onTimeupdate"
       @frame-updated="onFrameUpdated"
@@ -22,7 +23,6 @@
       :src="src"
       :frames="frames"
     />
-
     <template v-slot:next>
       <m-video
         flat
@@ -128,6 +128,9 @@ export default {
     onTimeupdate: function(time) {
       this.$emit("timeupdate", time);
       this.syncVideos(time);
+    },
+    onResize: function() {
+      this.$emit("resize");
     }
   }
 };

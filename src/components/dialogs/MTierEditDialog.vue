@@ -1,6 +1,7 @@
 <template>
   <m-card-dialog
     titleColor="green"
+    :fullscreen="$store.state.current.layout.mini"
     :title="$vuetify.lang.t(title)"
     v-model="dialog"
   >

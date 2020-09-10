@@ -130,13 +130,15 @@ export default {
         const out = result.MEMFS[0];
         buffs.push(Buffer(out.data));
       }
-
       const dist = io.video.concat(buffs);
-      console.log(dist);
       const out = dist.MEMFS[0];
-      const blob = io.video.toBlob(Buffer(out.data));
-      const name = this.$selected.map(x => x.fileName.split(".")[0]).join("-");
-      io.file.download(blob, name + ".mp4");
+      if (out) {
+        const blob = io.video.toBlob(Buffer(out.data));
+        const name = this.$selected
+          .map(x => x.fileName.split(".")[0])
+          .join("-");
+        io.file.download(blob, name + ".mp4");
+      }
     }
   }
 };

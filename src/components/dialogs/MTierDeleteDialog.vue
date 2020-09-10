@@ -2,6 +2,7 @@
   <m-card-dialog
     titleColor="error"
     :title="$vuetify.lang.t(title)"
+    :fullscreen="$store.state.current.layout.mini"
     v-model="dialog"
   >
     <template v-slot:activator="{ on, attrs }">

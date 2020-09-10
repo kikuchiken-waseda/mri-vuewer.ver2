@@ -1,7 +1,9 @@
 <template>
   <v-app-bar app color="primary" dark style="z-index:99">
     <v-app-bar-nav-icon @click="drawer = !drawer" />
-    <v-toolbar-title> {{ title }} </v-toolbar-title>
+    <v-toolbar-title v-if="$vuetify.breakpoint.smAndUp">
+      {{ title }}
+    </v-toolbar-title>
     <v-spacer></v-spacer>
     <v-text-field
       solo
@@ -14,7 +16,9 @@
       prepend-inner-icon="mdi-magnify"
     />
     <v-spacer />
-    <v-toolbar-title class="mr-3"> {{ fileInfo }} </v-toolbar-title>
+    <v-toolbar-title class="mr-3" v-if="!$store.state.current.layout.mini">
+      {{ fileInfo }}
+    </v-toolbar-title>
     <v-btn icon @click="to({ name: 'Home' })">
       <v-icon>mdi-home</v-icon>
     </v-btn>

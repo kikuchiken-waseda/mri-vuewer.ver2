@@ -1,6 +1,6 @@
 <template>
-  <v-container fluid class="py-0 transparent">
-    <m-tab v-slot="tab" :tabs="tabs">
+  <v-container fluid class="pa-0 transparent">
+    <m-tab :color="color" v-slot="tab" :tabs="tabs">
       <m-frame-table
         v-if="tab.i == 0"
         :video-height="videoHeight"
@@ -32,6 +32,10 @@ export default {
     MFrameTable
   },
   props: {
+    color: {
+      type: String,
+      default: "primary"
+    },
     videoHeight: {
       default: null
     },

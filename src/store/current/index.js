@@ -1,12 +1,14 @@
 import Vue from "vue";
 import video from "./video.js";
 import frame from "./frame.js";
+import layout from "./layout.js";
 export default {
   namespaced: true,
   state: () => ({
     wavesurfer: null,
     textgrid: null,
-    frames: []
+    frames: [],
+    autocompletes: []
   }),
   mutations: {
     waveSurfer(state, payload) {
@@ -17,6 +19,9 @@ export default {
     },
     frames(state, payload) {
       state.frames = payload;
+    },
+    autocompletes(state, payload) {
+      state.autocompletes = payload;
     }
   },
   actions: {
@@ -30,6 +35,18 @@ export default {
       if (i !== -1) {
         Vue.set(context.state.frames, i, payload);
       }
+    },
+    addAutocompletes: function(context, payload) {
+      context.state.autocompletes.push(payload);
+    },
+    updateAutocompletes: function(context, payload) {
+      const i = context.state.autocompletes.findIndex(x => x == payload);
+      if (i !== -1) {
+        Vue.set(context.state.autocompletes, i, payload);
+      }
+    },
+    deleteAutocompletes: function(context, i) {
+      context.state.autocompletes.splice(i, 1);
     }
   },
   getters: {
@@ -103,5 +120,5 @@ export default {
       return array;
     }
   },
-  modules: { video: video, frame: frame }
+  modules: { video: video, frame: frame, layout: layout }
 };

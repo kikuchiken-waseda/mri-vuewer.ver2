@@ -2,6 +2,7 @@
   <m-card-dialog
     persistent
     titleColor="warning darken-1"
+    :fullscreen="$store.state.current.layout.mini"
     :title="$vuetify.lang.t(title)"
     v-model="dialog"
     max-width="700"

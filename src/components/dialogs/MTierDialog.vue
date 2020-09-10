@@ -1,5 +1,9 @@
 <template>
-  <m-card-dialog :title="$vuetify.lang.t(title)" v-model="dialog">
+  <m-card-dialog
+    :fullscreen="$store.state.current.layout.mini"
+    :title="$vuetify.lang.t(title)"
+    v-model="dialog"
+  >
     <template v-slot:activator="{ on, attrs }">
       <slot name="activator" :on="on" :attrs="attrs"></slot>
     </template>

@@ -46,7 +46,6 @@
         fab
         dark
         x-small
-        v-if="$vuetify.breakpoint.mdAndUp"
         color="orange"
         @click="$emit('click-image-edit', item.time)"
       >
