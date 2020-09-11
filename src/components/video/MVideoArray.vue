@@ -9,6 +9,7 @@
         :origin-size="originSize"
         :src="src"
         :frames="frames"
+        @mouseover="$emit('mouseover')"
       />
     </template>
     <m-video
@@ -22,6 +23,7 @@
       :style="videoStyle"
       :src="src"
       :frames="frames"
+      @mouseover="$emit('mouseover')"
     />
     <template v-slot:next>
       <m-video
@@ -32,6 +34,7 @@
         :origin-size="originSize"
         :style="videoStyle"
         :frames="frames"
+        @mouseover="$emit('mouseover')"
       />
     </template>
   </m-video-array-layout>

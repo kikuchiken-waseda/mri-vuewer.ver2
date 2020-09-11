@@ -1,6 +1,9 @@
 <template>
   <v-hover v-slot:default="{ hover }">
-    <v-card-actions :class="`elevation-${hover ? 6 : 4} blue-grey darken-4`">
+    <v-card-actions
+      :class="`elevation-${hover ? 6 : 4} blue-grey darken-4`"
+      @mouseover="$emit('mouseover')"
+    >
       <v-btn
         dark
         icon

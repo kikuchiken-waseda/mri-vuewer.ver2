@@ -160,6 +160,9 @@ export default {
     mVideoInput: {
       title: "Select your video file (mp4)",
       hint: "supported format is mp4"
+    },
+    completes: {
+      title: "Select your dict complete file (text/plain)"
     }
   },
   pages: pages,
@@ -287,5 +290,6 @@ export default {
     }
   },
   annotation: "annotation",
-  frame: "frames"
+  frame: "frames",
+  browserError: "This feature is not available in this browser."
 };

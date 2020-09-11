@@ -29,10 +29,21 @@
 <script>
 export default {
   name: "m-speed-dial",
-  data: () => ({
-    fab: false
-  }),
+  props: {
+    value: {
+      type: Boolean,
+      default: false
+    }
+  },
   computed: {
+    fab: {
+      get() {
+        return this.value;
+      },
+      set(val) {
+        this.$emit("input", val);
+      }
+    },
     btns: function() {
       const btns = [
         { event: "click-detail", color: "black", icon: "mdi-eye" },

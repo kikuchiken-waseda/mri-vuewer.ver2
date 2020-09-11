@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="pa-0 transparent">
+  <v-container fluid class="pa-0 transparent" @mouseover="$emit('mouseover')">
     <m-tab :color="color" v-slot="tab" :tabs="tabs">
       <m-frame-table
         v-if="tab.i == 0"

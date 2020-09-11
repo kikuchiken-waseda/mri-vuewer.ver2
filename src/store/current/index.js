@@ -2,13 +2,13 @@ import Vue from "vue";
 import video from "./video.js";
 import frame from "./frame.js";
 import layout from "./layout.js";
+import complates from "./complates.js";
 export default {
   namespaced: true,
   state: () => ({
     wavesurfer: null,
     textgrid: null,
-    frames: [],
-    autocompletes: []
+    frames: []
   }),
   mutations: {
     waveSurfer(state, payload) {
@@ -35,18 +35,6 @@ export default {
       if (i !== -1) {
         Vue.set(context.state.frames, i, payload);
       }
-    },
-    addAutocompletes: function(context, payload) {
-      context.state.autocompletes.push(payload);
-    },
-    updateAutocompletes: function(context, payload) {
-      const i = context.state.autocompletes.findIndex(x => x == payload);
-      if (i !== -1) {
-        Vue.set(context.state.autocompletes, i, payload);
-      }
-    },
-    deleteAutocompletes: function(context, i) {
-      context.state.autocompletes.splice(i, 1);
     }
   },
   getters: {
@@ -120,5 +108,5 @@ export default {
       return array;
     }
   },
-  modules: { video: video, frame: frame, layout: layout }
+  modules: { video: video, frame: frame, layout: layout, complates: complates }
 };

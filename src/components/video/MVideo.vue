@@ -1,5 +1,10 @@
 <template>
-  <v-card :style="canvasWrapperStyle" :flat="flat" :tile="tile">
+  <v-card
+    @mouseover="$emit('mouseover')"
+    :style="canvasWrapperStyle"
+    :flat="flat"
+    :tile="tile"
+  >
     <video
       ref="video"
       :style="videoStyle"

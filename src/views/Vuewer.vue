@@ -92,7 +92,12 @@ export default {
             this.$router.push({ name: "Home" });
           }
         } catch (error) {
-          this.showError(error);
+          if (error.name == "DataError") {
+            this.showError("No file");
+            this.$router.push({ name: "Home" });
+          } else {
+            this.showError(error);
+          }
         }
         this.isLoading = false;
       } else {

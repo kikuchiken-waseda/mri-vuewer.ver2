@@ -187,6 +187,9 @@ export default {
     mVideoInput: {
       title: `${VIDEO}ファイルを選択`,
       hint: `${VIDEO} ファイルは mp4 形式のみをサポートしています`
+    },
+    completes: {
+      title: "補完辞書ファイルを選択 (text/plain)"
     }
   },
   pages: pages,
@@ -304,6 +307,7 @@ export default {
   loading: "読み込み中 ...",
   textgrid: TEXTGRID,
   annotation: ANNOTATION,
-  frame: FRAME
+  frame: FRAME,
+  browserError: "このブラウザでは, 該当の機能を使用することはできません."
 };
 //# sourceMappingURL=ja.js.map

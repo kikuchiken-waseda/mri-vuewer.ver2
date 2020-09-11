@@ -16,6 +16,10 @@ export default {
     },
     showInfo: function(message) {
       this.$store.dispatch("snackbar/info", message);
+    },
+    showBrowserError: function() {
+      const message = this.$vuetify.lang.t("$vuetify.browserError");
+      this.showWarning(message);
     }
   }
 };

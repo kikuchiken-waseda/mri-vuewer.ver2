@@ -60,7 +60,6 @@
 <script>
 export default {
   name: "MaterialCard",
-
   props: {
     avatar: {
       type: String,
@@ -87,7 +86,6 @@ export default {
       default: ""
     }
   },
-
   computed: {
     classes() {
       return {
