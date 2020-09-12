@@ -493,6 +493,7 @@ export default {
       if (time < d) {
         const item = { text: target.text, time: time };
         this.wavesurfer.setTierValue(key, idx, item);
+        this.seekTo(time);
       }
     },
     shrinkRecord(key, idx) {
@@ -508,6 +509,7 @@ export default {
           return;
         } else {
           this.wavesurfer.setTierValue(key, idx, item);
+          this.seekTo(time);
         }
       }
     },
@@ -746,6 +748,11 @@ export default {
         }
       }
 
+      // Ctrl + SPACE で現在時刻にティアーを挿入
+      if (payload.keycode == 32 && payload.ctrl) {
+        this.addRecord(item.key, this.wavesurfer.getCurrentTime(), "");
+      }
+
       // タブキー時に現在時刻の再生
       if (payload.keycode == 9) {
         this.playRecord(item.key, item.index);
@@ -822,12 +829,38 @@ export default {
 
       // VIM モード
       if (payload.keycode == 74) {
-        // j で前のレコードに移動: 74
-        this.prevRecord(item.key, item.index, false);
+        if (payload.ctrl) {
+          if (payload.shift) {
+            // ctrl + shift + j で現在レコードを縮小
+            this.shrinkRecord(item.key, item.index);
+          } else if (payload.alt) {
+            // ctrl + alt + j で現在レコードの始端に移動
+            this.toStartRecord(item.key, item.index);
+          } else {
+            // ctrl + j で前レコードに移動
+            this.prevRecord(item.key, item.index, false);
+          }
+        } else {
+          // j で前フレームに移動
+          this.wavesurfer.skipBackward();
+        }
       }
       if (payload.keycode == 75) {
-        // k で次のレコードに移動
-        this.nextRecord(item.key, item.index, false);
+        if (payload.ctrl) {
+          if (payload.shift) {
+            // k + ctrl + shift で現在レコードを延長
+            this.extendRecord(item.key, item.index);
+          } else if (payload.alt) {
+            // k + ctrl + alt で現在レコードの終端に移動
+            this.toEndRecord(item.key, item.index);
+          } else {
+            // k + ctrl で次のレコードに移動
+            this.nextRecord(item.key, item.index, false);
+          }
+        } else {
+          // k で次フレームに移動
+          this.wavesurfer.skipForward();
+        }
       }
       if (payload.keycode == 76) {
         // l で下の Tier をフォーカス

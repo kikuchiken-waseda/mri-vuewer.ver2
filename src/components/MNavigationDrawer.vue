@@ -124,7 +124,12 @@
         </v-list-item>
       </v-list-group>
 
-      <v-list-group prepend-icon="mdi-flask" sub-group :value="false">
+      <v-list-group
+        v-if="showDev"
+        prepend-icon="mdi-flask"
+        sub-group
+        :value="false"
+      >
         <template v-slot:activator>
           <v-list-item-title>DEVELOP</v-list-item-title>
         </template>
@@ -157,6 +162,9 @@ export default {
     dbImportDialog: false
   }),
   computed: {
+    showDev: function() {
+      return this.$store.state.setting.showDev;
+    },
     isLoading: function() {
       return this.$store.state.files.isLoading;
     },

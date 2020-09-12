@@ -1,5 +1,13 @@
 export default {
   computed: {
+    showDev: {
+      get() {
+        return this.$store.state.setting.showDev;
+      },
+      set(val) {
+        this.$store.commit("setting/showDev", val);
+      }
+    },
     maxVideoSize: {
       get() {
         return this.$store.state.setting.maxVideoSize;

@@ -2,6 +2,7 @@ import storage from "@/storage/localStorage.js";
 const S = storage.wavesurfer;
 
 const DEFAULTSTATE = {
+  showDev: false,
   shouldGetVideoInfo: true,
   shouldGetFrameInfo: true,
   maxVideoSize: 5,
@@ -24,6 +25,7 @@ const DS = DEFAULTSTATE;
 export default {
   namespaced: true,
   state: () => ({
+    showDev: S.get("showDev") == null ? DS.showDev : S.get("showDev"),
     maxVideoSize: Number(S.get("maxVideoSize")) || DS.maxVideoSize,
     shouldGetVideoInfo:
       S.get("shouldGetVideoInfo") == null
@@ -56,6 +58,10 @@ export default {
     deleteRecordKey: S.get("deleteRecordKey") || DS.deleteRecordKey
   }),
   mutations: {
+    showDev(state, payload) {
+      state.showDev = payload;
+      S.set("showDev", payload);
+    },
     setMaxVideoSize(state, payload) {
       state.maxVideoSize = Number(payload);
       S.set("maxVideoSize", Number(payload));
@@ -129,6 +135,7 @@ export default {
   },
   actions: {
     setDefault(context) {
+      context.commit("showDev", DS.showDev);
       context.commit("setMaxVideoSize", DS.maxVideoSize);
       context.commit("setShouldGetVideoInfo", DS.shouldGetVideoInfo);
       context.commit("setShouldGetFrameInfo", DS.shouldGetFrameInfo);

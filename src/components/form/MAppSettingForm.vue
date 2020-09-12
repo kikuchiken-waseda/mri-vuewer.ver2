@@ -32,6 +32,13 @@
       persistent-hint
       suffix="Milli Sec"
     />
+
+    <v-checkbox
+      class="mt-0"
+      hide-details
+      v-model="showDev"
+      :label="t(`${locale}.app.showDev.label`)"
+    />
   </v-form>
 </template>
 <script>

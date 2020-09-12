@@ -190,6 +190,9 @@ export default {
           label: "System message time out",
           hint:
             "Sets the timeout period for system messages. Setting this field to -1 will prevent automatic hiding."
+        },
+        showDev: {
+          label: "Show Develop page"
         }
       },
       metadata: {
