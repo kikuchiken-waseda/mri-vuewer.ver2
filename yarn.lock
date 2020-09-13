@@ -10276,9 +10276,9 @@ vue-cli-plugin-vuetify@~2.0.7:
     shelljs "^0.8.3"
 
 vue-code-highlight@^0.7.4:
-  version "0.7.4"
-  resolved "https://registry.yarnpkg.com/vue-code-highlight/-/vue-code-highlight-0.7.4.tgz#ab7f54960978baca8fdb074a88502a06a9126a55"
-  integrity sha512-TmJ/WPXQnNCIugHkAwMiS3//6BM0UIiUQRyLpoRJ2g6f+coIcoyAXLeGwqP9f1lfFHjlzCRSfmX+4tus4eKhgQ==
+  version "0.7.5"
+  resolved "https://registry.yarnpkg.com/vue-code-highlight/-/vue-code-highlight-0.7.5.tgz#3eadbcd39c22f6389e68e24d574a01d107936db1"
+  integrity sha512-y1/3xVz2diArv51eoQT3JCb8M2N4htMtgEtG0GAPABlXJkhdkJi4aSTfi0RYFNxqj5b+P73PBAmBcth/2NV0ng==
   dependencies:
     prism-es6 "^1.2.0"
     vue "^2.5.16"
@@ -10437,7 +10437,7 @@ watchpack@^1.7.4:
 
 "wavesurfer.vue@https://github.com/qh73xe/wavesurfer.vue.git":
   version "0.1.0"
-  resolved "https://github.com/qh73xe/wavesurfer.vue.git#411d88f3f76780ad1fa2e63a246a63540ff8111a"
+  resolved "https://github.com/qh73xe/wavesurfer.vue.git#99c47dc668fa86da8686595c87126f2016b58b08"
   dependencies:
     core-js "^3.6.5"
     debounce "^1.2.0"

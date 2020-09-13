@@ -198,6 +198,12 @@ export default {
       metadata: {
         label: "New Field"
       },
+      video: {
+        label: "Video Setting",
+        showFrameInVideo: {
+          label: "Show frame info"
+        }
+      },
       loading: {
         label: "File upload settings",
         maxVideoSize: {
@@ -249,6 +255,11 @@ export default {
           hint:
             "Frequency display ratio. What percentage of the fft analysis result is displayed.Set a value between 0.25 and 1."
         },
+        spectrogramHeight: {
+          label: "Max Spectrogram Height",
+          hint:
+            "The height of the spectrogram display area. Note that it is not the parsing width."
+        },
         showFreqLabel: {
           label: "Display Frequency Axis Label"
         }
@@ -283,6 +294,8 @@ export default {
         name: "Tier Name",
         showRef: "Copy Times",
         ref: "Ref Tier Name",
+        withText: "With Texts",
+        asParent: "Make the copy source as a parent",
         type: "Tier Type"
       },
       interval: "Interval Tier",

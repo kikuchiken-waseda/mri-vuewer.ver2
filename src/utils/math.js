@@ -15,6 +15,10 @@ const nearest = function(array, key, val) {
   return diff.obj;
 };
 
+function uniq(array) {
+  return Array.from(new Set(array));
+}
+
 const round = function(val, base) {
   return Math.round(val * 10 ** base) / 10 ** base;
 };
@@ -23,8 +27,14 @@ const distance = function(a, b) {
   return Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2);
 };
 
+function padding(num, len) {
+  return (Array(len).join("0") + num).slice(-len);
+}
+
 export default {
   nearest: nearest,
   distance: distance,
-  round: round
+  round: round,
+  padding: padding,
+  uniq: uniq
 };

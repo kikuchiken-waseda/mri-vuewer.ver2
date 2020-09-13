@@ -48,6 +48,7 @@ export default {
       const btns = [
         { event: "click-detail", color: "black", icon: "mdi-eye" },
         { event: "click-setting", color: "black", icon: "mdi-cog" },
+        { event: "click-save", color: "black", icon: "mdi-content-save" },
         { event: "click-ruler", color: "orange", icon: "mdi-ruler" },
         {
           event: "click-image-edit",

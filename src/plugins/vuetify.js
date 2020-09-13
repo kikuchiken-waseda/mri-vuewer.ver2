@@ -5,7 +5,6 @@ import ja from "@/locale/ja.js";
 import en from "@/locale/en.js";
 
 Vue.use(Vuetify);
-
 export default new Vuetify({
   icons: {
     iconfont: "mdi" // default - only for display purposes

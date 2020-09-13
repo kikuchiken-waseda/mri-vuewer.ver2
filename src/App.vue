@@ -4,6 +4,7 @@
     <m-navigation-drawer />
     <v-main>
       <router-view />
+      <m-logging-seet />
       <m-app-snackbar />
     </v-main>
   </v-app>
@@ -12,6 +13,7 @@
 <script>
 import MAppBar from "./components/MAppBar.vue";
 import MNavigationDrawer from "./components/MNavigationDrawer.vue";
+import MLoggingSeet from "./components/MLoggingSeet.vue";
 import MAppSnackbar from "./components/MAppSnackbar";
 
 export default {
@@ -19,10 +21,12 @@ export default {
   components: {
     MAppBar,
     MAppSnackbar,
-    MNavigationDrawer
+    MNavigationDrawer,
+    MLoggingSeet
   },
   data: () => ({}),
   mounted: function() {
+    this.$store.commit("lang", this.$vuetify.lang);
     this.$store.dispatch("files/init");
   }
 };

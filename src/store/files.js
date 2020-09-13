@@ -47,6 +47,15 @@ export default {
                 for (const x of items) {
                   context.commit("push", x);
                 }
+                context.dispatch(
+                  "logging/dblog",
+                  {
+                    tag: "GET",
+                    table: "files",
+                    msg: "init current status"
+                  },
+                  { root: true }
+                );
                 context.commit("isLoading", false);
                 resolve(true);
               })
@@ -69,6 +78,15 @@ export default {
           .then(items => {
             context.state.files = items;
             context.commit("count", items.length);
+            context.dispatch(
+              "logging/dblog",
+              {
+                tag: "GET",
+                table: "files",
+                msg: "load files"
+              },
+              { root: true }
+            );
             resolve(true);
           })
           .catch(error => reject(error))
@@ -121,6 +139,15 @@ export default {
         db.files
           .put(item)
           .then(id => {
+            context.dispatch(
+              "logging/dblog",
+              {
+                tag: "POST",
+                table: "files",
+                msg: `new files: ${id}`
+              },
+              { root: true }
+            );
             const frames = obj.frames.map(x => {
               x.fileId = id;
               return x;
@@ -158,6 +185,15 @@ export default {
           await db.frames.bulkDelete(frames.map(f => f.id));
           await db.files.delete(id);
           context.commit("destroy", id);
+          context.dispatch(
+            "logging/dblog",
+            {
+              tag: "DELETE",
+              table: "files",
+              msg: `delete files: ${id}`
+            },
+            { root: true }
+          );
           resolve(id);
         } catch (error) {
           reject(error);

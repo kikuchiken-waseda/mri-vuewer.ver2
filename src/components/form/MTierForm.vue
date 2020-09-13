@@ -23,6 +23,16 @@
       :items="tiers"
       :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.ref')}`"
     />
+    <v-checkbox
+      v-if="checkbox"
+      v-model="withText"
+      :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.withText')}`"
+    />
+    <v-checkbox
+      v-if="checkbox"
+      v-model="asParent"
+      :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.asParent')}`"
+    />
   </v-form>
 </template>
 <script>
@@ -33,11 +43,26 @@ export default {
     valid: false,
     name: "",
     type: "",
-    refName: ""
+    refName: "",
+    withText: false,
+    asParent: false
   }),
   props: {
-    tiers: {
-      type: Array
+    tiers: { type: Array },
+    current: { type: String }
+  },
+  watch: {
+    current: function(val, old) {
+      if (val !== old) {
+        if (val) {
+          this.refName = val;
+          const ref = this.$store.state.current.textgrid[this.current];
+          this.name = `${this.current}-copy`;
+          this.type = ref.type;
+          this.checkbox = true;
+          this.refName = this.current;
+        }
+      }
     }
   },
   computed: {
@@ -67,7 +92,6 @@ export default {
       ];
       return rules;
     },
-
     required: function() {
       if (this.$vuetify) {
         return [
@@ -101,9 +125,13 @@ export default {
       if (this.valid) {
         const item = {
           name: this.name,
-          type: this.type,
-          ref: this.refName || null
+          type: this.type
         };
+        if (this.checkbox) {
+          item.ref = this.refName || null;
+          item.withText = this.withText;
+          item.parent = this.asParent ? this.refName : null;
+        }
         this.$emit("validated", item);
       }
     },
@@ -112,6 +140,15 @@ export default {
     },
     resetValidation: function() {
       this.$refs.form.resetValidation();
+    }
+  },
+  mounted: function() {
+    if (this.current) {
+      const ref = this.$store.state.current.textgrid[this.current];
+      this.name = `${this.current}-copy`;
+      this.type = ref.type;
+      this.checkbox = true;
+      this.refName = this.current;
     }
   }
 };

@@ -23,16 +23,16 @@
 import db from "@/storage/db";
 import MVuewer from "@/components/MVuewer";
 import MLoadingDialog from "@/components/base/dialog/MLoadingDialog";
-import MSnackbarMixin from "@/mixins/MSnackbarMixin";
 import MVideoTWBMixin from "@/mixins/MVideoTWBMixin";
 export default {
   name: "vuewer",
-  mixins: [MVideoTWBMixin, MSnackbarMixin],
+  mixins: [MVideoTWBMixin],
   components: {
     MVuewer,
     MLoadingDialog
   },
   data: () => ({
+    tag: "views:vuewer",
     isLoading: false,
     videoElm: null,
     frames: [],
@@ -68,12 +68,13 @@ export default {
      */
     onIdChanged: async function(id) {
       if (id) {
-        this.log({ msg: `change id ${id}` });
+        this.$vuewer.console.log(this.tag, `change page id ${id}`);
         this.isLoading = true;
         // 画面表示する動画情報を初期化する
         this.$initVideo();
         try {
           const file = await db.files.get(Number(id));
+          this.$vuewer.db.log("files", "GET", `get file ${id}`);
           if (file) {
             this.item = file;
             this.$source = file.source;
@@ -88,27 +89,26 @@ export default {
               .where({ fileId: file.id })
               .with({ points: "points", rects: "rects" });
           } else {
-            this.showError("No file");
+            this.$vuewer.console.error(this.tag, "The file does not exist.");
+            this.$vuewer.snackbar.error("The file does not exist.");
             this.$router.push({ name: "Home" });
           }
         } catch (error) {
           if (error.name == "DataError") {
-            this.showError("No file");
+            this.$vuewer.snackbar.error("The file does not exist.");
+            this.$vuewer.console.error(this.tag, error);
             this.$router.push({ name: "Home" });
           } else {
-            this.showError(error);
+            this.$vuewer.snackbar.error(error);
+            this.$vuewer.console.error(this.tag, error);
           }
         }
         this.isLoading = false;
       } else {
-        this.showError("no id");
+        this.$vuewer.snackbar.error("There is no id.");
+        this.$vuewer.console.error(this.tag, "NO ID ACCESS");
+        this.$router.push({ name: "Home" });
       }
-    },
-    log: function(payload) {
-      this.$store.commit("logging/log", payload);
-    },
-    error: function(payload) {
-      this.$store.commit("logging/error", payload);
     },
     onTextGridUpdated: function(textgrid) {
       if (textgrid) {
@@ -116,6 +116,7 @@ export default {
         this.item.textgrid = Object.assign({}, textgrid);
         for (const key in this.item.textgrid) {
           this.item.textgrid[key] = {
+            parent: textgrid[key].parent,
             type: textgrid[key].type,
             values: textgrid[key].values
           };
@@ -124,16 +125,17 @@ export default {
           .put(this.item)
           .then(id => {
             const msg = `update the textgrid of a file (id=${id})`;
-            vm.log({ msg: msg });
+            vm.$vuewer.db.log("textgrid", "PUT", msg);
+            vm.$vuewer.console.log("textgrid", msg);
           })
           .catch(error => {
-            const msg = `failed: update the textgrid of a file (id=${this.item.id})`;
-            vm.error({ msg: msg, error: error });
-            console.error(error);
+            vm.$vuewer.console.error("vuewer:textgrid:put", error);
           });
       }
     },
     onFrameRectUpdated: function(frame) {
+      const vm = this;
+      const tag = "vuewer:onFrameRectUpdated";
       for (const r of frame.rects) {
         const item = {
           id: r.id,
@@ -149,10 +151,18 @@ export default {
           label: r.label || `rect-${r.id}`,
           frameId: frame.id
         };
-        db.rects.put(item).catch(error => this.showError(error));
+        db.rects
+          .put(item)
+          .then(() => vm.$vuewer.db.log("rects", "PUT", `change rects`))
+          .catch(error => {
+            vm.$vuewer.snackbar.error(error);
+            vm.$vuewer.console.error(tag, error);
+          });
       }
     },
     onFramePointUpdated: async function(frame) {
+      const vm = this;
+      const tag = "vuewer:onFramePointUpdated";
       for (const i in frame.points) {
         const p = frame.points[i];
         const item = {
@@ -164,14 +174,40 @@ export default {
           label: p.label || `point-${p.id}`,
           frameId: frame.id
         };
-        db.points.put(item).catch(error => this.showError(error));
+        db.points
+          .put(item)
+          .then(() => vm.$vuewer.db.log("points", "PUT", `change points`))
+          .catch(error => {
+            vm.$vuewer.snackbar.error(error);
+            vm.$vuewer.console.error(tag, error);
+          });
       }
     },
     onFramePointDeleted: function(point) {
-      db.points.delete(point.id).catch(error => this.showError(error));
+      const vm = this;
+      const tag = "vuewer:onFramePointDeleted";
+      db.points
+        .delete(point.id)
+        .then(() =>
+          vm.$vuewer.db.log("points", "DELETE", `delete point ${point.id}`)
+        )
+        .catch(error => {
+          vm.$vuewer.snackbar.error(error);
+          vm.$vuewer.console.error(tag, error);
+        });
     },
     onFrameRectDeleted: function(rect) {
-      db.rects.delete(rect.id).catch(error => this.showError(error));
+      const vm = this;
+      const tag = "vuewer:onFrameRectDeleted";
+      db.rects
+        .delete(rect.id)
+        .then(() =>
+          vm.$vuewer.db.log("rects", "DELETE", `delete rects ${rect.id}`)
+        )
+        .catch(error => {
+          vm.$vuewer.snackbar.error(error);
+          vm.$vuewer.console.error(tag, error);
+        });
     }
   },
   watch: {

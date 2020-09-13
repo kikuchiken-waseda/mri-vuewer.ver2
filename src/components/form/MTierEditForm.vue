@@ -6,11 +6,13 @@
       :items="tiers"
       :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.name')}`"
     />
+
     <v-text-field
       v-model="name"
       :rules="newNameRUle"
       :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.name')}`"
     />
+
     <v-autocomplete
       :items="typeChoice"
       v-model="type"
@@ -18,19 +20,6 @@
       item-value="val"
       :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.type')}`"
     />
-    <v-alert class="mt-4" v-if="valid" prominent type="warning">
-      <v-row align="center">
-        <v-col class="grow">
-          {{ $vuetify.lang.t("$vuetify.forms.tierEdit.warning") }}
-        </v-col>
-        <v-col class="shrink pa-1">
-          <v-btn @click="run" color="warning darken-2">YES</v-btn>
-          <v-btn @click="$emit('reject')" class="mt-4" color="warning darken-3">
-            NO
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-alert>
   </v-form>
 </template>
 <script>
@@ -42,10 +31,25 @@ export default {
     name: "",
     type: ""
   }),
+  watch: {
+    oldName: function(val, old) {
+      if (val !== old) {
+        const ref = this.$store.state.current.textgrid[val];
+        this.name = val;
+        this.type = ref.type;
+      }
+    },
+    current: function(val, old) {
+      if (val !== old) {
+        this.oldName = val;
+      }
+    }
+  },
   props: {
     tiers: {
       type: Array
-    }
+    },
+    current: { type: String }
   },
   computed: {
     typeChoice: function() {
@@ -96,7 +100,9 @@ export default {
     checkName: function(v) {
       if (v) {
         if (this.tiers.indexOf(v) > -1) {
-          return this.$vuetify.lang.t("$vuetify.validations.alreadyExists");
+          if (v !== this.oldName) {
+            return this.$vuetify.lang.t("$vuetify.validations.alreadyExists");
+          }
         }
         return true;
       }
@@ -116,6 +122,7 @@ export default {
     },
     validate: function() {
       this.$refs.form.validate();
+      this.run();
     },
     reset: function() {
       this.resetValidation();
@@ -123,6 +130,9 @@ export default {
     resetValidation: function() {
       this.$refs.form.resetValidation();
     }
+  },
+  mounted: function() {
+    if (this.current) this.oldName = this.current;
   }
 };
 </script>

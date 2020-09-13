@@ -3,11 +3,11 @@
     <v-checkbox
       class="mt-0"
       hide-details
-      v-model="shouldGetVideoInfo"
+      v-model="$shouldGetVideoInfo"
       :label="t(`$vuetify.setting.form.loading.shouldGetVideoInfo.label`)"
     />
     <m-video-input
-      v-if="shouldGetVideoInfo"
+      v-if="$shouldGetVideoInfo"
       @loading="onLoading"
       @loaded="onLoaded"
     />

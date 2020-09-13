@@ -13,6 +13,7 @@
           ref="form"
           v-if="dialog"
           :tiers="tiers"
+          :current="current"
           @validated="onValidated"
         />
       </v-card-text>
@@ -36,12 +37,9 @@ export default {
     title: "$vuetify.forms.tier.title"
   }),
   props: {
-    value: {
-      type: Boolean
-    },
-    tiers: {
-      type: Array
-    }
+    value: { type: Boolean },
+    current: { type: String },
+    tiers: { type: Array }
   },
   computed: {
     dialog: {
@@ -68,16 +66,16 @@ export default {
       this.$refs.form.validate();
     },
     onValidated: function(payload) {
-      this.addTier(payload.name, payload.type);
       if (payload.ref) {
-        const ref = this.$store.state.current.textgrid[payload.ref];
-        for (const val of ref.values) {
-          const record = {
-            text: "",
-            time: val.time
-          };
-          this.addTierValue(payload.name, record);
-        }
+        this.copyTier(
+          payload.ref,
+          payload.name,
+          payload.type,
+          payload.parent,
+          payload.withText
+        );
+      } else {
+        this.addTier(payload.name, payload.type, payload.parent);
       }
       this.close();
     }

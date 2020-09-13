@@ -55,7 +55,7 @@ export default {
     seek: function(time, isCenter) {
       const duration = this.getDuration();
       let t = time ? time : 0;
-      t = time <= 0 ? 0 : time; // 完全に 0 にすると画像取得ができない
+      t = time <= 0 ? 0 : time;
       t = time > duration ? duration : time;
       const progress = t == 0 ? 0 : t / duration;
       if (isCenter) {
@@ -65,15 +65,49 @@ export default {
       }
     },
     // アノテーション操作
-    addTier: function(key, type) {
-      if (this.$ws) this.$ws.addTier(key, type);
-    },
-    updateTier: function(key, obj) {
-      if (this.$ws) this.$ws.updateTier(key, obj);
+    addTier: function(key, type, parent = null) {
+      this.$vuewer.console.log(
+        "mixin:vuewer",
+        `add tier (key = ${key}, type=${type})`
+      );
+      if (this.$ws) this.$ws.addTier(key, type, parent);
     },
     deleteTier: function(key) {
       if (this.$ws) {
         this.$ws.deleteTier(key);
+        this.$vuewer.console.log("mixin:vuewer", `delete tier (key=${key})`);
+      }
+    },
+    copyTier: function(ref, key, type, parent, withText = true) {
+      const base = this.$store.state.current.textgrid[ref];
+      const $type = type || base.type;
+      this.addTier(key, $type, parent || null);
+      if (base) {
+        for (const val of base.values) {
+          const record = {
+            text: withText ? val.text || "" : "",
+            time: val.time
+          };
+          this.addTierValue(key, record);
+        }
+      }
+    },
+    updateTier: function(key, obj) {
+      if (this.$ws) {
+        const name = obj.name;
+        const type = obj.type;
+        const parent = obj.parent || null;
+        if (key == name) {
+          this.$ws.updateTier(key, { type: type });
+          this.$ws.updateTier(key, { parent: parent });
+        } else {
+          this.copyTier(key, name, type, parent, true);
+          this.deleteTier(key);
+        }
+        this.$vuewer.console.log(
+          "mixin:vuewer",
+          `update tier (key=${key}, new key=${name}, type=$.type})`
+        );
       }
     },
     addTierValue: function(key, obj) {

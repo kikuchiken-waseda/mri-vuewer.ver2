@@ -9,7 +9,6 @@
     </template>
     <v-card tile>
       <v-card-text>
-        <label>WAVESURFER SETTING</label>
         <m-setting-from />
       </v-card-text>
     </v-card>

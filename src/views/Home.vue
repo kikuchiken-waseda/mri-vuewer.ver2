@@ -46,7 +46,7 @@ export default {
       return `${this.name} ver.${this.version}`;
     },
     desc: function() {
-      return `${this.$vuetify.lang.t("$vuetify.home.disc")}`;
+      return `${this.$vuewer.t("$vuetify.home.disc")}`;
     },
     navs: function() {
       const vm = this;

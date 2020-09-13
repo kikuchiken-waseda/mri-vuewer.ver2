@@ -1,6 +1,16 @@
 export default {
   computed: {
-    showDev: {
+    // ビデオにフレーム情報を提示する
+    $showFrameInVideo: {
+      get() {
+        return this.$store.state.setting.showFrameInVideo;
+      },
+      set(val) {
+        this.$store.commit("setting/showFrameInVideo", val);
+      }
+    },
+    // 開発者ページを表示する
+    $showDev: {
       get() {
         return this.$store.state.setting.showDev;
       },
@@ -8,7 +18,8 @@ export default {
         this.$store.commit("setting/showDev", val);
       }
     },
-    maxVideoSize: {
+    // 最大ビデオサイズ
+    $maxVideoSize: {
       get() {
         return this.$store.state.setting.maxVideoSize;
       },
@@ -23,7 +34,8 @@ export default {
         }
       }
     },
-    shouldGetVideoInfo: {
+    // 動画読み込みに情報を取得する
+    $shouldGetVideoInfo: {
       get() {
         return this.$store.state.setting.shouldGetVideoInfo;
       },
@@ -31,7 +43,8 @@ export default {
         this.$store.commit("setting/setShouldGetVideoInfo", val);
       }
     },
-    shouldGetFrameInfo: {
+    // 動画読み込みにフレーム情報を取得する
+    $shouldGetFrameInfo: {
       get() {
         return this.$store.state.setting.shouldGetFrameInfo;
       },
@@ -39,6 +52,7 @@ export default {
         this.$store.commit("setting/setShouldGetFrameInfo", val);
       }
     },
+    // 動画読み込みにフレーム情報を取得する
     $minPxPerSec: {
       get() {
         return this.$store.state.setting.minPxPerSec;
@@ -56,7 +70,8 @@ export default {
         }
       }
     },
-    freqRate: {
+    // スペクトログラム表示上限周波数率
+    $freqRate: {
       get() {
         return this.$store.state.setting.freqRate;
       },
@@ -71,7 +86,8 @@ export default {
         }
       }
     },
-    targetChannel: {
+    // スペクトログラム対象チャンネル
+    $targetChannel: {
       get() {
         return this.$store.state.setting.targetChannel;
       },
@@ -79,7 +95,8 @@ export default {
         this.$store.commit("setting/setTargetChannel", val);
       }
     },
-    spectrogramHeight: {
+    // スペクトログラム表示高さ上限
+    $spectrogramHeight: {
       get() {
         return this.$store.state.setting.spectrogramHeight;
       },
@@ -87,7 +104,8 @@ export default {
         this.$store.commit("setting/setSpectrogramHeight", val);
       }
     },
-    showTimeLine: {
+    // 時間軸表示の有無
+    $showTimeLine: {
       get() {
         return this.$store.state.setting.showTimeLine;
       },
@@ -95,7 +113,8 @@ export default {
         this.$store.commit("setting/setShowTimeLine", val);
       }
     },
-    showSpectrogram: {
+    // スペクトログラム表示の有無
+    $showSpectrogram: {
       get() {
         return this.$store.state.setting.showSpectrogram;
       },
@@ -103,7 +122,8 @@ export default {
         this.$store.commit("setting/setShowSpectrogram", val);
       }
     },
-    showFreqLabel: {
+    // 周波数ラベル表示の有無
+    $showFreqLabel: {
       get() {
         return this.$store.state.setting.showFreqLabel;
       },
@@ -111,7 +131,8 @@ export default {
         this.$store.commit("setting/setShowFreqLabel", val);
       }
     },
-    cursorColor: {
+    // WAVE カーソル色
+    $cursorColor: {
       get() {
         return this.$store.state.setting.cursorColor;
       },
@@ -119,7 +140,8 @@ export default {
         this.$store.commit("setting/setCursorColor", val);
       }
     },
-    waveColor: {
+    // 未再生 WAVE 色
+    $waveColor: {
       get() {
         return this.$store.state.setting.waveColor;
       },
@@ -127,7 +149,8 @@ export default {
         this.$store.commit("setting/setWaveColor", val);
       }
     },
-    progressColor: {
+    // 再生 WAVE 色
+    $progressColor: {
       get() {
         return this.$store.state.setting.progressColor;
       },
@@ -135,7 +158,8 @@ export default {
         this.$store.commit("setting/setProgressColor", val);
       }
     },
-    addRecordKey: {
+    // レコード追加キーの種類
+    $addRecordKey: {
       get() {
         return this.$store.state.setting.addRecordKey;
       },
@@ -143,7 +167,8 @@ export default {
         this.$store.commit("setting/setAddRecordKey", val);
       }
     },
-    deleteRecordKey: {
+    // レコード削除キーの種類
+    $deleteRecordKey: {
       get() {
         return this.$store.state.setting.deleteRecordKey;
       },
@@ -151,7 +176,8 @@ export default {
         this.$store.commit("setting/setDeleteRecordKey", val);
       }
     },
-    playOffset: {
+    // 音声再生オフセット
+    $playOffset: {
       get() {
         return this.$store.state.setting.playOffset;
       },

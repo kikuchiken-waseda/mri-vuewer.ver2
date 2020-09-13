@@ -6,8 +6,9 @@
     </v-toolbar-title>
     <v-spacer></v-spacer>
     <v-text-field
-      solo
+      flat
       rounded
+      solo-inverted
       hide-details
       label="Search"
       v-model="keyword"

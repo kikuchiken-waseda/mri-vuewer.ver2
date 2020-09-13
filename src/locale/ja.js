@@ -15,6 +15,8 @@ const TEXTGRID = {
       name: "転記層名",
       showRef: "時刻情報をコピーする",
       ref: "対象転記層",
+      withText: "コピー時に文字を含む",
+      asParent: "コピー元を親にする",
       type: "転記層の種類"
     },
     interval: "境界転記層",
@@ -224,6 +226,12 @@ export default {
           label: "開発者用デモページを表示する"
         }
       },
+      video: {
+        label: "動画設定",
+        showFrameInVideo: {
+          label: "フレーム情報を表示する"
+        }
+      },
       metadata: {
         label: "新規フィールド"
       },
@@ -281,6 +289,11 @@ export default {
           label: "表示周波数率",
           hint:
             "周波数表示比率. fft の解析結果を低域何パーセントまで表示するかです. 0.25 - 1 までの値にしてください"
+        },
+        spectrogramHeight: {
+          label: "スペクトル領域の高さ",
+          hint:
+            "スペクトログラム表示領域の高さです. 解析幅ではないことに注意してください."
         },
         showFreqLabel: {
           label: "周波数軸ラベルを表示する"

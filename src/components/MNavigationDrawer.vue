@@ -45,6 +45,16 @@
             <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list dense nav class="pa-0">
+          <v-list-item link @click="$store.commit('logging/show', true)">
+            <v-list-item-icon>
+              <v-icon> mdi-console </v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>LOGGER</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
       </v-list-group>
       <v-divider />
 
@@ -125,7 +135,7 @@
       </v-list-group>
 
       <v-list-group
-        v-if="showDev"
+        v-if="$showDev"
         prepend-icon="mdi-flask"
         sub-group
         :value="false"
@@ -162,8 +172,8 @@ export default {
     dbImportDialog: false
   }),
   computed: {
-    showDev: function() {
-      return this.$store.state.setting.showDev;
+    $showDev: function() {
+      return this.$store.state.setting.$showDev;
     },
     isLoading: function() {
       return this.$store.state.files.isLoading;

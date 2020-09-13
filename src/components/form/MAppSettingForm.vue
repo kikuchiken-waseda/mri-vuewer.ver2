@@ -5,7 +5,7 @@
       <v-checkbox
         class="mt-0"
         hide-details
-        v-model="shouldGetVideoInfo"
+        v-model="$shouldGetVideoInfo"
         :label="t(`${locale}.loading.shouldGetVideoInfo.label`)"
       />
       <v-icon small>mdi-information</v-icon>
@@ -15,7 +15,7 @@
       />
     </div>
     <v-text-field
-      v-model="maxVideoSize"
+      v-model="$maxVideoSize"
       suffix="MB"
       :rules="rules.positiveIntegerRules"
       :label="t(`${locale}.loading.maxVideoSize.label`)"
@@ -36,7 +36,7 @@
     <v-checkbox
       class="mt-0"
       hide-details
-      v-model="showDev"
+      v-model="$showDev"
       :label="t(`${locale}.app.showDev.label`)"
     />
   </v-form>

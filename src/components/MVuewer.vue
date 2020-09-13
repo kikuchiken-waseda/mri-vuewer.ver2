@@ -1,46 +1,48 @@
 <template>
-  <m-vuwer-layout ref="layout" @resize="onResize">
-    <template v-slot:video>
-      <m-video-array
-        ref="videoArray"
-        :src="src"
-        :fps="fps"
-        :frameOffset="frameOffset"
-        :frames="$frames"
-        :origin-size="originSize"
-        @loadeddata="onLoadeddata"
-        @frame-updated="onFrameUpdated"
-        @mouseover="onMouseover('video-array')"
-      />
-      <m-vuwer-actions
-        @download-click="onDownloadClick"
-        @upload-click="onUploadClick"
-        @mouseover="onMouseover('actions')"
-        :fps="fps"
-        v-if="wavesurfer"
-      />
-    </template>
-    <template v-slot:table>
-      <m-text-grid
-        ref="tables"
-        @click-image-edit="onClickImageEdit"
-        @click-ruler="onClickRuler"
-        @mouseover="onMouseover('tables')"
-        :frames="$frames"
-        :textgrid="$textgrid"
-        :video-height="videoHeight"
-      />
-    </template>
-    <v-card @mouseover="onMouseover('wave-surfer')">
-      <m-w-context-menu
-        @click-image-edit="onClickImageEdit"
-        @click-tier-add="onClickTierAdd"
-        @click-tier-edit="onClickTierEdit"
-        @click-tier-delete="onClickTierDelete"
-        @click-download="onDownloadClick"
-        @click-complate="onClickComplate"
-        @click-record="onClickRecordContextMenu"
-      >
+  <m-w-context-menu
+    @click-setting="onClickSetting"
+    @click-save="onClickSave"
+    @click-image-edit="onClickImageEdit"
+    @click-tier-add="onClickTierAdd"
+    @click-tier-edit="onClickTierEdit"
+    @click-tier-delete="onClickTierDelete"
+    @click-download="onDownloadClick"
+    @click-complate="onClickComplate"
+    @click-record="onClickRecordContextMenu"
+  >
+    <m-vuwer-layout ref="layout" @resize="onResize">
+      <template v-slot:video>
+        <m-video-array
+          ref="videoArray"
+          :src="src"
+          :fps="fps"
+          :frameOffset="frameOffset"
+          :frames="$frames"
+          :origin-size="originSize"
+          @loadeddata="onLoadeddata"
+          @frame-updated="onFrameUpdated"
+          @mouseover="onMouseover('video-array')"
+        />
+        <m-vuwer-actions
+          @download-click="onDownloadClick"
+          @upload-click="onUploadClick"
+          @mouseover="onMouseover('actions')"
+          :fps="fps"
+          v-if="wavesurfer"
+        />
+      </template>
+      <template v-slot:table>
+        <m-text-grid
+          ref="tables"
+          @click-image-edit="onClickImageEdit"
+          @click-ruler="onClickRuler"
+          @mouseover="onMouseover('tables')"
+          :frames="$frames"
+          :textgrid="$textgrid"
+          :video-height="videoHeight"
+        />
+      </template>
+      <v-card @mouseover="onMouseover('wave-surfer')">
         <wave-surfer
           normalize
           responsive
@@ -50,19 +52,19 @@
           ref="wavesurfer"
           backend="MediaElement"
           textgrid-max-height="100px"
-          :cursorColor="cursorColor"
+          :cursorColor="$cursorColor"
           :drawingContextAttributes="drawingContextAttributes"
-          :freqRate="freqRate"
+          :freqRate="$freqRate"
           :minPxPerSec="minPxPerSec"
-          :showFreqLabel="showFreqLabel"
-          :showSpectrogram="showSpectrogram"
-          :showTimeLine="showTimeLine"
+          :showFreqLabel="$showFreqLabel"
+          :showSpectrogram="$showSpectrogram"
+          :showTimeLine="$showTimeLine"
           :skipLength="skipLength"
           :source="videoElm"
-          :spectrogramHeight="spectrogramHeight"
-          :targetChannel="targetChannel"
-          :waveColor="waveColor"
-          :progressColor="progressColor"
+          :spectrogramHeight="$spectrogramHeight"
+          :targetChannel="$targetChannel"
+          :waveColor="$waveColor"
+          :progressColor="$progressColor"
           @spectrogram-render-end="onSpectrogramRenderEnd"
           @spectrogram-render-start="onSpectrogramRenderStart"
           @textgrid-click="onTextGridClick"
@@ -105,58 +107,71 @@
             </div>
           </div>
         </wave-surfer>
-      </m-w-context-menu>
-    </v-card>
+      </v-card>
 
-    <template v-slot:bottom>
-      <m-speed-dial
-        v-model="fab"
-        @click-setting="onClickSetting"
-        @click-detail="onClickDetail"
-        @click-ruler="onClickRuler"
-        @click-image-edit="onClickImageEdit"
-        @click-tier-add="onClickTierAdd"
-        @click-tier-edit="onClickTierEdit"
-        @click-tier-delete="onClickTierDelete"
-      />
-      <m-detail-dialog
-        v-model="dialog.detail.show"
-        :src="current.frame.src"
-        @download-click="onDownloadClick"
-        @upload-click="onUploadClick"
-      />
-      <m-textgrid-dialog
-        v-model="dialog.textgrid.show"
-        v-if="$store.state.current.layout.mini"
-        :frames="$frames"
-        :textgrid="$textgrid"
-        @click-image-edit="onClickImageEdit"
-        @click-ruler="onClickRuler"
-      />
-      <m-setting-dialog v-model="dialog.setting.show" />
-      <m-tier-dialog v-model="dialog.tier.show" :tiers="tiers" />
-      <m-tier-edit-dialog v-model="dialog.tierEdit.show" :tiers="tiers" />
-      <m-tier-delete-dialog v-model="dialog.tierDelete.show" :tiers="tiers" />
-      <m-ruler-dialog
-        v-if="originSize.width"
-        v-model="dialog.ruler.show"
-        :origin-size="originSize"
-        :src="current.frame.src"
-      />
-      <m-image-edit-dialog
-        v-if="current.frame.src"
-        v-model="dialog.imageEdit.show"
-        @rects-updated="onRectsUpdated"
-        @points-updated="onPointsUpdated"
-        @rect-deleted="onRectDeleted"
-        @point-deleted="onPointDeleted"
-        :frame="current.frame"
-        :src="current.frame.src"
-        :origin-size="originSize"
-      />
-      <m-complates-dialog v-model="dialog.complates.show" />
-    </template>
-  </m-vuwer-layout>
+      <template v-slot:bottom>
+        <m-speed-dial
+          v-model="fab"
+          @click-save="onClickSave"
+          @click-setting="onClickSetting"
+          @click-detail="onClickDetail"
+          @click-ruler="onClickRuler"
+          @click-image-edit="onClickImageEdit"
+          @click-tier-add="onClickTierAdd"
+          @click-tier-edit="onClickTierEdit"
+          @click-tier-delete="onClickTierDelete"
+        />
+        <m-detail-dialog
+          v-model="dialog.detail.show"
+          :src="current.frame.src"
+          @download-click="onDownloadClick"
+          @upload-click="onUploadClick"
+        />
+        <m-textgrid-dialog
+          v-model="dialog.textgrid.show"
+          v-if="$store.state.current.layout.mini"
+          :frames="$frames"
+          :textgrid="$textgrid"
+          @click-image-edit="onClickImageEdit"
+          @click-ruler="onClickRuler"
+        />
+        <m-setting-dialog v-model="dialog.setting.show" />
+        <m-tier-dialog
+          v-model="dialog.tier.show"
+          :tiers="tiers"
+          :current="current.tier.key"
+        />
+        <m-tier-edit-dialog
+          v-model="dialog.tierEdit.show"
+          :tiers="tiers"
+          :current="current.tier.key"
+        />
+        <m-tier-delete-dialog
+          v-model="dialog.tierDelete.show"
+          :tiers="tiers"
+          :current="current.tier.key"
+        />
+        <m-ruler-dialog
+          v-if="originSize.width"
+          v-model="dialog.ruler.show"
+          :origin-size="originSize"
+          :src="current.frame.src"
+        />
+        <m-image-edit-dialog
+          v-if="current.frame.src"
+          v-model="dialog.imageEdit.show"
+          @rects-updated="onRectsUpdated"
+          @points-updated="onPointsUpdated"
+          @rect-deleted="onRectDeleted"
+          @point-deleted="onPointDeleted"
+          :frame="current.frame"
+          :src="current.frame.src"
+          :origin-size="originSize"
+        />
+        <m-complates-dialog v-model="dialog.complates.show" />
+      </template>
+    </m-vuwer-layout>
+  </m-w-context-menu>
 </template>
 
 <script>
@@ -249,6 +264,7 @@ export default {
     }
   },
   data: () => ({
+    tag: "WVuwer",
     videoElm: null, // WS のレンダ対象
     videoHeight: null, // ビデオ表示領域の最大幅
     isLoading: false, // WS がレンダ中か否か
@@ -365,8 +381,14 @@ export default {
     current: {
       handler: function(val) {
         if (val.key) {
-          this.complates =
-            this.$store.state.current.complates.complates[val.key] || [];
+          if (this.$textgrid[val.key].values) {
+            // 補完の候補を決定
+            const texts = this.$textgrid[val.key].values.map(x => x.text);
+            const complates = texts.concat(
+              this.$store.state.current.complates.complates[val.key] || []
+            );
+            this.complates = [...new Set(complates)];
+          }
         }
       },
       deep: true
@@ -377,10 +399,22 @@ export default {
     addRecord: function(key, time, text = "") {
       const item = { time: time, text: text };
       this.wavesurfer.addTierValue(key, item);
+      if (!this.isSyncing) {
+        this.$vuewer.console.log(
+          this.tag,
+          `add a record (key: ${key}, time: ${time})`
+        );
+      }
     },
     deleteRecord: function(key, idx) {
       if (idx > -1) {
         this.wavesurfer.deleteTierValue(key, idx);
+        if (!this.isSyncing) {
+          this.$vuewer.console.log(
+            this.tag,
+            `delete a record (key: ${key} idx: ${idx})`
+          );
+        }
       }
     },
     playRecord: function(key, idx) {
@@ -399,7 +433,7 @@ export default {
           }
         } else {
           const d = this.wavesurfer.getDuration();
-          const offset = this.playOffset * this.frameRate;
+          const offset = this.$playOffset * this.frameRate;
           const start = current.time - offset > 0 ? current.time - offset : 0;
           const end = current.time + offset < d ? current.time + offset : d;
           this.wavesurfer.play(start, end);
@@ -425,6 +459,12 @@ export default {
           };
           vm.wavesurfer.setTierValue(key, idx, item);
           vm.current.tier.record.text = text;
+          if (!this.isSyncing) {
+            this.$vuewer.console.log(
+              this.tag,
+              `update text a record (key: ${key} idx: ${idx})`
+            );
+          }
         });
       }
     },
@@ -487,20 +527,29 @@ export default {
       this.focusTier(key);
     },
     extendRecord(key, idx) {
-      const target = this.$textgrid[key].values[idx];
+      const tier = this.$textgrid[key];
+      const target = tier.values[idx];
       const d = this.wavesurfer.getDuration();
+      const lim = idx + 1 == tier.length ? d : tier.values[idx + 1].time;
       const time = target.time + this.frameRate;
-      if (time < d) {
+      if (time < lim) {
         const item = { text: target.text, time: time };
         this.wavesurfer.setTierValue(key, idx, item);
+        if (!this.isSyncing) {
+          this.$vuewer.console.log(
+            this.tag,
+            `update time a record (key: ${key} idx: ${idx})`
+          );
+        }
         this.seekTo(time);
       }
     },
     shrinkRecord(key, idx) {
       const target = this.$textgrid[key].values[idx];
+      const lim = idx == 0 ? 0 : this.$textgrid[key].values[idx - 1].time;
       const type = this.$textgrid[key].type;
       const time = target.time - this.frameRate;
-      if (time > 0) {
+      if (time > lim) {
         const item = { text: target.text, time: time };
         if (
           type == "interval" &&
@@ -509,6 +558,12 @@ export default {
           return;
         } else {
           this.wavesurfer.setTierValue(key, idx, item);
+          if (!this.isSyncing) {
+            this.$vuewer.console.log(
+              this.tag,
+              `update time a record (key: ${key} idx: ${idx})`
+            );
+          }
           this.seekTo(time);
         }
       }
@@ -517,6 +572,12 @@ export default {
       const tier = this.$textgrid[key];
       const target = tier.values[idx];
       if (tier.type == "interval") {
+        if (!this.isSyncing) {
+          this.$vuewer.console.log(
+            this.tag,
+            `split a record (key: ${key} idx: ${idx})`
+          );
+        }
         const prev = idx - 1 == 0 ? tier.values[0] : tier.values[idx - 1];
         if (type == "frames") {
           // フレーム分割
@@ -558,6 +619,7 @@ export default {
         }
       }
     },
+    // Tier 操作
     nextTier() {
       const key = this.current.tier.key;
       const keys = Object.keys(this.$textgrid);
@@ -588,7 +650,13 @@ export default {
         tg.tiers[key].canvas.focus();
       });
     },
-
+    // TextGrid 操作
+    saveTextGrid: function() {
+      if (!this.isSyncing) {
+        this.$vuewer.console.log(this.tag, "save textgrid");
+        this.$emit("textgrid-updated", this.$textgrid);
+      }
+    },
     seekTo: function(time, center) {
       const d = this.wavesurfer.getDuration();
       const p = time / d;
@@ -602,9 +670,11 @@ export default {
 
     // EVENT ハンドラー
     onResize: function(payload) {
+      this.$vuewer.console.log(this.tag, `on resize`);
       this.videoHeight = payload;
     },
     onDownloadClick: function(payload) {
+      this.$vuewer.console.log(this.tag, `on download`);
       const bname = this.$store.state.current.video.filename.split(".")[0];
       if (payload == "XLSX") {
         const obj = {
@@ -647,6 +717,7 @@ export default {
       }
     },
     onUploadClick: function(payload) {
+      this.$vuewer.console.log(this.tag, `on upload`);
       if (payload.click == "JSON") {
         const msg = `${payload.click} is not working yet!!`;
         this.showWarning(msg);
@@ -661,6 +732,7 @@ export default {
     },
     onLoadeddata: function(payload) {
       if (payload) {
+        this.$vuewer.console.log(this.tag, `on loaded`);
         this.videoElm = payload;
         this.$nextTick(() => {
           // 他コンポーネントで WS の操作を実施可能にする
@@ -671,6 +743,7 @@ export default {
       }
     },
     onFrameUpdated(payload) {
+      this.$vuewer.console.log(this.tag, `on frame updated`);
       this.current.frame = payload;
       if (this.lazyRular) {
         this.dialog.ruler.show = true;
@@ -682,23 +755,27 @@ export default {
       }
     },
     onSpectrogramRenderStart() {
+      this.$vuewer.console.log(this.tag, `on spectrogram render start`);
       this.isLoading = true;
     },
     onSpectrogramRenderEnd() {
+      this.$vuewer.console.log(this.tag, `on spectrogram render end`);
       if (this.textgrid) {
         if (this.current.frame.i == null) {
           this.isSyncing = true;
           for (const key in this.textgrid) {
-            this.wavesurfer.addTier(key, this.textgrid[key].type);
+            this.wavesurfer.addTier(
+              key,
+              this.textgrid[key].type,
+              this.textgrid[key].parent || null
+            );
             for (const val of this.textgrid[key].values) {
               if (val) this.wavesurfer.addTierValue(key, val);
             }
           }
           // start が指定されている場合そこに移動
-          const start = Number(this.$route.query.start);
-          if (start) {
-            this.seekTo(start);
-          }
+          const start = Number(this.$route.query.start) || this.$frames[1].time;
+          this.seekTo(start);
           // current.tier を初期化
           this.current.tier.key = null;
           this.current.tier.values = [];
@@ -715,12 +792,12 @@ export default {
       this.current.key = payload.key;
       this.current.time = payload.time;
       if (payload.ctrl) {
-        if (this.addRecordKey == "ctrl") {
+        if (this.$addRecordKey == "ctrl") {
           if (payload.detail == 1) this.addRecord(payload.key, payload.time);
         }
       }
       if (payload.alt) {
-        if (this.addRecordKey == "alt") {
+        if (this.$addRecordKey == "alt") {
           if (payload.detail == 1) this.addRecord(payload.key, payload.time);
         }
       }
@@ -730,7 +807,7 @@ export default {
       }
     },
     onTextGridDblClick: function(payload) {
-      if (this.addRecordKey == "dbl") {
+      if (this.$addRecordKey == "dbl") {
         this.addRecord(payload.key, payload.time);
       }
     },
@@ -739,12 +816,28 @@ export default {
 
       // DELETE 系の動作
       if (payload.keycode == 8 || payload.keycode == 46) {
-        if (this.deleteRecordKey == "alt") {
-          if (payload.alt) this.deleteRecord(item.key, item.index);
-        } else if (this.deleteRecordKey == "ctrl") {
-          if (payload.ctrl) this.deleteRecord(item.key, item.index);
+        if (this.$deleteRecordKey == "alt") {
+          if (payload.alt) {
+            if (payload.shift) {
+              this.onClickTierDelete();
+            } else {
+              this.deleteRecord(item.key, item.index);
+            }
+          }
+        } else if (this.$deleteRecordKey == "ctrl") {
+          if (payload.ctrl) {
+            if (payload.shift) {
+              this.onClickTierDelete();
+            } else {
+              this.deleteRecord(item.key, item.index);
+            }
+          }
         } else {
-          this.deleteRecord(item.key, item.index);
+          if (payload.shift) {
+            this.onClickTierDelete();
+          } else {
+            this.deleteRecord(item.key, item.index);
+          }
         }
       }
 
@@ -819,12 +912,21 @@ export default {
 
       // ctrl + c でクリップボードにコピー
       if (payload.keycode == 67 && payload.ctrl == true) {
-        this.copyRecord(item.key, item.index);
+        if (payload.shift) {
+          this.onClickTierAdd();
+        } else {
+          this.copyRecord(item.key, item.index);
+        }
       }
 
       // ctrl + v でクリップボードにペースト
       if (payload.keycode == 86 && payload.ctrl == true) {
         this.pasteRecord(item.key, item.index);
+      }
+
+      // ctrl + s で明示的に保存
+      if (payload.keycode == 83 && payload.ctrl == true) {
+        this.saveTextGrid();
       }
 
       // VIM モード
@@ -885,6 +987,13 @@ export default {
         };
         const idx = this.current.tier.record.idx;
         this.wavesurfer.setTierValue(key, idx, item);
+        if (!this.isSyncing) {
+          this.$vuewer.console.log(
+            this.tag,
+            `update text a record (key: ${key} idx: ${idx})`
+          );
+        }
+
         if (opt == "next") {
           this.nextRecord(key, idx, true);
         }
@@ -900,9 +1009,7 @@ export default {
     onTextGridUpdate: function(textgrid) {
       if (textgrid) {
         this.$textgrid = Object.assign({}, textgrid);
-        if (!this.isSyncing) {
-          this.$emit("textgrid-updated", this.$textgrid);
-        }
+        this.saveTextGrid();
       }
     },
     onRecordUpdated: function(payload) {
@@ -929,16 +1036,24 @@ export default {
       }
     },
     onClickDetail: function() {
+      this.$vuewer.console.log(this.tag, `on click detail`);
       if (this.$store.state.current.layout.mini) {
         this.dialog.textgrid.show = true;
       } else {
         this.dialog.detail.show = true;
       }
     },
+    onClickSave: function() {
+      this.saveTextGrid();
+      this.$vuewer.snackbar.success("save data !");
+    },
     onClickSetting: function() {
+      this.$vuewer.console.log(this.tag, `on click setting`);
       this.dialog.setting.show = true;
     },
     onClickRuler: function(payload) {
+      this.$vuewer.console.log(this.tag, `on click ruler`);
+      this.dialog.setting.show = true;
       if (payload) {
         this.lazyRular = true;
         this.seekTo(payload);
@@ -947,6 +1062,7 @@ export default {
       }
     },
     onClickImageEdit: function(payload) {
+      this.$vuewer.console.log(this.tag, `on click image edit`);
       if (payload) {
         this.lazyImageEdit = true;
         this.seekTo(payload);
@@ -955,15 +1071,19 @@ export default {
       }
     },
     onClickTierAdd: function() {
+      this.$vuewer.console.log(this.tag, `on click tier add`);
       this.dialog.tier.show = true;
     },
     onClickTierEdit: function() {
+      this.$vuewer.console.log(this.tag, `on click tier edit`);
       this.dialog.tierEdit.show = true;
     },
     onClickTierDelete: function() {
+      this.$vuewer.console.log(this.tag, `on click tier delete`);
       this.dialog.tierDelete.show = true;
     },
     onClickComplate: function() {
+      this.$vuewer.console.log(this.tag, `on click complate`);
       this.dialog.complates.show = true;
     },
     // context menu の record 関連処理
@@ -1011,11 +1131,19 @@ export default {
       this.current.frame.points = points;
       this.$store.dispatch("current/updateFrame", this.current.frame);
       this.$emit("frame-point-updated", this.current.frame);
+      this.$vuewer.console.log(
+        this.tag,
+        `update points (idx: ${this.current.frame.idx})`
+      );
     },
     onRectsUpdated: function(rects) {
       this.current.frame.rects = rects;
       this.$store.dispatch("current/updateFrame", this.current.frame);
       this.$emit("frame-rect-updated", this.current.frame);
+      this.$vuewer.console.log(
+        this.tag,
+        `update rects (idx: ${this.current.frame.idx})`
+      );
     },
     onPointDeleted: function(point) {
       const i = this.current.frame.points.findIndex(x => x.id == point.id);
@@ -1023,6 +1151,10 @@ export default {
         this.current.frame.points.splice(i, 1);
         this.$store.dispatch("current/updateFrame", this.current.frame);
         this.$emit("frame-point-deleted", point);
+        this.$vuewer.console.log(
+          this.tag,
+          `delete point (idx: ${this.current.frame.idx}: id ${point.id})`
+        );
       }
     },
     onRectDeleted: function(rect) {
@@ -1031,6 +1163,10 @@ export default {
         this.current.frame.rects.splice(i, 1);
         this.$store.dispatch("current/updateFrame", this.current.frame);
         this.$emit("frame-rect-deleted", rect);
+        this.$vuewer.console.log(
+          this.tag,
+          `delete rect (idx: ${this.current.frame.idx}, id: ${rect.id})`
+        );
       }
     },
     // 特殊ボタンの操作
@@ -1086,6 +1222,8 @@ export default {
         e.preventDefault();
         if (e.ctrlKey) {
           this.$store.commit("setDrawer", true);
+        } else if (e.altKey) {
+          this.$store.commit("logging/show", true);
         } else {
           this.fab = !this.fab;
         }

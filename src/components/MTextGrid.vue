@@ -53,11 +53,42 @@ export default {
     }
   },
   computed: {
+    parents: function() {
+      let parents = [];
+      if (this.textgrid) {
+        for (const key in this.textgrid) {
+          if (this.textgrid[key].parent)
+            parents.push(this.textgrid[key].parent);
+        }
+      }
+      return this.$vuewer.math.uniq(parents);
+    },
+    children: function() {
+      let children = [];
+      if (this.textgrid) {
+        for (const key in this.textgrid) {
+          if (this.textgrid[key].parent) children.push(key);
+        }
+      }
+      return this.$vuewer.math.uniq(children);
+    },
     tabs: function() {
-      const tabs = ["FRAMES"];
+      const tabs = [{ text: "FRAMES" }];
       if (this.textgrid) {
         for (const x of Object.keys(this.textgrid)) {
-          tabs.push(x);
+          if (this.parents.findIndex(p => p == x) != -1) {
+            tabs.push({
+              text: x,
+              icon: "mdi-link-lock"
+            });
+          } else if (this.children.findIndex(p => p == x) != -1) {
+            tabs.push({
+              text: x,
+              icon: "mdi-link"
+            });
+          } else {
+            tabs.push({ text: x });
+          }
         }
       }
       return tabs;

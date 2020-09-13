@@ -73,7 +73,7 @@ export default {
   methods: {
     playItem: function(item) {
       this.src = item.src;
-      const offset = this.playOffset * (1 / item.fps);
+      const offset = this.$playOffset * (1 / item.fps);
       const start = item.time - offset;
       const end = item.time + offset;
       this.start = start > 0 ? start : 0;
@@ -81,7 +81,7 @@ export default {
       this.dialog = true;
     },
     trimItem: function(item) {
-      const offset = this.playOffset * (1 / item.fps);
+      const offset = this.$playOffset * (1 / item.fps);
       const src = item.src;
       const bname = item.fileName.split(".")[0];
       const start = item.time - offset;

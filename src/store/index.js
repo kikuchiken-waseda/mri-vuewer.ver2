@@ -20,9 +20,15 @@ export default new Vuex.Store({
     author: "qh73xe",
     devYear: "2017-2020",
     github: "https://github.com/kikuchiken-waseda/mri-vuewer.ver2",
+    lang: {
+      t: null
+    },
     drawer: false
   },
   mutations: {
+    lang: function(state, val) {
+      state.lang = val;
+    },
     max_z_index: function(state, val) {
       state.max_z_index = val;
     },
@@ -30,7 +36,14 @@ export default new Vuex.Store({
       state.drawer = val;
     }
   },
-  actions: {},
+  getters: {
+    t: state => key => {
+      if (state.lang.t) {
+        return state.lang.t(key);
+      }
+      return key;
+    }
+  },
   modules: {
     snackbar,
     search,

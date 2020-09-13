@@ -9,7 +9,7 @@
         max-height="600"
       >
         <v-toolbar dense color="primary" dark>
-          <v-toolbar-title>WAVE-MENU</v-toolbar-title>
+          <v-toolbar-title>VUWER-MENU</v-toolbar-title>
         </v-toolbar>
         <v-list dense subheader class="overflow-y-auto" max-height="450">
           <div v-for="(item, key) in items" :key="key">
@@ -142,28 +142,51 @@ export default {
           ]
         },
         {
+          text: "設定",
+          icon: "mdi-cog",
+          click: () => {
+            setTimeout(function() {
+              vm.$emit("click-setting");
+            }, 10);
+          }
+        },
+        {
+          text: "保存",
+          icon: "mdi-content-save",
+          click: () => {
+            setTimeout(function() {
+              vm.$emit("click-save");
+            }, 10);
+          }
+        },
+        {
           subheader: "時系列転記"
         },
         {
           text: "転記層を追加",
           icon: "mdi-plus",
           click: () => {
-            console.log("OK");
-            vm.$emit("click-tier-add");
+            setTimeout(function() {
+              vm.$emit("click-tier-add");
+            }, 10);
           }
         },
         {
           text: "転記層を変更",
           icon: "mdi-pencil",
           click: () => {
-            vm.$emit("click-tier-edit");
+            setTimeout(function() {
+              vm.$emit("click-tier-edit");
+            }, 10);
           }
         },
         {
           text: "転記層を削除",
           icon: "mdi-delete",
           click: () => {
-            vm.$emit("click-tier-delete");
+            setTimeout(function() {
+              vm.$emit("click-tier-delete");
+            }, 10);
           }
         },
         {
@@ -175,84 +198,108 @@ export default {
               text: "現在レコードを再生",
               icon: "",
               click: () => {
-                vm.$emit("click-record", "play");
+                setTimeout(function() {
+                  vm.$emit("click-tier-delete");
+                }, 10);
               }
             },
             {
               text: "現在レコードをコピー",
               icon: "",
               click: () => {
-                vm.$emit("click-record", "copy");
+                setTimeout(function() {
+                  vm.$emit("click-record", "copy");
+                }, 10);
               }
             },
             {
               text: "現在レコードにペースト",
               icon: "",
               click: () => {
-                vm.$emit("click-record", "paste");
+                setTimeout(function() {
+                  vm.$emit("click-record", "paste");
+                }, 10);
               }
             },
             {
               text: "次のレコードに移動",
               icon: "",
               click: () => {
-                vm.$emit("click-record", "next");
+                setTimeout(function() {
+                  vm.$emit("click-record", "next");
+                }, 10);
               }
             },
             {
               text: "前のレコードに移動",
               icon: "",
               click: () => {
-                vm.$emit("click-record", "prev");
+                setTimeout(function() {
+                  vm.$emit("click-record", "prev");
+                }, 10);
               }
             },
             {
               text: "現在レコードの始端に移動",
               icon: "",
               click: () => {
-                vm.$emit("click-record", "to-start");
+                setTimeout(function() {
+                  vm.$emit("click-record", "to-start");
+                }, 10);
               }
             },
             {
               text: "現在レコードの終端に移動",
               icon: "",
               click: () => {
-                vm.$emit("click-record", "to-end");
+                setTimeout(function() {
+                  vm.$emit("click-record", "to-end");
+                }, 10);
               }
             },
             {
               text: "現在レコードを延長",
               icon: "",
               click: () => {
-                vm.$emit("click-record", "extend");
+                setTimeout(function() {
+                  vm.$emit("click-record", "extend");
+                }, 10);
               }
             },
             {
               text: "現在レコードを短縮",
               icon: "",
               click: () => {
-                vm.$emit("click-record", "shrink");
+                setTimeout(function() {
+                  vm.$emit("click-record", "shrink");
+                }, 10);
               }
             },
             {
               text: "レコード分割 (フレーム毎)",
               icon: "",
               click: () => {
-                vm.$emit("click-record", "split-by-frames");
+                setTimeout(function() {
+                  vm.$emit("click-record", "split-by-frames");
+                }, 10);
               }
             },
             {
               text: "レコード分割 (文字毎)",
               icon: "",
               click: () => {
-                vm.$emit("click-record", "split-by-chars");
+                setTimeout(function() {
+                  vm.$emit("click-record", "split-by-chars");
+                }, 10);
               }
             },
             {
               text: "レコード分割 (区切り文字毎: /)",
               icon: "",
               click: () => {
-                vm.$emit("click-record", "split-by-slash");
+                setTimeout(function() {
+                  vm.$emit("click-record", "split-by-slash");
+                }, 10);
               }
             }
           ]
@@ -266,7 +313,9 @@ export default {
               text: "テキスト補完辞書の追加",
               icon: "",
               click: () => {
-                vm.$emit("click-complate");
+                setTimeout(function() {
+                  vm.$emit("click-complate");
+                }, 10);
               }
             }
           ]
@@ -280,21 +329,27 @@ export default {
               text: "TEXTGRID 形式で保存",
               icon: "",
               click: () => {
-                vm.$emit("click-download", "TEXTGRID/TEXTGRID");
+                setTimeout(function() {
+                  vm.$emit("click-download", "TEXTGRID/TEXTGRID");
+                }, 10);
               }
             },
             {
               text: "JSON 形式で保存",
               icon: "",
               click: () => {
-                vm.$emit("click-download", "TEXTGRID/JSON");
+                setTimeout(function() {
+                  vm.$emit("click-download", "TEXTGRID/JSON");
+                }, 10);
               }
             },
             {
               text: "XLSX 形式で保存",
               icon: "",
               click: () => {
-                vm.$emit("click-download", "TEXTGRID/XLSX");
+                setTimeout(function() {
+                  vm.$emit("click-download", "TEXTGRID/XLSX");
+                }, 10);
               }
             }
           ]
@@ -307,7 +362,9 @@ export default {
           text: "画像転記画面を表示",
           icon: "mdi-selection-drag",
           click: () => {
-            vm.$emit("click-image-edit");
+            setTimeout(function() {
+              vm.$emit("click-image-edit");
+            }, 10);
           },
           divider: true
         }

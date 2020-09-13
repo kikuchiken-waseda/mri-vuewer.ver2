@@ -14,14 +14,16 @@
           ref="form"
           v-if="dialog"
           :tiers="tiers"
+          :current="current"
           @validated="onValidated"
           @reject="onReject"
         />
       </v-card-text>
+
       <v-card-actions>
         <v-spacer />
         <v-btn color="error" @click="close">Cancel</v-btn>
-        <v-btn color="primary" @click="validate">ok</v-btn>
+        <v-btn color="primary" @click="validate">Ok</v-btn>
       </v-card-actions>
     </v-card>
   </m-card-dialog>
@@ -38,12 +40,9 @@ export default {
     title: "$vuetify.forms.tierEdit.title"
   }),
   props: {
-    value: {
-      type: Boolean
-    },
-    tiers: {
-      type: Array
-    }
+    value: { type: Boolean },
+    current: { type: String },
+    tiers: { type: Array }
   },
   computed: {
     dialog: {
@@ -70,11 +69,8 @@ export default {
       this.$refs.form.validate();
     },
     onValidated: function(payload) {
-      if (payload.key) this.deleteTier(payload.key);
-      if (payload.item) {
-        if ((payload.item.name, payload.item.type)) {
-          this.addTier(payload.item.name, payload.item.type);
-        }
+      if (payload.key) {
+        this.updateTier(payload.key, payload.item);
       }
       this.dialog = false;
     },
