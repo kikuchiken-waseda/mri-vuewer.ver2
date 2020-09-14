@@ -81,6 +81,7 @@
               dense
               hide-details
               outlined
+              append-icon="mdi-microphone"
               autocomplete="on"
               label="text"
               list="complates"
@@ -88,6 +89,7 @@
               v-if="showTextField"
               v-model="current.tier.record.text"
               :disabled="current.tier.key == null"
+              @click:append="onVoiceUpdateRecordText"
               @keydown.enter="onUpdateRecordText"
               @keydown.tab="onUpdateRecordText('next')"
               @keydown.ctrl.219="onEscTextField"
@@ -968,15 +970,35 @@ export default {
         setTimeout(() => this.$refs.input.focus());
       }
     },
+    onVoiceUpdateRecordText: function() {
+      const recog =
+        window.webkitSpeechRecognition || window.SpeechRecognition || null;
+      if (recog) {
+        const rec = new recog();
+        rec.lang = this.$vuetify.lang.current == "ja" ? "ja-JP" : "en-US";
+        rec.onresult = e => {
+          if (e.results[0].isFinal) {
+            this.current.tier.record.text = e.results[0][0].transcript;
+            this.onUpdateRecordText();
+          }
+        };
+        rec.start();
+      } else {
+        this.$vuewer.snackbar.warn(
+          this.$vuetify.lang.t("$vuetify.contexts.browserError")
+        );
+      }
+    },
     onUpdateRecordText: function(opt) {
       const tier = this.current.tier;
       const key = tier.key;
+      const idx = tier.record.idx;
+      const record = this.$textgrid[key].values[idx];
       if (key) {
         const item = {
-          time: tier.record.time,
+          time: record.time,
           text: tier.record.text
         };
-        const idx = this.current.tier.record.idx;
         this.wavesurfer.setTierValue(key, idx, item);
         if (!this.isSyncing) {
           this.$vuewer.console.log(
@@ -984,7 +1006,6 @@ export default {
             `update text a record (key: ${key} idx: ${idx})`
           );
         }
-
         if (opt == "next") {
           this.nextRecord(key, idx, true);
         }

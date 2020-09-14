@@ -15,6 +15,8 @@
       v-if="isSearch"
       background-color="primary lighten-1"
       prepend-inner-icon="mdi-magnify"
+      :append-icon="recIcon"
+      @click:append="rec"
     />
     <v-spacer />
     <v-toolbar-title class="mr-3" v-if="!$store.state.current.layout.mini">
@@ -88,9 +90,32 @@ export default {
       set(val) {
         this.$store.commit("setDrawer", val);
       }
+    },
+    recog: function() {
+      return window.webkitSpeechRecognition || window.SpeechRecognition || null;
+    },
+    recIcon: function() {
+      return this.recog ? "mdi-microphone" : null;
     }
   },
   methods: {
+    rec: function() {
+      if (this.recog) {
+        this.keyword = "";
+        const rec = new this.recog();
+        rec.lang = this.$vuetify.lang.current == "ja" ? "ja-JP" : "en-US";
+        rec.onresult = e => {
+          if (e.results[0].isFinal) {
+            this.keyword = e.results[0][0].transcript;
+          }
+        };
+        rec.start();
+      } else {
+        this.$vuewer.snackbar.warn(
+          this.$vuetify.lang.t("$vuetify.contexts.browserError")
+        );
+      }
+    },
     to: function(payload) {
       if (payload.name) {
         if (this.$route.name !== payload.name) {
@@ -101,5 +126,4 @@ export default {
   }
 };
 </script>
-
 <style scoped></style>

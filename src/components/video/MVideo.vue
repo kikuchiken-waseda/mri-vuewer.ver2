@@ -223,6 +223,10 @@ export default {
     }
   },
   methods: {
+    // 動画再生速度を変更
+    setPlaybackRate: function(val) {
+      this.$refs.video.defaultPlaybackRate = val;
+    },
     // ビデオ操作の再現
     play: function() {
       this.$refs.video.play();

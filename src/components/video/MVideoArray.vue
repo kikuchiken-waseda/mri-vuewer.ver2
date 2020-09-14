@@ -88,7 +88,9 @@ export default {
     t: function(key) {
       return this.$vuetify.lang.t(`$vuetify.wVideo.${key}`);
     },
-
+    setPlaybackRate: function(val) {
+      this.$refs.video.setPlaybackRate(val);
+    },
     syncVideos: function(currentTime) {
       if (this.$refs.video) {
         const offsetTime = this.frameOffset * this.frameRate;
