@@ -305,6 +305,59 @@ export default {
       }
     }
   },
+  contexts: {
+    playPause: "play or pause",
+    skip: "skip",
+    skipBackward: "skip backward",
+    skipForward: "skip forward",
+    zoom: "zoom",
+    zoom_in: "zoom in",
+    zoom_out: "zoom out",
+    setting: "setting",
+    save: "save",
+    tier: {
+      add: "Add a Tier",
+      edit: "Edit a Tier",
+      delete: "Delete a Tier"
+    },
+    record: {
+      name: "Record",
+      play: "play a current record",
+      copy: "copy a text of the current record",
+      paste: "paste a text of the current record",
+      next: "move to a next record",
+      prev: "move to a prev record",
+      toStart: "move to start time of a current record",
+      toEnd: "move to end time of a current record",
+      extend: "extend end time of a current record",
+      shrink: "shrink end time of a current record",
+      splitByFrames: "split a current record by frames.",
+      splitByChars: "split a current record by chars.",
+      splitBySlash: "split a current record by slash."
+    },
+    frame: {
+      name: `Image Annotation`,
+      edit: `Show an Image Annotation Dialog`
+    }
+  },
+  downloads: {
+    name: "Download File",
+    xlsx: "Download as xlsx file (ALL)",
+    json: "Download as json file (ALL)",
+    png: "Download as png file (CURRENT)",
+    mp4: "Download as mp4 file (CURRENT)",
+    textgrid: {
+      title: "Download of TextGrid Data.",
+      textgrid: "Download as textgrid file",
+      json: "Download as json file",
+      xlsx: "Download as xlsx file"
+    },
+    frame: {
+      title: "Download of Frame Data.",
+      json: "Download as json file",
+      xlsx: "Download as xlsx file"
+    }
+  },
   annotation: "annotation",
   frame: "frames",
   browserError: "This feature is not available in this browser."

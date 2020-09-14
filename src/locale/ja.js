@@ -324,6 +324,59 @@ export default {
   textgrid: TEXTGRID,
   annotation: ANNOTATION,
   frame: FRAME,
-  browserError: "このブラウザでは, 該当の機能を使用することはできません."
+  browserError: "このブラウザでは, 該当の機能を使用することはできません.",
+  contexts: {
+    playPause: "再生/停止",
+    skip: "スキップ",
+    skipBackward: "戻る",
+    skipForward: "進む",
+    zoom: "ズーム",
+    zoom_in: "拡大",
+    zoom_out: "縮小",
+    setting: "設定",
+    save: "保存",
+    tier: {
+      add: `${TEXTGRID.tier.name} を追加`,
+      edit: `${TEXTGRID.tier.name} を編集`,
+      delete: `${TEXTGRID.tier.name} を削除`
+    },
+    record: {
+      name: `${TEXTGRID.tier.record.name} 操作`,
+      play: `現在${TEXTGRID.tier.record.name}を再生`,
+      copy: `現在${TEXTGRID.tier.record.name}をコピー`,
+      paste: `現在${TEXTGRID.tier.record.name}にペースト`,
+      next: `次の${TEXTGRID.tier.record.name}に移動`,
+      prev: `前の${TEXTGRID.tier.record.name}に移動`,
+      toStart: `現在${TEXTGRID.tier.record.name}の始端に移動`,
+      toEnd: `現在${TEXTGRID.tier.record.name}の終端に移動`,
+      extend: `現在${TEXTGRID.tier.record.name}を終端を延長`,
+      shrink: `現在${TEXTGRID.tier.record.name}を終端を短縮`,
+      splitByFrames: `${TEXTGRID.tier.record.name}の分割 (フレーム毎)`,
+      splitByChars: `${TEXTGRID.tier.record.name}の分割 (文字毎)`,
+      splitBySlash: `${TEXTGRID.tier.record.name}の分割 (区切り文字毎: /)`
+    },
+    frame: {
+      name: `${FRAME.name}`,
+      edit: `${FRAME.name} 画面の表示`
+    }
+  },
+  downloads: {
+    name: "ファイルダウンロード",
+    xlsx: "XLSX 形式でダウンロード (ALL)",
+    json: "JSON 形式でダウンロード (ALL)",
+    png: "PNG 形式でダウンロード (現在)",
+    mp4: "MP4 形式でダウンロード (現在)",
+    textgrid: {
+      title: `${TEXTGRID.name} のダウンロード`,
+      textgrid: "Download as textgrid file",
+      json: `JSON 形式でダウンロード (${TEXTGRID.name})`,
+      xlsx: `XLSX 形式でダウンロード (${TEXTGRID.name})`
+    },
+    frame: {
+      title: `${FRAME.name} のダウンロード`,
+      json: `JSON 形式でダウンロード (${FRAME.name})`,
+      xlsx: `XLSX 形式でダウンロード (${FRAME.name})`
+    }
+  }
 };
 //# sourceMappingURL=ja.js.map

@@ -72,6 +72,9 @@
           @textgrid-dblclick="onTextGridDblClick"
           @textgrid-keydown="onTextGridKeydown"
           @textgrid-update="onTextGridUpdate"
+          @tier-add="onTextGridUpdate"
+          @tier-delete="onTextGridUpdate"
+          @tier-update="onTextGridUpdate"
         >
           <template v-slot:textform>
             <v-text-field
@@ -380,8 +383,8 @@ export default {
     },
     current: {
       handler: function(val) {
-        if (val.key) {
-          if (this.$textgrid[val.key].values) {
+        if (val && val.key) {
+          if (this.$textgrid[val.key]) {
             // 補完の候補を決定
             const texts = this.$textgrid[val.key].values.map(x => x.text);
             const complates = texts.concat(
@@ -569,54 +572,19 @@ export default {
       }
     },
     splitRecord(key, idx, type) {
-      const tier = this.$textgrid[key];
-      const target = tier.values[idx];
-      if (tier.type == "interval") {
-        if (!this.isSyncing) {
-          this.$vuewer.console.log(
-            this.tag,
-            `split a record (key: ${key} idx: ${idx})`
-          );
-        }
-        const prev = idx - 1 == 0 ? tier.values[0] : tier.values[idx - 1];
-        if (type == "frames") {
-          // フレーム分割
-          let time = prev.time;
-          while (time < target.time - this.frameRate) {
-            time = time + this.frameRate;
-            this.addRecord(key, time);
-          }
-        } else if (type == "chars") {
-          // 文字別分割
-          const num = target.text.length;
-          const duration = target.time - prev.time;
-          const offset = duration / num;
-          for (let i = 1; i < num; i++) {
-            const time = prev.time + offset * i;
-            this.addRecord(key, time, target.text[i]);
-          }
-
-          const item = {
-            time: target.time,
-            text: target.text[num - 1]
-          };
-          this.wavesurfer.setTierValue(key, idx + num - 1, item);
-        } else {
-          // 区切り文字分割
-          const texts = target.text.split(type);
-          const num = texts.length;
-          const duration = target.time - prev.time;
-          const offset = duration / num;
-          for (let i = 1; i < num; i++) {
-            const time = prev.time + offset * i;
-            this.addRecord(key, time, texts[i]);
-          }
-          const item = {
-            time: target.time,
-            text: texts[num - 1]
-          };
-          this.wavesurfer.setTierValue(key, idx + num - 1, item);
-        }
+      this.$vuewer.console.log(
+        this.tag,
+        `split a record (key: ${key} idx: ${idx})`
+      );
+      if (type == "frames") {
+        // フレーム分割
+        this.wavesurfer.splitTierValue(key, idx, this.frameRate);
+      } else if (type == "chars") {
+        // 文字別分割
+        this.wavesurfer.splitTierValue(key, idx);
+      } else {
+        // 区切り文字分割
+        this.wavesurfer.splitTierValue(key, idx, type);
       }
     },
     // Tier 操作
@@ -685,6 +653,36 @@ export default {
         };
         const blob = io.xlsx.dump(obj);
         io.file.download(blob, `${bname}.xlsx`);
+      } else if (payload == "JSON") {
+        this.$emit("download-json");
+      } else if (payload == "PNG") {
+        if (this.$refs.videoArray) this.$refs.videoArray.downloadImage();
+      } else if (payload == "MP4") {
+        const key = this.current.tier.key || Object.keys(this.$textgrid)[0];
+        if (key) {
+          const tier = this.$textgrid[key];
+          const idx = this.current.tier.record.idx || 0;
+          const item = tier.values[idx];
+          const d = this.wavesurfer.getDuration();
+          let start = 0;
+          let end = d;
+          if (tier.type == "interval") {
+            start = idx == 0 ? 0 : tier.values[idx - 1].time;
+            end = item.time;
+          } else {
+            const offsetS = item.time - this.playOffset;
+            const offsetE = item.time + this.playOffset;
+            start = offsetS < 0 ? 0 : offsetS;
+            end = offsetE > d ? d : offsetE;
+          }
+          const bname = this.$store.state.current.video.filename.split(".")[0];
+          const name = `${bname}.mp4`;
+          const buff = io.file.toBuff(this.src);
+          const result = io.video.trim(buff, start, end);
+          const out = result.MEMFS[0];
+          const blob = io.video.toBlob(Buffer(out.data));
+          io.file.download(blob, name);
+        }
       } else if (payload == "TEXTGRID/JSON") {
         const blob = new Blob([JSON.stringify(this.$textgrid, null, "  ")], {
           type: "application/json"
@@ -763,19 +761,12 @@ export default {
       if (this.textgrid) {
         if (this.current.frame.i == null) {
           this.isSyncing = true;
-          for (const key in this.textgrid) {
-            this.wavesurfer.addTier(
-              key,
-              this.textgrid[key].type,
-              this.textgrid[key].parent || null
-            );
-            for (const val of this.textgrid[key].values) {
-              if (val) this.wavesurfer.addTierValue(key, val);
-            }
-          }
+          this.wavesurfer.setTextGrid(this.textgrid);
+
           // start が指定されている場合そこに移動
           const start = Number(this.$route.query.start) || this.$frames[1].time;
           this.seekTo(start);
+
           // current.tier を初期化
           this.current.tier.key = null;
           this.current.tier.values = [];

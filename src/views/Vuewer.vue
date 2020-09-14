@@ -13,6 +13,7 @@
       @frame-rect-updated="onFrameRectUpdated"
       @frame-point-deleted="onFramePointDeleted"
       @frame-rect-deleted="onFrameRectDeleted"
+      @download-json="downloadJson"
     />
     <m-loading-dialog v-model="isLoading">
       {{ $vuetify.lang.t("$vuetify.loading") }}
@@ -24,6 +25,7 @@ import db from "@/storage/db";
 import MVuewer from "@/components/MVuewer";
 import MLoadingDialog from "@/components/base/dialog/MLoadingDialog";
 import MVideoTWBMixin from "@/mixins/MVideoTWBMixin";
+import io from "@/io";
 export default {
   name: "vuewer",
   mixins: [MVideoTWBMixin],
@@ -58,6 +60,28 @@ export default {
     }
   },
   methods: {
+    downloadJson: async function() {
+      try {
+        const file = await db.files.get(Number(this.id));
+        file.frames = await db.frames
+          .where({ fileId: file.id })
+          .with({ points: "points", rects: "rects" });
+        const bname = file.name.split(".")[0];
+        const blob = new Blob([JSON.stringify(file, null, "  ")], {
+          type: "application/json"
+        });
+        io.file.download(blob, `${bname}.json`);
+      } catch (error) {
+        if (error.name == "DataError") {
+          this.$vuewer.snackbar.error("The file does not exist.");
+          this.$vuewer.console.error(this.tag, error);
+          this.$router.push({ name: "Home" });
+        } else {
+          this.$vuewer.snackbar.error(error);
+          this.$vuewer.console.error(this.tag, error);
+        }
+      }
+    },
     /**
      * onIdChanged.
      *
@@ -68,6 +92,7 @@ export default {
      */
     onIdChanged: async function(id) {
       if (id) {
+        this.id = id;
         this.$vuewer.console.log(this.tag, `change page id ${id}`);
         this.isLoading = true;
         // 画面表示する動画情報を初期化する

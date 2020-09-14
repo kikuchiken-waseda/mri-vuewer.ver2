@@ -134,6 +134,9 @@ export default {
     },
     onResize: function() {
       this.$emit("resize");
+    },
+    downloadImage: function() {
+      this.$refs.video.downloadImage();
     }
   }
 };

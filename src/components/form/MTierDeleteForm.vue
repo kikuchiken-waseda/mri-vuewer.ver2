@@ -3,7 +3,7 @@
     <v-autocomplete
       :rules="nameRule"
       v-model="names"
-      :items="tiers"
+      :items="tiers || []"
       :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.name')}`"
       multiple
     />
@@ -58,9 +58,13 @@ export default {
     }
   },
   watch: {
-    current: function(val) {
-      if (this.names.findIndex(x => x == val) == -1) {
-        this.names.push(val);
+    current: function(val, old) {
+      if (val != old) {
+        if (val) {
+          if (this.names.findIndex(x => x == val) == -1) {
+            this.names.push(val);
+          }
+        }
       }
     }
   },

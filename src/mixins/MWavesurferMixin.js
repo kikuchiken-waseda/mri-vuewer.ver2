@@ -79,31 +79,17 @@ export default {
       }
     },
     copyTier: function(ref, key, type, parent, withText = true) {
-      const base = this.$store.state.current.textgrid[ref];
-      const $type = type || base.type;
-      this.addTier(key, $type, parent || null);
-      if (base) {
-        for (const val of base.values) {
-          const record = {
-            text: withText ? val.text || "" : "",
-            time: val.time
-          };
-          this.addTierValue(key, record);
-        }
+      if (this.$ws) {
+        this.$ws.copyTier(ref, key, type, parent, withText);
+        this.$vuewer.console.log(
+          "mixin:vuewer",
+          `copy tier (ref=${ref}, key=${key})`
+        );
       }
     },
     updateTier: function(key, obj) {
       if (this.$ws) {
-        const name = obj.name;
-        const type = obj.type;
-        const parent = obj.parent || null;
-        if (key == name) {
-          this.$ws.updateTier(key, { type: type });
-          this.$ws.updateTier(key, { parent: parent });
-        } else {
-          this.copyTier(key, name, type, parent, true);
-          this.deleteTier(key);
-        }
+        this.$ws.updateTier(key, obj);
         this.$vuewer.console.log(
           "mixin:vuewer",
           `update tier (key=${key}, new key=${name}, type=$.type})`
