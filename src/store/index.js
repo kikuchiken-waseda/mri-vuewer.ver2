@@ -5,6 +5,7 @@ import wcards from "./wcards.js";
 import snackbar from "./snackbar.js";
 import search from "./search.js";
 import logging from "./logging.js";
+import loading from "./loading.js";
 
 import setting from "./setting.js";
 import current from "./current";
@@ -49,6 +50,7 @@ export default new Vuex.Store({
     search,
     wcards,
     logging,
+    loading,
     setting,
     current,
     files,

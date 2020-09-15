@@ -14,32 +14,26 @@
       @frame-point-deleted="onFramePointDeleted"
       @frame-rect-deleted="onFrameRectDeleted"
       @download-json="downloadJson"
+      @save-dropbox="saveDropbox"
     />
-    <m-loading-dialog v-model="isLoading">
-      {{ $vuetify.lang.t("$vuetify.loading") }}
-    </m-loading-dialog>
   </v-container>
 </template>
 <script>
 import db from "@/storage/db";
 import MVuewer from "@/components/MVuewer";
-import MLoadingDialog from "@/components/base/dialog/MLoadingDialog";
 import MVideoTWBMixin from "@/mixins/MVideoTWBMixin";
 import io from "@/io";
 export default {
   name: "vuewer",
   mixins: [MVideoTWBMixin],
-  components: {
-    MVuewer,
-    MLoadingDialog
-  },
+  components: { MVuewer },
   data: () => ({
     tag: "views:vuewer",
-    isLoading: false,
     videoElm: null,
     frames: [],
     item: {}, // DB データ更新用オブジェクト
-    textgrid: {}
+    textgrid: {},
+    isLoading: false
   }),
   computed: {
     source: {
@@ -60,26 +54,51 @@ export default {
     }
   },
   methods: {
+    onError: function(error, msg = null, next = false) {
+      if (msg) {
+        this.$vuewer.snackbar.error(msg);
+      } else {
+        this.$vuewer.snackbar.error(error);
+      }
+      this.$vuewer.console.error(this.tag, error);
+      if (next) this.$router.push({ name: next });
+    },
     downloadJson: async function() {
       try {
-        const file = await db.files.get(Number(this.id));
-        file.frames = await db.frames
-          .where({ fileId: file.id })
-          .with({ points: "points", rects: "rects" });
-        const bname = file.name.split(".")[0];
-        const blob = new Blob([JSON.stringify(file, null, "  ")], {
-          type: "application/json"
-        });
-        io.file.download(blob, `${bname}.json`);
+        const file = await this.$vuewer.db.get(Number(this.id));
+        const blob = this.$vuewer.io.json.toFile(`${file.bname}.json`, file);
+        io.file.download(blob, blob.name);
       } catch (error) {
         if (error.name == "DataError") {
-          this.$vuewer.snackbar.error("The file does not exist.");
-          this.$vuewer.console.error(this.tag, error);
-          this.$router.push({ name: "Home" });
+          this.onError(error, "The file does not exist.", "Home");
         } else {
-          this.$vuewer.snackbar.error(error);
-          this.$vuewer.console.error(this.tag, error);
+          this.onError(error);
         }
+      }
+    },
+    saveDropbox: async function() {
+      if (this.$vuewer.dropbox.hasToken()) {
+        this.$vuewer.loading.start("ファイル送信中...");
+        const file = await this.$vuewer.db.get(Number(this.id));
+        const name = `${file.name.split(".")[0]}.json`;
+        const blob = this.$vuewer.io.json.toFile(name, file);
+        const res = this.$vuewer.dropbox
+          .write("data/" + name, blob)
+          .then(() => {
+            this.$vuewer.snackbar.success(
+              `sended file to ${res.path_display} in dropbox`
+            );
+          })
+          .catch(res => {
+            // res.error.error_summary
+            const msg = `DROPBOX ERROR: ${res.status} :${res.error.error_summary}`;
+            this.onError(res.error, msg);
+          })
+          .finally(() => {
+            this.$vuewer.loading.end();
+          });
+      } else {
+        this.$vuewer.dropbox.auth();
       }
     },
     /**
@@ -95,6 +114,7 @@ export default {
         this.id = id;
         this.$vuewer.console.log(this.tag, `change page id ${id}`);
         this.isLoading = true;
+        this.$vuewer.loading.start("$vuetify.loading");
         // 画面表示する動画情報を初期化する
         this.$initVideo();
         try {
@@ -129,6 +149,7 @@ export default {
           }
         }
         this.isLoading = false;
+        this.$vuewer.loading.end();
       } else {
         this.$vuewer.snackbar.error("There is no id.");
         this.$vuewer.console.error(this.tag, "NO ID ACCESS");

@@ -21,11 +21,9 @@
 <script>
 import MCardDialog from "@/components/base/dialog/MCardDialog";
 import MDbImportForm from "@/components/form/MDbImportForm";
-import MSnackbarMixin from "@/mixins/MSnackbarMixin";
 export default {
   name: "m-db-import-dialog",
   components: { MCardDialog, MDbImportForm },
-  mixins: [MSnackbarMixin],
   props: {
     value: {
       type: Boolean,
@@ -53,7 +51,7 @@ export default {
     close: function() {
       this.dialog = false;
       if (!this.loaded) {
-        this.showWarning(this.t("$vuetify.forms.db.messages.stop"));
+        this.$vuewer.snackbar.warning("$vuetify.forms.db.messages.stop");
       }
       if (this.$route.name !== "Home") {
         this.$router.push({ name: "Home" });
@@ -66,15 +64,15 @@ export default {
     onLoaded: function() {
       this.loaded = true;
       this.close();
-      this.showSuccess(this.t("$vuetify.forms.db.messages.success"));
+      this.$vuewer.snackbar.success("$vuetify.forms.db.messages.success");
     },
     onError: function(error) {
       this.loaded = true;
       this.close();
       if (~error.message.indexOf("out of memory")) {
-        this.showError(this.t("$vuetify.forms.db.messages.outofmemory"));
+        this.$vuewer.snackbar.error("$vuetify.forms.db.messages.outofmemory");
       } else {
-        this.showError(error);
+        this.$vuewer.snackbar.error(error);
       }
     }
   }

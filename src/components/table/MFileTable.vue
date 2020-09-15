@@ -51,13 +51,11 @@
 </template>
 <script>
 import db from "@/storage/db";
-import MSnackbarMixin from "@/mixins/MSnackbarMixin";
 import MVideoMetaDataDialog from "@/components/dialogs/MVideoMetaDataDialog";
 import MAudioStreamList from "@/components/list/MAudioStreamList";
 import MVideoStreamList from "@/components/list/MVideoStreamList";
 export default {
   name: "m-file-table",
-  mixins: [MSnackbarMixin],
   components: {
     MVideoMetaDataDialog,
     MVideoStreamList,
@@ -149,11 +147,11 @@ export default {
             "$vuetify.pages.on.destroy",
             name
           );
-          vm.showSuccess(message);
+          vm.$vuewer.snackbar.warning(message);
         })
         .catch(error => {
-          console.error(error);
-          vm.showError(error);
+          vm.$vuewer.console.error(error);
+          vm.$vuewer.snackbar.error(error);
         });
     },
     onValidated: function(payload) {
@@ -166,13 +164,13 @@ export default {
           .then(id => {
             db.files.get(id).then(x => {
               const msg = `update the metadata of a file (id=${x.id})`;
-              this.showSuccess(msg);
+              this.$vuewer.snackbar.success(msg);
               this.files.splice(idx, 1, item);
             });
           })
           .catch(error => {
-            this.showError(error);
-            console.error(error);
+            this.$vuewer.snackbar.error(error);
+            this.$vuewer.console.error(error);
           });
       }
     }

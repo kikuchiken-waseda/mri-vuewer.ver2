@@ -12,7 +12,7 @@
     <v-icon v-if="type == 'warning'" class="mr-1">mdi-alert</v-icon>
     <v-icon v-if="type == 'info'" class="mr-1">mdi-information</v-icon>
     <v-icon v-if="type == 'success'" class="mr-1">mdi-check-circle</v-icon>
-    <span class="subtitle"> {{ message }} </span>
+    <span class="subtitle"> {{ $vuetify.lang.t(message) }} </span>
     <template v-slot:action="{ attrs }">
       <v-btn icon color="white" v-bind="attrs" @click="show = false">
         <v-icon>mdi-close-circle</v-icon>

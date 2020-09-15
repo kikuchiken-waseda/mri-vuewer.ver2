@@ -12,6 +12,9 @@ export default {
     timeout: Number(STORAGE.get("timeout")) || DEFAULT_TIMEOUT
   }),
   mutations: {
+    loading: function(state, payload) {
+      state.loading = payload;
+    },
     show: function(state, payload) {
       state.show = payload;
     },
@@ -31,6 +34,7 @@ export default {
   },
   actions: {
     init(context) {
+      context.commit("loading", false);
       context.commit("show", false);
       context.commit("message", "");
       context.commit("color", "");

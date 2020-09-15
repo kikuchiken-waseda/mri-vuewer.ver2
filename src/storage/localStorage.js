@@ -1,5 +1,5 @@
 const BASEKEYNAME = "mri-vuewer";
-const names = ["wavesurfer", "snackbar", "metadata"];
+const names = ["wavesurfer", "snackbar", "metadata", "dropbox"];
 
 const get = function(basename, key) {
   const keyname = `${BASEKEYNAME}-${basename}-${key}`;

@@ -14,11 +14,9 @@
 <script>
 import MCardDialog from "@/components/base/dialog/MCardDialog";
 import MVideoRegistFrom from "@/components/form/MVideoRegistFrom";
-import MSnackbarMixin from "@/mixins/MSnackbarMixin";
 export default {
   name: "m-file-upload-dialog",
   components: { MCardDialog, MVideoRegistFrom },
-  mixins: [MSnackbarMixin],
   props: {
     value: {
       type: Boolean,
@@ -46,18 +44,20 @@ export default {
     close: function() {
       this.dialog = false;
       if (!this.loaded) {
-        this.showWarning(this.t("$vuetify.forms.video.messages.stop"));
+        this.$vuewer.snackbar.warning("$vuetify.forms.video.messages.stop");
       }
     },
     onLoaded: function() {
       this.loaded = true;
-      this.showSuccess(this.t("$vuetify.forms.video.messages.success"));
+      this.$vuewer.snackbar.success("$vuetify.forms.video.messages.success");
     },
     onError: function(error) {
       if (~error.message.indexOf("out of memory")) {
-        this.showError(this.t("$vuetify.forms.video.messages.outofmemory"));
+        this.$vuewer.snackbar.error(
+          "$vuetify.forms.video.messages.outofmemory"
+        );
       } else {
-        this.showError(error);
+        this.$vuewer.snackbar.error(error);
       }
       this.dialog = false;
     }

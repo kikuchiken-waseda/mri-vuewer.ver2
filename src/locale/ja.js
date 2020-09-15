@@ -22,7 +22,8 @@ const TEXTGRID = {
     interval: "境界転記層",
     point: "イベント転記層",
     record: {
-      name: "時刻記述"
+      name: "時刻記述",
+      no: "レコードが選択されていません"
     }
   }
 };
@@ -36,6 +37,9 @@ const pages = {
   demo: "ライブデモ",
   setting: "設定",
   about: "このアプリについて",
+  logger: "ロガー",
+  dropbox: "ドロップボックス連携",
+  loadDropbox: "ドロップボックスのファイルを読み込む",
   db: {
     clear: `${DB}の${DELETE}`,
     dump: `${DB}のエクスポート`,
@@ -321,6 +325,9 @@ export default {
     }
   },
   loading: "読み込み中 ...",
+  loaded: "データの読み込みが終了しました",
+  notAcceptable: "不正なファイルです",
+  yet: "この関数は作成中です",
   textgrid: TEXTGRID,
   annotation: ANNOTATION,
   frame: FRAME,
@@ -335,6 +342,7 @@ export default {
     zoom_out: "縮小",
     setting: "設定",
     save: "保存",
+    saveDropbox: "ドロップボックスに保存",
     tier: {
       add: `${TEXTGRID.tier.name} を追加`,
       edit: `${TEXTGRID.tier.name} を編集`,

@@ -6,6 +6,9 @@ const pages = {
   demo: "Line Demo",
   setting: "Setting",
   about: "About",
+  logger: "Logger",
+  dropbox: "Works with dropbox",
+  loadDropbox: "load dropbox file",
   db: {
     clear: "Clear DB",
     dump: "Export DB",
@@ -286,6 +289,9 @@ export default {
     }
   },
   loading: "Now Loading ...",
+  loaded: "The data was loaded",
+  notAcceptable: "The data is not acceptable!!",
+  yet: "This function is under construction",
   textgrid: {
     name: "TextGrid",
     tier: {
@@ -301,7 +307,8 @@ export default {
       interval: "Interval Tier",
       point: "Point Tier",
       record: {
-        name: "Time Record"
+        name: "Time Record",
+        no: "No record was selected!"
       }
     }
   },
@@ -315,6 +322,7 @@ export default {
     zoom_out: "zoom out",
     setting: "setting",
     save: "save",
+    saveDropbox: "save to dropbox",
     tier: {
       add: "Add a Tier",
       edit: "Edit a Tier",

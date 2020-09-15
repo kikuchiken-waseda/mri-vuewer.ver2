@@ -13,6 +13,7 @@
     "core-js": "^3.6.5",
     "dexie": "^3.0.2",
     "dexie-relationships": "^1.2.11",
+    "dropbox": "^5.2.1",
     "ffmpeg.js": "^4.2.9003",
     "konva": "^7.0.5",
     "kuromoji": "^0.1.2",

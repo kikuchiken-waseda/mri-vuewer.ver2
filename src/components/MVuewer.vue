@@ -2,6 +2,7 @@
   <m-w-context-menu
     @click-setting="onClickSetting"
     @click-save="onClickSave"
+    @click-save-dropbox="onClickSaveDropbox"
     @click-image-edit="onClickImageEdit"
     @click-tier-add="onClickTierAdd"
     @click-tier-edit="onClickTierEdit"
@@ -118,6 +119,7 @@
         <m-speed-dial
           v-model="fab"
           @click-save="onClickSave"
+          @click-save-dropbox="onClickSaveDropbox"
           @click-setting="onClickSetting"
           @click-detail="onClickDetail"
           @click-ruler="onClickRuler"
@@ -203,12 +205,11 @@ import MTextgridDialog from "@/components/dialogs/MTextgridDialog";
 import MComplatesDialog from "@/components/dialogs/MComplatesDialog";
 import MSpeedDial from "@/components/MSpeedDial";
 import MSettingMixin from "@/mixins/MSettingMixin";
-import MSnackbarMixin from "@/mixins/MSnackbarMixin";
 import io from "@/io";
 
 export default {
   name: "WVuwer",
-  mixins: [MSettingMixin, MSnackbarMixin],
+  mixins: [MSettingMixin],
   components: {
     MVuwerLayout,
     MVideoArray,
@@ -731,22 +732,18 @@ export default {
         const blob = io.xlsx.dump(obj);
         io.file.download(blob, `${bname}.xlsx`);
       } else {
-        const msg = `${payload} の処理は未実装です`;
-        this.showWarning(msg);
+        this.$vuewer.snackbar.warning("$vuetify.yet");
       }
     },
     onUploadClick: function(payload) {
       this.$vuewer.console.log(this.tag, `on upload`);
       if (payload.click == "JSON") {
-        const msg = `${payload.click} is not working yet!!`;
-        this.showWarning(msg);
+        this.$vuewer.snackbar.warning("$vuetify.yet");
       } else if (payload.click == "TEXTGRID") {
         this.wavesurfer.loadTextGrid(payload.files[0]);
-        const msg = `${payload.click} is loaded!!`;
-        this.showSuccess(msg);
+        this.$vuewer.snackbar.success("$vuetify.loaded");
       } else {
-        const msg = `${payload.click} is not accepted!!`;
-        this.showWarning(msg);
+        this.$vuewer.snackbar.warning("$vuetify.notAcceptable");
       }
     },
     onLoadeddata: function(payload) {
@@ -1078,6 +1075,9 @@ export default {
       this.saveTextGrid();
       this.$vuewer.snackbar.success("save data !");
     },
+    onClickSaveDropbox: function() {
+      this.$emit("save-dropbox");
+    },
     onClickSetting: function() {
       this.$vuewer.console.log(this.tag, `on click setting`);
       this.dialog.setting.show = true;
@@ -1165,7 +1165,7 @@ export default {
           this.tokenizeRecord(key, record.idx, payload);
         }
       } else {
-        this.showWarning("No record was selected!");
+        this.$vuewer.snackbar.warning("$vuetify.textgrid.tier.record.no");
       }
     },
     onPointsUpdated: function(points) {

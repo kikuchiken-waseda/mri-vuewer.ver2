@@ -1,5 +1,7 @@
 import $store from "../store";
 import utils from "../utils";
+import io from "../io";
+import db from "../storage/db.js";
 
 const Vuewer = {
   install: function(vue) {
@@ -24,8 +26,10 @@ const Vuewer = {
     };
     vue.prototype.$vuewer = {
       t: t,
+      io: io,
       math: utils.math,
       text: utils.text,
+      dropbox: utils.dropbox,
       console: $console,
       db: {
         log: function(table, tag, msg) {
@@ -35,7 +39,16 @@ const Vuewer = {
               $store.commit("logging/dblog", item);
             }
           }
-        }
+        },
+        gets: db.gets,
+        get: db.get,
+        add: db.add,
+        put: db.put,
+        destory: db.destory,
+        files: db.files,
+        frames: db.frames,
+        points: db.points,
+        rects: db.rects
       },
       snackbar: {
         error: function(error) {
@@ -58,6 +71,10 @@ const Vuewer = {
         info: function(msg) {
           $store.dispatch("snackbar/info", t(msg));
         }
+      },
+      loading: {
+        start: message => $store.dispatch("loading/start", message),
+        end: () => $store.dispatch("loading/finish")
       }
     };
   }

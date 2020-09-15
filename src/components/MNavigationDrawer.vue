@@ -46,12 +46,36 @@
           </v-list-item-content>
         </v-list-item>
         <v-list dense nav class="pa-0">
+          <v-list-item v-if="hasToken" link @click="loadDropbox">
+            <v-list-item-icon>
+              <v-icon> mdi-dropbox </v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ $vuetify.lang.t("$vuetify.pages.loadDropbox") }}
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item v-else link @click="dropboxAuth">
+            <v-list-item-icon>
+              <v-icon> mdi-dropbox </v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ $vuetify.lang.t("$vuetify.pages.dropbox") }}
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+        <v-list dense nav class="pa-0">
           <v-list-item link @click="$store.commit('logging/show', true)">
             <v-list-item-icon>
               <v-icon> mdi-console </v-icon>
             </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title>LOGGER</v-list-item-title>
+              <v-list-item-title>
+                {{ $vuetify.lang.t("$vuetify.pages.logger") }}
+              </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -158,16 +182,19 @@
 
     <m-file-upload-dialog v-model="uploadDialog" />
     <m-db-import-dialog v-model="dbImportDialog" />
+    <m-dropbox-dialog v-model="dropboxDialog" />
   </v-navigation-drawer>
 </template>
 <script>
 import MFileUploadDialog from "@/components/dialogs/MFileUploadDialog";
+import MDropboxDialog from "@/components/dialogs/MDropboxDialog";
 import MDbImportDialog from "@/components/dialogs/MDbImportDialog";
 export default {
   name: "MNavigationDrawer",
-  components: { MFileUploadDialog, MDbImportDialog },
+  components: { MFileUploadDialog, MDbImportDialog, MDropboxDialog },
   data: () => ({
     current: null,
+    dropboxDialog: false,
     uploadDialog: false,
     dbImportDialog: false
   }),
@@ -235,6 +262,9 @@ export default {
           };
           return x;
         });
+    },
+    hasToken: function() {
+      return this.$vuewer.dropbox.hasToken();
     }
   },
   methods: {
@@ -249,6 +279,12 @@ export default {
           this.$router.push({ path: `/files/${payload.id}` });
         }
       }
+    },
+    loadDropbox: function() {
+      this.dropboxDialog = true;
+    },
+    dropboxAuth: function() {
+      this.$vuewer.dropbox.auth();
     },
     dbAdd: function() {
       this.uploadDialog = true;

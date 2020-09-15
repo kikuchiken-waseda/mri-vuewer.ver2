@@ -160,6 +160,15 @@ export default {
           }
         },
         {
+          text: "$vuetify.contexts.saveDropbox",
+          icon: "mdi-dropbox",
+          click: () => {
+            setTimeout(function() {
+              vm.$emit("click-save-dropbox");
+            }, 10);
+          }
+        },
+        {
           text: "インポート",
           show: false,
           icon: "mdi-upload",
