@@ -353,7 +353,12 @@ export default {
       shrink: `現在${TEXTGRID.tier.record.name}を終端を短縮`,
       splitByFrames: `${TEXTGRID.tier.record.name}の分割 (フレーム毎)`,
       splitByChars: `${TEXTGRID.tier.record.name}の分割 (文字毎)`,
-      splitBySlash: `${TEXTGRID.tier.record.name}の分割 (区切り文字毎: /)`
+      splitBySlash: `${TEXTGRID.tier.record.name}の分割 (区切り文字毎: /)`,
+      owakati: `現在${TEXTGRID.tier.record.name}を分かち書き`,
+      oyomi: `現在${TEXTGRID.tier.record.name}をよみに変換`,
+      opronunciation: `現在${TEXTGRID.tier.record.name}を発音系に変換`,
+      obasic: `現在${TEXTGRID.tier.record.name}を代表系に変換`,
+      opos: `現在${TEXTGRID.tier.record.name}を品詞に変換`
     },
     frame: {
       name: `${FRAME.name}`,

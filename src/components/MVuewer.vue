@@ -205,7 +205,6 @@ import MSpeedDial from "@/components/MSpeedDial";
 import MSettingMixin from "@/mixins/MSettingMixin";
 import MSnackbarMixin from "@/mixins/MSnackbarMixin";
 import io from "@/io";
-import math from "@/utils/math";
 
 export default {
   name: "WVuwer",
@@ -243,26 +242,34 @@ export default {
       type: Number,
       required: true
     },
-    // 動画オリジナルサイズ
+    /**
+     * 動画オリジナルサイズ
+     */
     originSize: {
       type: Object,
       required: true
     },
-    // 既存アノテーション情報
+    /**
+     * 既存アノテーション情報
+     */
     textgrid: {
       type: Object,
       default: function() {
         return {};
       }
     },
-    // 各種画像アノテーション結果
+    /**
+     * 画像アノテーション結果
+     */
     frames: {
       type: Array,
       default: function() {
         return [];
       }
     },
-    // スキップ時に何フレーム分をスキップするか
+    /**
+     * スキップ時に何フレーム分をスキップするか
+     */
     frameOffset: {
       type: Number,
       default: 1
@@ -589,6 +596,18 @@ export default {
         this.wavesurfer.splitTierValue(key, idx, type);
       }
     },
+    tokenizeRecord(key, idx, type) {
+      const record = this.$textgrid[key].values[idx];
+      const tokenize = this.$vuewer.text[type];
+      if (tokenize && record.text) {
+        tokenize(record.text).then(res => {
+          if (res) {
+            const item = { text: res.join("/"), time: record.time };
+            this.wavesurfer.setTierValue(key, idx, item);
+          }
+        });
+      }
+    },
     // Tier 操作
     nextTier() {
       const key = this.current.tier.key;
@@ -610,7 +629,7 @@ export default {
       setTimeout(() => {
         const tg = this.wavesurfer.wavesurfer.textgrid;
         if (key != this.current.tier.key) {
-          const target = math.nearest(
+          const target = this.$vuewer.math.nearest(
             this.$textgrid[key].values,
             "time",
             this.wavesurfer.getCurrentTime()
@@ -1134,6 +1153,16 @@ export default {
         } else if (payload == "split-by-slash") {
           // レコード分割 (区切り文字毎: /)
           this.splitRecord(key, record.idx, "/");
+        } else if (payload == "owakati") {
+          this.tokenizeRecord(key, record.idx, payload);
+        } else if (payload == "oyomi") {
+          this.tokenizeRecord(key, record.idx, payload);
+        } else if (payload == "opronunciation") {
+          this.tokenizeRecord(key, record.idx, payload);
+        } else if (payload == "obasic") {
+          this.tokenizeRecord(key, record.idx, payload);
+        } else if (payload == "opos") {
+          this.tokenizeRecord(key, record.idx, payload);
         }
       } else {
         this.showWarning("No record was selected!");
@@ -1287,5 +1316,4 @@ export default {
   }
 };
 </script>
-
 <style scoped></style>

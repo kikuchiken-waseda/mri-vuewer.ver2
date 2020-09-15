@@ -333,7 +333,12 @@ export default {
       shrink: "shrink end time of a current record",
       splitByFrames: "split a current record by frames.",
       splitByChars: "split a current record by chars.",
-      splitBySlash: "split a current record by slash."
+      splitBySlash: "split a current record by slash.",
+      owakati: "word-separation for the current record",
+      oyomi: "Convert current record to reading",
+      opronunciation: "Convert current record to pronunciation",
+      obasic: "Convert current record to representative type",
+      opos: "Convert current record to part of speech"
     },
     frame: {
       name: `Image Annotation`,

@@ -25,6 +25,7 @@ const Vuewer = {
     vue.prototype.$vuewer = {
       t: t,
       math: utils.math,
+      text: utils.text,
       console: $console,
       db: {
         log: function(table, tag, msg) {

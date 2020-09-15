@@ -405,6 +405,51 @@ export default {
                   vm.$emit("click-record", "split-by-slash");
                 }, 10);
               }
+            },
+            {
+              text: "$vuetify.contexts.record.owakati",
+              icon: "",
+              click: () => {
+                setTimeout(function() {
+                  vm.$emit("click-record", "owakati");
+                }, 10);
+              }
+            },
+            {
+              text: "$vuetify.contexts.record.oyomi",
+              icon: "",
+              click: () => {
+                setTimeout(function() {
+                  vm.$emit("click-record", "oyomi");
+                }, 10);
+              }
+            },
+            {
+              text: "$vuetify.contexts.record.opronunciation",
+              icon: "",
+              click: () => {
+                setTimeout(function() {
+                  vm.$emit("click-record", "opronunciation");
+                }, 10);
+              }
+            },
+            {
+              text: "$vuetify.contexts.record.obasic",
+              icon: "",
+              click: () => {
+                setTimeout(function() {
+                  vm.$emit("click-record", "obasic");
+                }, 10);
+              }
+            },
+            {
+              text: "$vuetify.contexts.record.opos",
+              icon: "",
+              click: () => {
+                setTimeout(function() {
+                  vm.$emit("click-record", "opos");
+                }, 10);
+              }
             }
           ]
         },
