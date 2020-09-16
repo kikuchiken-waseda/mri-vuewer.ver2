@@ -82,21 +82,33 @@
       </v-list-group>
       <v-divider />
 
-      <v-list-group
-        v-if="files.length > 0"
-        prepend-icon="mdi-menu-open"
-        sub-group
-        :value="false"
-      >
+      <v-list-item v-if="isLoading" sub-group>
+        <v-list-item-icon></v-list-item-icon>
+        <v-list-item-title>
+          Loading files...
+        </v-list-item-title>
+        <v-list-item-action>
+          <v-progress-circular indeterminate color="primary" />
+        </v-list-item-action>
+      </v-list-item>
+
+      <v-list-item sub-group v-else-if="files.length == 0">
+        <v-list-item-icon><v-icon>mdi-menu-open</v-icon></v-list-item-icon>
+        <v-list-item-title>
+          No Files
+        </v-list-item-title>
+      </v-list-item>
+
+      <v-list-group sub-group v-else :value="true" prepend-icon="mdi-menu-open">
         <template v-slot:activator>
           <v-list-item-title>FILES</v-list-item-title>
         </template>
         <v-divider />
         <v-list-item
-          @click="to({ id: item.id })"
+          link
           v-for="item in files"
           :key="item.id"
-          link
+          @click="to({ id: item.id })"
         >
           <v-list-item-content>
             <v-list-item-title>{{ item.name }}</v-list-item-title>
@@ -113,6 +125,17 @@
         <template v-slot:activator>
           <v-list-item-title>DATABASE</v-list-item-title>
         </template>
+        <v-list-item @click="dbAdd" link>
+          <v-list-item-icon>
+            <v-icon>mdi-database-plus</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ $vuetify.lang.t("$vuetify.pages.db.add") }}
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
         <v-list-item @click="dbDump" link>
           <v-list-item-icon>
             <v-icon>mdi-database-export</v-icon>
@@ -135,16 +158,6 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item @click="dbAdd" link>
-          <v-list-item-icon>
-            <v-icon>mdi-database-plus</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>
-              {{ $vuetify.lang.t("$vuetify.pages.db.add") }}
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
         <v-list-item @click="dbClear" link>
           <v-list-item-icon>
             <v-icon color="error">mdi-database-remove</v-icon>
@@ -206,11 +219,7 @@ export default {
     },
     files: function() {
       const files = this.$store.state.files.files;
-      if (!this.isLoading && files.length) {
-        return files.map(x => {
-          return { id: x.id, name: x.name };
-        });
-      }
+      if (files) return files;
       return [];
     },
     drawer: {

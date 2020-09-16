@@ -4,16 +4,14 @@ export default {
   namespaced: true,
   state: () => ({
     files: [],
-    isLoading: false,
-    count: 0
+    isLoading: false
   }),
   mutations: {
-    files: function(state, obj) {
-      state.files = obj;
+    files: function(state, files) {
+      if (Array.isArray(files)) state.files = files;
     },
     push: function(state, obj) {
       state.files.push(obj);
-      state.count = state.count + 1;
     },
     update: function(state, obj) {
       const idx = state.files.findIndex(x => x.id == obj.id);
@@ -25,48 +23,47 @@ export default {
       const i = state.files.findIndex(x => x.id == id);
       if (i > -1) {
         state.files.splice(i, 1);
-        state.count = state.count - 1;
       }
     },
     isLoading: function(state, payload) {
       state.isLoading = payload;
-    },
-    count: function(state, payload) {
-      state.count = payload;
     }
   },
   actions: {
+    // logging
+    getLog: function(context, msg) {
+      context.dispatch(
+        "logging/dblog",
+        { tag: "GET", table: "files", msg: msg },
+        { root: true }
+      );
+    },
+    postLog: function(context, msg) {
+      context.dispatch(
+        "logging/dblog",
+        { tag: "POST", table: "files", msg: msg },
+        { root: true }
+      );
+    },
+    deleteLog: function(context, msg) {
+      context.dispatch(
+        "logging/dblog",
+        { tag: "DELETE", table: "files", msg: msg },
+        { root: true }
+      );
+    },
     // ファイルストア初期化
     init: function(context) {
       return new Promise((resolve, reject) => {
         context.commit("isLoading", true);
         context.state.files = [];
         db.files
-          .count()
-          .then(x => {
-            context.commit("count", x);
-            db.files
-              .toArray()
-              .then(items => {
-                for (const x of items) {
-                  context.commit("push", x);
-                }
-                context.dispatch(
-                  "logging/dblog",
-                  {
-                    tag: "GET",
-                    table: "files",
-                    msg: "init current status"
-                  },
-                  { root: true }
-                );
-                context.commit("isLoading", false);
-                resolve(true);
-              })
-              .catch(error => {
-                context.commit("isLoading", false);
-                reject(error);
-              });
+          .toArray()
+          .then(files => {
+            context.commit("files", files);
+            context.dispatch("getLog", "init current status");
+            context.commit("isLoading", false);
+            resolve(true);
           })
           .catch(error => {
             context.commit("isLoading", false);
@@ -79,22 +76,16 @@ export default {
       return new Promise((resolve, reject) => {
         context.commit("isLoading", true);
         db.load(payload)
-          .then(items => {
-            context.state.files = items;
-            context.commit("count", items.length);
-            context.dispatch(
-              "logging/dblog",
-              {
-                tag: "GET",
-                table: "files",
-                msg: "load files"
-              },
-              { root: true }
-            );
+          .then(files => {
+            context.commit("files", files);
+            context.dispatch("getLog", "load files");
+            context.commit("isLoading", false);
             resolve(true);
           })
-          .catch(error => reject(error))
-          .finally(() => context.commit("isLoading", false));
+          .catch(error => {
+            context.commit("isLoading", false);
+            reject(error);
+          });
       });
     },
     // ファイル一覧を JSON 形式で出力
@@ -102,9 +93,14 @@ export default {
       return new Promise((resolve, reject) => {
         context.commit("isLoading", true);
         db.dump()
-          .then(() => resolve(true))
-          .catch(error => reject(error))
-          .finally(() => context.commit("isLoading", false));
+          .then(() => {
+            context.commit("isLoading", false);
+            resolve(true);
+          })
+          .catch(error => {
+            context.commit("isLoading", false);
+            reject(error);
+          });
       });
     },
     // ファイルDB をクリア
@@ -118,11 +114,14 @@ export default {
           db.files.clear
         ])
           .then(() => {
-            context.state.files = [];
+            context.commit("files", []);
+            context.commit("isLoading", false);
             resolve(true);
           })
-          .catch(error => reject(error))
-          .finally(() => context.commit("isLoading", false));
+          .catch(error => {
+            context.commit("isLoading", false);
+            reject(error);
+          });
       });
     },
     // 一つのファイルを追加
@@ -131,25 +130,24 @@ export default {
         context.commit("isLoading", true);
         db.put(obj)
           .then(() => {
-            const files = db.files.toArray().then(() => {
-              context.commit("files", files);
-              context
-                .dispatch(
-                  "logging/dblog",
-                  {
-                    tag: "GET",
-                    table: "files",
-                    msg: "init current status"
-                  },
-                  { root: true }
-                )
-                .catch(error => reject(error))
-                .finally(() => context.commit("isLoading", false));
-              context.commit("isLoading", false);
-              resolve(true);
-            });
+            db.files
+              .toArray()
+              .then(files => {
+                context.commit("files", files);
+                context.dispatch("postLog", "add a data.");
+                context.commit("isLoading", false);
+                resolve(true);
+              })
+              .catch(error => {
+                console.log("push:toArray:catch");
+                context.commit("isLoading", false);
+                reject(error);
+              });
           })
-          .catch(error => reject(error));
+          .catch(error => {
+            context.commit("isLoading", false);
+            reject(error);
+          });
       });
     },
     // 一つのファイルを削除
@@ -163,21 +161,19 @@ export default {
                 .toArray()
                 .then(files => {
                   context.commit("files", files);
-                  context.dispatch(
-                    "logging/dblog",
-                    {
-                      tag: "DELETE",
-                      table: "files",
-                      msg: `delete files: ${id}`
-                    },
-                    { root: true }
-                  );
+                  context.dispatch("deleteLog", `delete files: ${id}`);
+                  context.commit("isLoading", false);
                   resolve(id);
                 })
-                .catch(error => reject(error))
-                .finally(() => context.commit("isLoading", false));
+                .catch(error => {
+                  context.commit("isLoading", false);
+                  reject(error);
+                });
             })
-            .catch(error => reject(error));
+            .catch(error => {
+              context.commit("isLoading", false);
+              reject(error);
+            });
         } else {
           reject(new Error("no id"));
         }
