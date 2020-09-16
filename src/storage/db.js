@@ -112,7 +112,7 @@ const add_frames = async function(fileId, obj) {
     const points = [];
     const rects = [];
     let i = 0;
-    for (const f in obj.frames) {
+    for (const f of obj.frames) {
       if (f.idx && f.time) {
         if (obj.points) points.push({ data: obj.points, idx: i });
         if (obj.rects) rects.push({ data: obj.rects, idx: i });
@@ -152,14 +152,13 @@ const add_frames = async function(fileId, obj) {
 const add = async function(obj) {
   const keys = Object.keys(obj);
   if (obj.name && obj.source) {
-    //  動画解析が必要かをチェック
+    // 動画解析が必要かをチェック
     let require_ffmpeg = false;
     if (keys.indexOf("fps") === -1) require_ffmpeg = true;
     if (keys.indexOf("duration") === -1) require_ffmpeg = true;
     if (keys.indexOf("originSize") === -1) require_ffmpeg = true;
     if (keys.indexOf("videoStream") === -1) require_ffmpeg = true;
     if (keys.indexOf("audioStream") === -1) require_ffmpeg = true;
-
     if (require_ffmpeg) {
       const buff = io.file.toBuff(obj.source);
       io.video.info(buff, async function(res) {

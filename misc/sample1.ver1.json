@@ -1,0 +1,181 @@
+{
+  "points": [
+    {
+      "start": 1.53,
+      "end": 1.5399999999999998,
+      "data": {
+        "time": 1.535,
+        "frame": 21,
+        "type": "point"
+      },
+      "attributes": {
+        "label": "1",
+        "type": "point",
+        "highlight": false
+      },
+      "color": "rgba(103, 58, 183, 0.5)",
+      "resize": false,
+      "id": "point_5"
+    },
+    {
+      "start": 2.585,
+      "end": 2.5949999999999998,
+      "data": {
+        "time": 2.59,
+        "frame": 35,
+        "type": "point"
+      },
+      "attributes": {
+        "label": "2",
+        "type": "point",
+        "highlight": false
+      },
+      "color": "rgba(103, 58, 183, 0.5)",
+      "resize": false,
+      "id": "point_4"
+    },
+    {
+      "start": 2.92,
+      "end": 2.9299999999999997,
+      "data": {
+        "time": 2.925,
+        "frame": 40,
+        "type": "point"
+      },
+      "attributes": {
+        "label": "3",
+        "type": "point",
+        "highlight": false
+      },
+      "color": "rgba(103, 58, 183, 0.5)",
+      "resize": false,
+      "id": "point_3"
+    },
+    {
+      "start": 3.895,
+      "end": 3.905,
+      "data": {
+        "time": 3.9,
+        "frame": 53,
+        "type": "point"
+      },
+      "attributes": {
+        "label": "4",
+        "type": "point",
+        "highlight": false
+      },
+      "color": "rgba(103, 58, 183, 0.5)",
+      "resize": false,
+      "id": "point_2"
+    },
+    {
+      "start": 4.39,
+      "end": 4.3999999999999995,
+      "data": {
+        "time": 4.395,
+        "frame": 60,
+        "type": "point"
+      },
+      "attributes": {
+        "label": "5",
+        "type": "point",
+        "highlight": false
+      },
+      "color": "rgba(103, 58, 183, 0.5)",
+      "resize": false,
+      "id": "point_1"
+    }
+  ],
+  "regions": [
+    {
+      "start": 0.8050000000000002,
+      "end": 2.0150000000000006,
+      "color": "rgba(255,183,77, 0.3)",
+      "data": {
+        "type": "region",
+        "duration": 1.2100000000000004
+      },
+      "attributes": {
+        "label": "1",
+        "type": "region",
+        "highlight": false
+      },
+      "id": "wavesurfer_npjf55pihv8"
+    },
+    {
+      "start": 2.065,
+      "end": 3.579999999999999,
+      "color": "rgba(255,183,77, 0.3)",
+      "data": {
+        "type": "region",
+        "duration": 1.5149999999999992
+      },
+      "attributes": {
+        "label": "2",
+        "type": "region",
+        "highlight": false
+      },
+      "id": "wavesurfer_abajqvp679"
+    },
+    {
+      "start": 3.524999999999999,
+      "end": 4.535,
+      "color": "rgba(255,183,77, 0.3)",
+      "data": {
+        "type": "region",
+        "duration": 1.0100000000000011
+      },
+      "attributes": {
+        "label": "3",
+        "type": "region",
+        "highlight": false
+      },
+      "id": "wavesurfer_qrajru0s89"
+    },
+    {
+      "start": 4.505000000000001,
+      "end": 5.9350000000000005,
+      "color": "rgba(255,183,77, 0.3)",
+      "data": {
+        "type": "region",
+        "duration": 1.4299999999999997
+      },
+      "attributes": {
+        "label": "4",
+        "type": "region",
+        "highlight": false
+      },
+      "id": "wavesurfer_apqnb97adog"
+    },
+    {
+      "start": 5.885,
+      "end": 7.3199999999999985,
+      "color": "rgba(255,183,77, 0.3)",
+      "data": {
+        "type": "region",
+        "duration": 1.4349999999999987
+      },
+      "attributes": {
+        "label": "5",
+        "type": "region",
+        "highlight": false
+      },
+      "id": "wavesurfer_s1vvdgdvvmo"
+    },
+    {
+      "start": 7.284999999999999,
+      "end": 9.234999999999998,
+      "color": "rgba(255,183,77, 0.3)",
+      "data": {
+        "type": "region",
+        "duration": 1.9499999999999984
+      },
+      "attributes": {
+        "label": "6",
+        "type": "region",
+        "highlight": false
+      },
+      "id": "wavesurfer_2m03iholo8o"
+    }
+  ]
+}

@@ -10,7 +10,7 @@
     />
 
     <v-list-item v-for="(item, i) in textgrid" :key="i" @click="onClick(item)">
-      <v-list-item-title>{{ item.name }}</v-list-item-title>
+      <v-list-item-title>{{ item.text }}</v-list-item-title>
     </v-list-item>
   </v-list>
 </template>
@@ -19,16 +19,24 @@ export default {
   name: "m-video-upload-list",
   data: () => ({
     clicked: {
-      name: "",
+      text: "",
+      val: "",
       accept: ""
     },
     textgrid: [
       {
-        name: "TEXTGRID",
+        text: "TEXTGRID",
+        val: "TEXTGRID/TEXTGRID",
         accept: ".TextGrid,.textgrid,.Textgrid"
       },
       {
-        name: "JSON",
+        text: "JSON",
+        val: "TEXTGRID/JSON",
+        accept: "application/json"
+      },
+      {
+        text: "JSON (ver1)",
+        val: "TEXTGRID/JSON-VER1",
         accept: "application/json"
       }
     ]
@@ -43,7 +51,7 @@ export default {
     onChange() {
       this.$nextTick(() => {
         const item = {
-          click: this.clicked.name,
+          click: this.clicked.val,
           files: this.$refs.input.files
         };
         this.$emit("click", item);

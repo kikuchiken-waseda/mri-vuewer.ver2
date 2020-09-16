@@ -109,7 +109,6 @@
         </v-list-item>
       </v-list-group>
       <v-divider />
-
       <v-list-group prepend-icon="mdi-database" sub-group :value="false">
         <template v-slot:activator>
           <v-list-item-title>DATABASE</v-list-item-title>
@@ -324,15 +323,17 @@ export default {
         });
     },
     fileDestroy: function(item) {
-      const name = item.name;
       this.$store
         .dispatch("files/destroy", item.id)
-        .then(() => {
+        .then(id => {
           const message = this.$vuetify.lang.t(
             "$vuetify.pages.on.destroy",
-            name
+            `file id = ${id}`
           );
           this.$store.dispatch("snackbar/success", message);
+          if (id == this.$route.params.id) {
+            this.$router.push({ name: "Home" });
+          }
         })
         .catch(error => {
           this.$store.dispatch("snackbar/error", error.message);

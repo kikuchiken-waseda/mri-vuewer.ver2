@@ -736,15 +736,15 @@ export default {
       }
     },
     onUploadClick: function(payload) {
-      this.$vuewer.console.log(this.tag, `on upload`);
-      if (payload.click == "JSON") {
-        this.$vuewer.snackbar.warning("$vuetify.yet");
-      } else if (payload.click == "TEXTGRID") {
-        this.wavesurfer.loadTextGrid(payload.files[0]);
-        this.$vuewer.snackbar.success("$vuetify.loaded");
-      } else {
-        this.$vuewer.snackbar.warning("$vuetify.notAcceptable");
-      }
+      this.$vuewer.console.log(this.tag, `on upload: ${payload.click}`);
+      // if (payload.click == "JSON") {
+      //   this.$vuewer.snackbar.warning("$vuetify.yet");
+      // } else if (payload.click == "TEXTGRID") {
+      //   this.wavesurfer.loadTextGrid(payload.files[0]);
+      //   this.$vuewer.snackbar.success("$vuetify.loaded");
+      // } else {
+      //   this.$vuewer.snackbar.warning("$vuetify.notAcceptable");
+      // }
     },
     onLoadeddata: function(payload) {
       if (payload) {

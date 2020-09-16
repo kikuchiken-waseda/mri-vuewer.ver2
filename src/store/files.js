@@ -130,49 +130,54 @@ export default {
       return new Promise((resolve, reject) => {
         context.commit("isLoading", true);
         db.put(obj)
-          .then(async function() {
-            const files = await db.files.toArray();
-            context.commit("files", files);
-            context.dispatch(
-              "logging/dblog",
-              {
-                tag: "GET",
-                table: "files",
-                msg: "init current status"
-              },
-              { root: true }
-            );
-            context.commit("isLoading", false);
-            resolve(true);
+          .then(() => {
+            const files = db.files.toArray().then(() => {
+              context.commit("files", files);
+              context
+                .dispatch(
+                  "logging/dblog",
+                  {
+                    tag: "GET",
+                    table: "files",
+                    msg: "init current status"
+                  },
+                  { root: true }
+                )
+                .catch(error => reject(error))
+                .finally(() => context.commit("isLoading", false));
+              context.commit("isLoading", false);
+              resolve(true);
+            });
           })
-          .catch(error => reject(error))
-          .finally(() => context.commit("isLoading", false));
+          .catch(error => reject(error));
       });
     },
     // 一つのファイルを削除
     destroy: function(context, id) {
-      const $destroy = async (resolve, reject, id) => {
-        context.commit("isLoading", true);
-        try {
-          await db.destory(id);
-          context.dispatch(
-            "logging/dblog",
-            {
-              tag: "DELETE",
-              table: "files",
-              msg: `delete files: ${id}`
-            },
-            { root: true }
-          );
-          resolve(id);
-        } catch (error) {
-          reject(error);
-        }
-        context.commit("isLoading", false);
-      };
       return new Promise((resolve, reject) => {
         if (id) {
-          $destroy(resolve, reject, id);
+          context.commit("isLoading", true);
+          db.destory(id)
+            .then(() => {
+              db.files
+                .toArray()
+                .then(files => {
+                  context.commit("files", files);
+                  context.dispatch(
+                    "logging/dblog",
+                    {
+                      tag: "DELETE",
+                      table: "files",
+                      msg: `delete files: ${id}`
+                    },
+                    { root: true }
+                  );
+                  resolve(id);
+                })
+                .catch(error => reject(error))
+                .finally(() => context.commit("isLoading", false));
+            })
+            .catch(error => reject(error));
         } else {
           reject(new Error("no id"));
         }
