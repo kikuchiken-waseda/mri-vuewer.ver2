@@ -88,12 +88,12 @@
   ],
   "regions": [
     {
-      "start": 0.8050000000000002,
-      "end": 2.0150000000000006,
+      "start": 0.27500000000000013,
+      "end": 1.4850000000000014,
       "color": "rgba(255,183,77, 0.3)",
       "data": {
         "type": "region",
-        "duration": 1.2100000000000004
+        "duration": 1.2100000000000013
       },
       "attributes": {
         "label": "1",
@@ -103,12 +103,12 @@
       "id": "wavesurfer_npjf55pihv8"
     },
     {
-      "start": 2.065,
-      "end": 3.579999999999999,
+      "start": 1.895,
+      "end": 3.4099999999999997,
       "color": "rgba(255,183,77, 0.3)",
       "data": {
         "type": "region",
-        "duration": 1.5149999999999992
+        "duration": 1.5149999999999997
       },
       "attributes": {
         "label": "2",
@@ -118,12 +118,12 @@
       "id": "wavesurfer_abajqvp679"
     },
     {
-      "start": 3.524999999999999,
-      "end": 4.535,
+      "start": 3.734999999999999,
+      "end": 4.745000000000001,
       "color": "rgba(255,183,77, 0.3)",
       "data": {
         "type": "region",
-        "duration": 1.0100000000000011
+        "duration": 1.010000000000002
       },
       "attributes": {
         "label": "3",
@@ -133,8 +133,8 @@
       "id": "wavesurfer_qrajru0s89"
     },
     {
-      "start": 4.505000000000001,
-      "end": 5.9350000000000005,
+      "start": 4.945000000000002,
+      "end": 6.375000000000002,
       "color": "rgba(255,183,77, 0.3)",
       "data": {
         "type": "region",
@@ -148,12 +148,12 @@
       "id": "wavesurfer_apqnb97adog"
     },
     {
-      "start": 5.885,
-      "end": 7.3199999999999985,
+      "start": 6.615000000000001,
+      "end": 8.050000000000002,
       "color": "rgba(255,183,77, 0.3)",
       "data": {
         "type": "region",
-        "duration": 1.4349999999999987
+        "duration": 1.4350000000000014
       },
       "attributes": {
         "label": "5",
@@ -163,12 +163,12 @@
       "id": "wavesurfer_s1vvdgdvvmo"
     },
     {
-      "start": 7.284999999999999,
-      "end": 9.234999999999998,
+      "start": 8.415000000000001,
+      "end": 10.364999999999998,
       "color": "rgba(255,183,77, 0.3)",
       "data": {
         "type": "region",
-        "duration": 1.9499999999999984
+        "duration": 1.9499999999999975
       },
       "attributes": {
         "label": "6",

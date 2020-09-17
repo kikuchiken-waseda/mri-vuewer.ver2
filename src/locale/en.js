@@ -373,5 +373,6 @@ export default {
   },
   annotation: "annotation",
   frame: "frames",
-  browserError: "This feature is not available in this browser."
+  browserError: "This feature is not available in this browser.",
+  ver1: "MRI Vuewer ver.1"
 };

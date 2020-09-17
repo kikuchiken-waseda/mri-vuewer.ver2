@@ -15,10 +15,13 @@ const auth = function() {
 };
 
 const setToken = function(text) {
-  const token = text.split("&")[0].split("=")[1];
-  conf.token = token;
-  storages.dropbox.set("token", token);
-  CLIENT = new Dropbox({ clientId: conf.key, accessToken: conf.token });
+  const info = text.split("&")[0].split("=");
+  if (info[0] == "#access_token") {
+    const token = text.split("&")[0].split("=")[1];
+    conf.token = token;
+    storages.dropbox.set("token", token);
+    CLIENT = new Dropbox({ clientId: conf.key, accessToken: conf.token });
+  }
 };
 
 const get = function(path) {

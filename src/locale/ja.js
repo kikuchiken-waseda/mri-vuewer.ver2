@@ -390,6 +390,7 @@ export default {
       json: `JSON 形式でダウンロード (${FRAME.name})`,
       xlsx: `XLSX 形式でダウンロード (${FRAME.name})`
     }
-  }
+  },
+  ver1: "MRI Vuewer ver.1 系"
 };
 //# sourceMappingURL=ja.js.map

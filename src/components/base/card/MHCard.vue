@@ -97,8 +97,12 @@ export default {
     onResize() {
       this.$nextTick(() => {
         const iconSize = 50 * (this.actions.length + 1);
-        const subTextMaxWidth = this.$refs.card.$el.clientWidth - iconSize;
-        this.subTextMaxWidth = subTextMaxWidth;
+        if (this.$refs.card) {
+          if (this.$refs.card.$el) {
+            const subTextMaxWidth = this.$refs.card.$el.clientWidth - iconSize;
+            this.subTextMaxWidth = subTextMaxWidth;
+          }
+        }
       });
     }
   },

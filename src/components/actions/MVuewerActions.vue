@@ -30,8 +30,7 @@
       >
         <v-icon dark>mdi-magnify-minus</v-icon>
       </v-btn>
-      <m-video-upload-menu @click="$emit('upload-click', $event)" />
-
+      <m-video-upload-menu @click="onUploadClick" />
       <v-spacer />
       <v-btn dark icon :class="`elevation-${hover ? 4 : 0}`" @click="playPause">
         <v-icon dark>mdi-play-pause</v-icon>
@@ -92,6 +91,9 @@ export default {
     }
   },
   methods: {
+    onUploadClick(payload) {
+      this.$emit("upload-click", payload);
+    },
     incPxPerSec() {
       if (this.pxPerSec < 500) {
         this.pxPerSec = this.pxPerSec + 50;

@@ -99,6 +99,13 @@ export default {
       const navSize = Object.keys(this.navs).length;
       return Math.round(12 / navSize);
     }
+  },
+  mounted: function() {
+    const nextpage = this.$route.query.nextpage;
+    if (nextpage) {
+      const path = nextpage.replace("-", "/");
+      this.$router.push({ path: path });
+    }
   }
 };
 </script>

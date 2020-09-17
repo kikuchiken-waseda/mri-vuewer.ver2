@@ -46,28 +46,6 @@
           </v-list-item-content>
         </v-list-item>
         <v-list dense nav class="pa-0">
-          <v-list-item v-if="hasToken" link @click="loadDropbox">
-            <v-list-item-icon>
-              <v-icon> mdi-dropbox </v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>
-                {{ $vuetify.lang.t("$vuetify.pages.loadDropbox") }}
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <v-list-item v-else link @click="dropboxAuth">
-            <v-list-item-icon>
-              <v-icon> mdi-dropbox </v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>
-                {{ $vuetify.lang.t("$vuetify.pages.dropbox") }}
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
-        <v-list dense nav class="pa-0">
           <v-list-item link @click="$store.commit('logging/show', true)">
             <v-list-item-icon>
               <v-icon> mdi-console </v-icon>
@@ -90,13 +68,6 @@
         <v-list-item-action>
           <v-progress-circular indeterminate color="primary" />
         </v-list-item-action>
-      </v-list-item>
-
-      <v-list-item sub-group v-else-if="files.length == 0">
-        <v-list-item-icon><v-icon>mdi-menu-open</v-icon></v-list-item-icon>
-        <v-list-item-title>
-          No Files
-        </v-list-item-title>
       </v-list-item>
 
       <v-list-group sub-group v-else :value="true" prepend-icon="mdi-menu-open">
@@ -187,6 +158,33 @@
         >
           <v-list-item-content>
             <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-group>
+
+      <v-list-group prepend-icon="mdi-dropbox" sub-group :value="false">
+        <template v-slot:activator>
+          <v-list-item-title>DROPBOX</v-list-item-title>
+        </template>
+        <v-list-item link @click="dropboxAuth">
+          <v-list-item-icon>
+            <v-icon> mdi-dropbox </v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ $vuetify.lang.t("$vuetify.pages.dropbox") }}
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item v-if="hasToken" link @click="loadDropbox">
+          <v-list-item-icon>
+            <v-icon> mdi-dropbox </v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ $vuetify.lang.t("$vuetify.pages.loadDropbox") }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list-group>

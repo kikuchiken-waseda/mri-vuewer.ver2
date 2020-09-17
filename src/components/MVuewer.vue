@@ -737,14 +737,44 @@ export default {
     },
     onUploadClick: function(payload) {
       this.$vuewer.console.log(this.tag, `on upload: ${payload.click}`);
-      // if (payload.click == "JSON") {
-      //   this.$vuewer.snackbar.warning("$vuetify.yet");
-      // } else if (payload.click == "TEXTGRID") {
-      //   this.wavesurfer.loadTextGrid(payload.files[0]);
-      //   this.$vuewer.snackbar.success("$vuetify.loaded");
-      // } else {
-      //   this.$vuewer.snackbar.warning("$vuetify.notAcceptable");
-      // }
+      const file = payload.files[0];
+      if (file) {
+        if (payload.click == "TEXTGRID/JSON") {
+          io.json.read(file).then(obj => {
+            this.wavesurfer.setTextGrid({});
+            const textgrid = io.obj.ver2.loadTextGrid(obj);
+            this.wavesurfer.setTextGrid(textgrid);
+            this.$vuewer.snackbar.success("$vuetify.loaded");
+          });
+        } else if (payload.click == "TEXTGRID/JSON/VER1") {
+          io.json.read(file).then(obj => {
+            this.wavesurfer.setTextGrid({});
+            const textgrid = io.obj.ver1.loadTextGrid(obj, "both");
+            this.wavesurfer.setTextGrid(textgrid);
+            this.$vuewer.snackbar.success("$vuetify.loaded");
+          });
+        } else if (payload.click == "TEXTGRID/JSON/VER1/LEFT") {
+          io.json.read(file).then(obj => {
+            this.wavesurfer.setTextGrid({});
+            const textgrid = io.obj.ver1.loadTextGrid(obj, "left");
+            this.wavesurfer.setTextGrid(textgrid);
+            this.$vuewer.snackbar.success("$vuetify.loaded");
+          });
+        } else if (payload.click == "TEXTGRID/JSON/VER1/RIGHT") {
+          io.json.read(file).then(obj => {
+            this.wavesurfer.setTextGrid({});
+            const textgrid = io.obj.ver1.loadTextGrid(obj, "right");
+            this.wavesurfer.setTextGrid(textgrid);
+            this.$vuewer.snackbar.success("$vuetify.loaded");
+          });
+        } else if (payload.click == "TEXTGRID/TEXTGRID") {
+          this.wavesurfer.setTextGrid({});
+          this.wavesurfer.loadTextGrid(file);
+          this.$vuewer.snackbar.success("$vuetify.loaded");
+        } else {
+          this.$vuewer.snackbar.warning("$vuetify.notAcceptable");
+        }
+      }
     },
     onLoadeddata: function(payload) {
       if (payload) {

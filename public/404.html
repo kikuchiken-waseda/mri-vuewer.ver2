@@ -5,9 +5,38 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <link rel=icon href=/mri-vuewer.dev/favicon.ico>
-    <title>mri-vuewer.dev</title>
+    <title>mri-vuewer.ver2</title>
     <script>
-      window.location.pathname = "/mri-vuewer.dev/";
+      const path = window.location.pathname.split("/");
+      const nexts = [];
+      for (const i in path) {
+        if (path[i] && path[i] !== "mri-vuewer.ver2") {
+          nexts.push(path[i]);
+        }
+      }
+      const nextpage = nexts.join("-");
+      if (nextpage) {
+        const protocol = window.location.protocol;
+        const hostname = window.location.hostname;
+
+        const query = window.location.search.split("&");
+        const queries = [];
+        for (const i in query) {
+          if (query[i]) {
+            queries.push(query[i].replace("?", ""));
+          }
+        }
+        const nextquery = queries.join("&");
+
+        let search = `nextpage=${nextpage}`;
+        if (nextquery) {
+          const search = `nextpage=${nextpage}&{nextquery}`;
+        }
+        const url = `${protocol}//${hostname}/mri-vuewer.ver2/?${search}`;
+        window.location.replace(url);
+      } else {
+        window.location.pathname = `/mri-vuewer.ver2/`;
+      }
     </script>
   </head>
   <body>
