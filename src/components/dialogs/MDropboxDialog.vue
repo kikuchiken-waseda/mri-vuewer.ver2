@@ -34,7 +34,7 @@ export default {
   components: { MCardDialog },
   data: () => ({
     tag: "component:m-dropbox-dialog",
-    title: "$vuetify.pages.loadDropbox",
+    title: "$vuetify.pages.dropbox.load",
     isLoading: false,
     files: [],
     selected: null

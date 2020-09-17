@@ -9,6 +9,23 @@ export default {
         this.$store.commit("setting/showFrameInVideo", val);
       }
     },
+    // ビデオにポイントを表示する
+    $showPointsInVideo: {
+      get() {
+        return this.$store.state.setting.showPointsInVideo;
+      },
+      set(val) {
+        this.$store.commit("setting/showPointsInVideo", val);
+      }
+    },
+    $showRectsInVideo: {
+      get() {
+        return this.$store.state.setting.showRectsInVideo;
+      },
+      set(val) {
+        this.$store.commit("setting/showRectsInVideo", val);
+      }
+    },
     // 開発者ページを表示する
     $showDev: {
       get() {

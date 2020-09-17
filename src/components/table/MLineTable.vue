@@ -1,5 +1,5 @@
 <template>
-  <v-data-table :headers="headers" :items="points">
+  <v-data-table :headers="headers" :items="lines">
     <template v-slot:item.label="props">
       <v-edit-dialog
         :return-value.sync="props.item.label"
@@ -17,17 +17,30 @@
         </template>
       </v-edit-dialog>
     </template>
-
-    <template v-if="showFrame" v-slot:item.time="props">
-      {{ $vuewer.math.round(props.item.frame.time, 3) }}
+    <template v-slot:item.time="props">
+      {{ Math.round(props.item.frame.time) }}
     </template>
 
-    <template v-slot:item.x="props">
-      {{ Math.round((props.item.x / cw) * ow) }}
+    <template v-slot:item.x1="props">
+      {{ Math.round((props.item.points[0] / cw) * ow) }}
     </template>
-    <template v-slot:item.y="props">
-      {{ Math.round((props.item.y / ch) * oh) }}
+
+    <template v-slot:item.y1="props">
+      {{ Math.round((props.item.points[1] / cw) * ow) }}
     </template>
+
+    <template v-slot:item.x2="props">
+      {{ Math.round((props.item.points[2] / cw) * ow) }}
+    </template>
+
+    <template v-slot:item.y2="props">
+      {{ Math.round((props.item.points[3] / cw) * ow) }}
+    </template>
+
+    <template v-slot:item.distance="props">
+      {{ Math.round(getDistance(props.item.points)) }}
+    </template>
+
     <template v-slot:item.color="props">
       <m-color-menu
         icon
@@ -40,14 +53,14 @@
 <script>
 import MColorMenu from "@/components/menus/MColorMenu";
 export default {
-  name: "m-point-table",
+  name: "m-line-table",
   components: { MColorMenu },
   props: {
     showFrame: {
       type: Boolean,
       default: false
     },
-    points: {
+    lines: {
       type: Array,
       require: true
     },
@@ -79,15 +92,21 @@ export default {
           { text: "label", value: "label" },
           { text: "frame", value: "frame.idx" },
           { text: "time", value: "time" },
-          { text: "x", value: "x" },
-          { text: "y", value: "y" },
+          { text: "x1", value: "x1" },
+          { text: "y1", value: "y1" },
+          { text: "x2", value: "x2" },
+          { text: "y2", value: "y2" },
+          { text: "distance", value: "distance" },
           { text: "color", value: "color" }
         ];
       }
       return [
         { text: "label", value: "label" },
-        { text: "x", value: "x" },
-        { text: "y", value: "y" },
+        { text: "x1", value: "x1" },
+        { text: "y1", value: "y1" },
+        { text: "x2", value: "x2" },
+        { text: "y2", value: "y2" },
+        { text: "distance", value: "distance" },
         { text: "color", value: "color" }
       ];
     }
@@ -97,8 +116,19 @@ export default {
     pagination: {}
   }),
   methods: {
+    getDistance: function(points) {
+      const p1 = {
+        x: (points[0] / this.cw) * this.ow,
+        y: (points[1] / this.ch) * this.oh
+      };
+      const p2 = {
+        x: (points[2] / this.cw) * this.ow,
+        y: (points[3] / this.ch) * this.oh
+      };
+      return this.$vuewer.math.distance(p1, p2);
+    },
     close(item) {
-      this.$emit("update-point", item);
+      this.$emit("update-line", item);
     }
   }
 };

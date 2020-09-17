@@ -5,27 +5,31 @@
     :fullscreen="$store.state.current.layout.mini"
     :title="$vuetify.lang.t(title)"
     v-model="dialog"
-    max-width="700"
+    :max-width="maxWidth"
   >
     <template v-slot:activator="{ on, attrs }">
       <slot name="activator" :on="on" :attrs="attrs"></slot>
     </template>
     <template v-slot:toolbar-actions>
-      <v-btn icon @click="dialog = false" color="white">
+      <span v-if="frame">
+        FRAME: {{ frame.idx }}: {{ $vuewer.math.round(frame.time, 3) }} sec
+      </span>
+      <v-btn icon @click="close" color="white">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </template>
-    <div>
-      <m-frame-editor
-        :src="src"
-        :frame="frame"
-        :origin-size="originSize"
-        @rects-updated="$emit('rects-updated', $event)"
-        @points-updated="$emit('points-updated', $event)"
-        @rect-deleted="$emit('rect-deleted', $event)"
-        @point-deleted="$emit('point-deleted', $event)"
-      />
-    </div>
+    <m-frame-editor
+      ref="editor"
+      :src="src"
+      :frame="frame"
+      :origin-size="originSize"
+      @skip="onSkip"
+      @update-max-width="onUpdateMaxWidth"
+      @rects-updated="$emit('rects-updated', $event)"
+      @points-updated="$emit('points-updated', $event)"
+      @rect-deleted="$emit('rect-deleted', $event)"
+      @point-deleted="$emit('point-deleted', $event)"
+    />
   </m-card-dialog>
 </template>
 <script>
@@ -34,9 +38,6 @@ import MFrameEditor from "@/components/video/MFrameEditor";
 export default {
   name: "m-image-edit-dialog",
   components: { MCardDialog, MFrameEditor },
-  data: () => ({
-    title: "$vuetify.forms.ruler.title"
-  }),
   props: {
     value: {
       type: Boolean
@@ -52,7 +53,28 @@ export default {
       type: Object
     }
   },
+  data: () => ({
+    maxWidth: "700"
+  }),
+  methods: {
+    onUpdateMaxWidth: function(maxWidth) {
+      if (this.maxWidth != maxWidth) {
+        this.maxWidth = maxWidth;
+      }
+    },
+    onSkip: function() {
+      this.maxWidth = "700";
+    },
+    close: function() {
+      this.$refs.editor.close();
+      this.maxWidth = "700";
+      this.dialog = false;
+    }
+  },
   computed: {
+    title: function() {
+      return "$vuetify.forms.imageEdit.title";
+    },
     dialog: {
       get() {
         return this.value;

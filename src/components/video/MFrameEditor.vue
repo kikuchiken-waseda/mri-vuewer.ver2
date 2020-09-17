@@ -1,80 +1,106 @@
 <template>
   <v-card ref="card" class="mx-auto" color="grey">
     <v-toolbar dense>
-      <m-color-menu v-model="color" />
-      <v-spacer />
-      <v-btn-toggle v-model="mode" dense background-color="primary" dark>
-        <v-btn>
+      <v-btn-toggle v-model="mode" dense group color="primary">
+        <v-btn text>
           <v-icon>mdi-shape-circle-plus</v-icon>
         </v-btn>
-        <v-btn>
+        <v-btn text>
           <v-icon>mdi-shape-rectangle-plus</v-icon>
         </v-btn>
-        <v-btn>
+        <v-btn text>
           <v-icon>mdi-eraser</v-icon>
         </v-btn>
       </v-btn-toggle>
-      <v-btn @click="downloadImage" class="ml-1" dark>
-        png
-        <v-icon>mdi-download</v-icon>
+      <div class="mx-1"></div>
+      <m-color-menu icon v-model="color" />
+      <v-spacer />
+
+      <v-btn-toggle dense group color="primary">
+        <v-btn icon @click="skipPrev">
+          <v-icon>mdi-skip-previous</v-icon>
+        </v-btn>
+        <v-btn icon @click="skipNext">
+          <v-icon>mdi-skip-next</v-icon>
+        </v-btn>
+      </v-btn-toggle>
+
+      <v-btn-toggle dense group color="primary">
+        <v-btn text @click="zoomOut">
+          <v-icon>mdi-magnify-minus</v-icon>
+        </v-btn>
+        <v-btn text @click="zoomIn">
+          <v-icon>mdi-magnify-plus</v-icon>
+        </v-btn>
+      </v-btn-toggle>
+
+      <v-btn text @click="downloadImage">
+        png <v-icon>mdi-download</v-icon>
       </v-btn>
     </v-toolbar>
-    <v-stage
-      ref="stage"
-      :config="canvas"
-      @mousedown="onStageMouseDown"
-      @touchstart="onStageMouseDown"
+
+    <v-card
+      flat
+      class="overflow-y-auto"
+      :style="`max-height: ${canvasMaxHeight}px`"
     >
-      <v-layer ref="layer">
-        <v-image @dblclick="onDblClick" :config="background" />
-      </v-layer>
-      <v-layer ref="layer">
-        <v-circle
-          v-for="(x, i) in points"
-          :key="i"
-          :config="{
-            x: x.x,
-            y: x.y,
-            stroke: 'white',
-            strokeWidth: 1,
-            opacity: x.opacity || 1,
-            radius: x.size,
-            fill: x.color,
-            draggable: true
-          }"
-          @click="onPointClick"
-          @mouseenter="onPointMouseEnter"
-          @mouseleave="onPointMouseLeave"
-          @dragstart="onPointDragStart"
-          @dragend="onPointDragEnd"
-        />
-      </v-layer>
-      <v-layer ref="layer">
-        <v-rect
-          v-for="x in rects"
-          :key="x.name"
-          :config="{
-            name: x.name,
-            x: x.x,
-            y: x.y,
-            width: x.width,
-            height: x.height,
-            rotation: x.rotation || 1,
-            scaleX: x.scaleX || 1,
-            scaleY: x.scaleY || 1,
-            stroke: x.color,
-            strokeWidth: x.size || 1,
-            opacity: x.opacity || 1,
-            draggable: true
-          }"
-          @click="onRectClick"
-          @dragstart="onRectDragStart"
-          @dragend="onRectDragEnd"
-          @transformend="onTransformEnd"
-        />
-        <v-transformer ref="transformer" />
-      </v-layer>
-    </v-stage>
+      <v-stage
+        ref="stage"
+        :config="canvas"
+        @mousedown="onStageMouseDown"
+        @touchstart="onStageMouseDown"
+      >
+        <v-layer ref="layer">
+          <v-image @dblclick="onDblClick" :config="background" />
+        </v-layer>
+        <v-layer ref="layer">
+          <v-circle
+            v-for="(x, i) in points"
+            :key="i"
+            :config="{
+              x: x.x,
+              y: x.y,
+              stroke: 'white',
+              strokeWidth: 1,
+              opacity: x.opacity || 1,
+              radius: x.size,
+              fill: x.color,
+              draggable: true
+            }"
+            @click="onPointClick"
+            @mouseenter="onPointMouseEnter"
+            @mouseleave="onPointMouseLeave"
+            @dragstart="onPointDragStart"
+            @dragend="onPointDragEnd"
+          />
+        </v-layer>
+        <v-layer ref="layer">
+          <v-rect
+            v-for="x in rects"
+            :key="x.name"
+            :config="{
+              name: x.name,
+              x: x.x,
+              y: x.y,
+              width: x.width,
+              height: x.height,
+              rotation: x.rotation || 1,
+              scaleX: x.scaleX || 1,
+              scaleY: x.scaleY || 1,
+              stroke: x.color,
+              strokeWidth: x.size || 1,
+              opacity: x.opacity || 1,
+              draggable: true
+            }"
+            @click="onRectClick"
+            @dragstart="onRectDragStart"
+            @dragend="onRectDragEnd"
+            @transformend="onTransformEnd"
+          />
+          <v-transformer ref="transformer" />
+        </v-layer>
+      </v-stage>
+    </v-card>
     <v-tabs v-model="tab" fixed-tabs background-color="primary" dark>
       <v-tab> Points </v-tab>
       <v-tab> Rects </v-tab>
@@ -100,12 +126,14 @@
   </v-card>
 </template>
 <script>
+import MWavesurferMixin from "@/mixins/MWavesurferMixin";
 import MColorMenu from "@/components/menus/MColorMenu";
 import MPointTable from "@/components/table/MPointTable";
 import MRectTable from "@/components/table/MRectTable";
 import db from "@/storage/db";
 export default {
   name: "m-frame-editor",
+  mixins: [MWavesurferMixin],
   components: {
     MColorMenu,
     MPointTable,
@@ -127,6 +155,8 @@ export default {
     color: "#F44336",
     size: 5,
     mode: 0,
+    scale: 0,
+    canvasMaxHeight: 600,
     background: {
       image: null
     },
@@ -144,6 +174,32 @@ export default {
     tab: null
   }),
   methods: {
+    zoomIn: function() {
+      if (this.scale < 0) this.scale = 0;
+      const cw = this.$refs.card.$el.clientWidth || 500;
+      const $cw = cw + 100 * this.scale;
+      if ($cw < 1000) {
+        this.scale = this.scale + 0.5;
+        this.loadImage(this.src);
+      }
+    },
+    zoomOut: function() {
+      if (this.scale > 0) this.scale = 0;
+      const cw = this.$refs.card.$el.clientWidth || 500;
+      const $cw = cw + 100 * this.scale;
+      if ($cw > 300) {
+        this.scale = this.scale - 0.5;
+        this.loadImage(this.src);
+      }
+    },
+    skipNext: function() {
+      this.skipForward();
+      this.$emit("skip");
+    },
+    skipPrev: function() {
+      this.skipBackward();
+      this.$emit("skip");
+    },
     loadImage: function(val) {
       const img = new Image();
       img.src = val;
@@ -292,10 +348,13 @@ export default {
     onResize: function() {
       const cw = this.$refs.card.$el.clientWidth || 500;
       const ch = (this.originSize.height * cw) / this.originSize.width;
-      this.canvas.width = cw;
-      this.canvas.height = ch;
-      this.background.height = cw;
-      this.background.width = ch;
+      const $cw = cw + 100 * this.scale;
+      const $ch = ch + 100 * this.scale;
+      this.canvas.width = $cw;
+      this.canvas.height = $ch;
+      this.background.height = $cw;
+      this.background.width = $ch;
+      this.canvasMaxHeight = ch - (64 + 64);
     },
     onDblClick: function() {
       this.mouse = this.$refs.stage.getNode().getPointerPosition();
@@ -321,7 +380,7 @@ export default {
       // ポイントがクリックされた場合, mode が 2 であればデータを削除する
       if (this.mode == 2) {
         const i = e.target.index;
-        this.$emit("point-deleted", this.points[i]);
+        setTimeout(() => this.$emit("point-deleted", this.points[i]));
         this.points.splice(i, 1);
       }
     },
@@ -428,16 +487,24 @@ export default {
       this.rects[i].label = rect.label;
       this.rects[i].color = rect.color;
       this.emitUpdateRects();
+    },
+    close: function() {
+      this.scale = 0;
     }
   },
   watch: {
+    mode: function(val) {
+      if (val == undefined) this.mode = 0;
+    },
     src: function(val) {
       if (val) {
+        this.scale = 0;
         this.loadImage(val);
       }
     }
   },
   mounted: function() {
+    this.scale = 0;
     this.loadImage(this.src);
   }
 };

@@ -50,27 +50,19 @@
     </template>
 
     <template v-slot:item.color="props">
-      <v-edit-dialog
-        ref="colorEditDialog"
-        :return-value.sync="props.item.color"
-        @close="close(props.item)"
-      >
-        {{ props.item.color }}
-        <template v-slot:input>
-          <v-color-picker
-            label="Edit"
-            v-model="props.item.color"
-            show-swatches
-          />
-          <v-text-field v-model="props.item.color" label="Edit" single-line />
-        </template>
-      </v-edit-dialog>
+      <m-color-menu
+        icon
+        v-model="props.item.color"
+        @input="close(props.item)"
+      />
     </template>
   </v-data-table>
 </template>
 <script>
+import MColorMenu from "@/components/menus/MColorMenu";
 export default {
   name: "m-rect-table",
+  components: { MColorMenu },
   props: {
     rects: {
       type: Array

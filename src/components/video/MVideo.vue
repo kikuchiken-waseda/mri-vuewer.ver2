@@ -21,10 +21,10 @@
       ref="stage"
       :config="canvas"
     >
-      <v-layer>
+      <v-layer v-if="$store.state.setting.showPointsInVideo">
         <v-circle v-for="(x, i) in frame.circles" :key="i" :config="x" />
       </v-layer>
-      <v-layer>
+      <v-layer v-if="$store.state.setting.showRectsInVideo">
         <v-rect v-for="(x, i) in frame.rects" :key="i" :config="x" />
       </v-layer>
       <v-layer>

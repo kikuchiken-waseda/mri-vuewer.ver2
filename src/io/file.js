@@ -49,8 +49,7 @@ const fetchFile = async function(url, filename, metadata) {
   }
 };
 
-const download = function(blob, name) {
-  const url = URL.createObjectURL(blob);
+const downloadURL = function(url, name) {
   const a = document.createElement("a");
   document.body.appendChild(a);
   a.download = name;
@@ -62,11 +61,17 @@ const download = function(blob, name) {
   }, 1e4);
 };
 
+const download = function(blob, name) {
+  const url = URL.createObjectURL(blob);
+  downloadURL(url, name);
+};
+
 export default {
   toBase64: toBase64,
   toBlob: toBlob,
   toBuff: toBuff,
   toUnit8Array: toUnit8Array,
   fetch: fetchFile,
-  download: download
+  download: download,
+  downloadURL: downloadURL
 };

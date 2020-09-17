@@ -38,8 +38,11 @@ const pages = {
   setting: "設定",
   about: "このアプリについて",
   logger: "ロガー",
-  dropbox: "ドロップボックス連携",
-  loadDropbox: "ドロップボックスのファイルを読み込む",
+  dropbox: {
+    auth: "ドロップボックス連携",
+    connected: "連携済み",
+    load: "ファイル取り込み"
+  },
   db: {
     clear: `${DB}の${DELETE}`,
     dump: `${DB}のエクスポート`,
@@ -233,7 +236,13 @@ export default {
       video: {
         label: "動画設定",
         showFrameInVideo: {
-          label: "フレーム情報を表示する"
+          label: "フレーム情報を動画に表示する"
+        },
+        syncPoints: {
+          label: "ポイントを動画に表示する"
+        },
+        syncRects: {
+          label: "矩形を動画に表示する"
         }
       },
       metadata: {

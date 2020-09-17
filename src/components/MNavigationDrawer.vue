@@ -167,23 +167,21 @@
           <v-list-item-title>DROPBOX</v-list-item-title>
         </template>
         <v-list-item link @click="dropboxAuth">
-          <v-list-item-icon>
-            <v-icon> mdi-dropbox </v-icon>
-          </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>
-              {{ $vuetify.lang.t("$vuetify.pages.dropbox") }}
+              {{ $vuetify.lang.t("$vuetify.pages.dropbox.auth") }}
             </v-list-item-title>
           </v-list-item-content>
+          <v-list-item-action>
+            <v-chip v-if="hasToken" small color="success">
+              {{ $vuetify.lang.t("$vuetify.pages.dropbox.connected") }}
+            </v-chip>
+          </v-list-item-action>
         </v-list-item>
-
         <v-list-item v-if="hasToken" link @click="loadDropbox">
-          <v-list-item-icon>
-            <v-icon> mdi-dropbox </v-icon>
-          </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>
-              {{ $vuetify.lang.t("$vuetify.pages.loadDropbox") }}
+              {{ $vuetify.lang.t("$vuetify.pages.dropbox.load") }}
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>

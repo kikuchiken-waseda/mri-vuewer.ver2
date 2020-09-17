@@ -14,6 +14,8 @@ const DEFAULTSTATE = {
   shouldGetVideoInfo: true,
   showDev: false,
   showFrameInVideo: true,
+  showPointsInVideo: true,
+  showRectsInVideo: true,
   showFreqLabel: false,
   showSpectrogram: true,
   showTimeLine: true,
@@ -45,8 +47,16 @@ export default {
     showDev: S.get("showDev") == null ? DS.showDev : S.get("showDev"),
     showFrameInVideo:
       S.get("showFrameInVideo") == null
-        ? DS.showDev
+        ? DS.showFrameInVideo
         : S.get("showFrameInVideo"),
+    showPointsInVideo:
+      S.get("showPointsInVideo") == null
+        ? DS.showPointsInVideo
+        : S.get("showPointsInVideo"),
+    showRectsInVideo:
+      S.get("showRectsInVideo") == null
+        ? DS.showRectsInVideo
+        : S.get("showRectsInVideo"),
     showFreqLabel:
       S.get("showFreqLabel") == null
         ? DS.showSpectrogram
@@ -70,6 +80,14 @@ export default {
     showFrameInVideo(state, payload) {
       state.showFrameInVideo = payload;
       S.set("showFrameInVideo", payload);
+    },
+    showPointsInVideo(state, payload) {
+      state.showPointsInVideo = payload;
+      S.set("showPointsInVideo", payload);
+    },
+    showRectsInVideo(state, payload) {
+      state.showRectsInVideo = payload;
+      S.set("showRectsInVideo", payload);
     },
     setMaxVideoSize(state, payload) {
       state.maxVideoSize = Number(payload);
@@ -146,6 +164,8 @@ export default {
     setDefault(context) {
       context.commit("showDev", DS.showDev);
       context.commit("showFrameInVideo", DS.showFrameInVideo);
+      context.commit("showPointsInVideo", DS.showPointsInVideo);
+      context.commit("showRectsInVideo", DS.showRectsInVideo);
       context.commit("setMaxVideoSize", DS.maxVideoSize);
       context.commit("setShouldGetVideoInfo", DS.shouldGetVideoInfo);
       context.commit("setShouldGetFrameInfo", DS.shouldGetFrameInfo);

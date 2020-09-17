@@ -159,9 +159,10 @@
           :current="current.tier.key"
         />
         <m-ruler-dialog
-          v-if="originSize.width"
+          v-if="current.frame.src"
           v-model="dialog.ruler.show"
           :origin-size="originSize"
+          :frame="current.frame"
           :src="current.frame.src"
         />
         <m-image-edit-dialog
@@ -1114,7 +1115,6 @@ export default {
     },
     onClickRuler: function(payload) {
       this.$vuewer.console.log(this.tag, `on click ruler`);
-      this.dialog.setting.show = true;
       if (payload) {
         this.lazyRular = true;
         this.seekTo(payload);

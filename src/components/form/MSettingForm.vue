@@ -101,7 +101,17 @@
       <v-checkbox
         hide-details
         v-model="$showFrameInVideo"
-        :label="t(`${locale}.waveform.showFrameInVideo.label`)"
+        :label="t(`${locale}.video.showFrameInVideo.label`)"
+      />
+      <v-checkbox
+        hide-details
+        v-model="$showPointsInVideo"
+        :label="t(`${locale}.video.syncPoints.label`)"
+      />
+      <v-checkbox
+        hide-details
+        v-model="$showRectsInVideo"
+        :label="t(`${locale}.video.syncRects.label`)"
       />
     </div>
   </v-form>

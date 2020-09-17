@@ -7,8 +7,11 @@ const pages = {
   setting: "Setting",
   about: "About",
   logger: "Logger",
-  dropbox: "Works with dropbox",
-  loadDropbox: "load dropbox file",
+  dropbox: {
+    auth: "Works with dropbox",
+    connected: "Connected",
+    load: "load dropbox file"
+  },
   db: {
     clear: "Clear DB",
     dump: "Export DB",
@@ -205,6 +208,12 @@ export default {
         label: "Video Setting",
         showFrameInVideo: {
           label: "Show frame info"
+        },
+        syncPoints: {
+          label: "show points in a video"
+        },
+        syncRects: {
+          label: "show rects in a video"
         }
       },
       loading: {

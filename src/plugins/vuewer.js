@@ -27,6 +27,10 @@ const Vuewer = {
     vue.prototype.$vuewer = {
       t: t,
       io: io,
+      download: {
+        blob: io.file.download,
+        url: io.file.downloadURL
+      },
       math: utils.math,
       text: utils.text,
       dropbox: utils.dropbox,
