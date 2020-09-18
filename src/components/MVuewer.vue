@@ -7,6 +7,7 @@
     @click-tier-add="onClickTierAdd"
     @click-tier-edit="onClickTierEdit"
     @click-tier-delete="onClickTierDelete"
+    @click-upload="onUploadClick"
     @click-download="onDownloadClick"
     @click-complate="onClickComplate"
     @click-record="onClickRecordContextMenu"

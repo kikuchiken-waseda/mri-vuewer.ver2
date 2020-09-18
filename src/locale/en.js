@@ -362,6 +362,20 @@ export default {
       edit: `Show an Image Annotation Dialog`
     }
   },
+  uploads: {
+    name: "Upload File",
+    dict: "complement dictionary (.dict)",
+    textgrid: {
+      title: `TEXTGRID`,
+      textgrid: `TextGrid`,
+      json: {
+        v1: `JSON (ver1)`,
+        v1left: `JSON (ver1:left)`,
+        v1right: `JSON (ver1:right)`,
+        v2: `JSON (ver2)`
+      }
+    }
+  },
   downloads: {
     name: "Download File",
     xlsx: "Download as xlsx file (ALL)",

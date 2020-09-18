@@ -382,6 +382,20 @@ export default {
       edit: `${FRAME.name} 画面の表示`
     }
   },
+  uploads: {
+    name: "ファイルアップロード",
+    dict: "テキスト補完辞書 (.dict)",
+    textgrid: {
+      title: `${TEXTGRID.name} のアップロード`,
+      textgrid: `TextGrid 形式`,
+      json: {
+        v1: `JSON 形式 (ver1)`,
+        v1left: `JSON 形式 (ver1:left)`,
+        v1right: `JSON 形式 (ver1:right)`,
+        v2: `JSON 形式 (ver2)`
+      }
+    }
+  },
   downloads: {
     name: "ファイルダウンロード",
     xlsx: "XLSX 形式でダウンロード (ALL)",
@@ -390,7 +404,7 @@ export default {
     mp4: "MP4 形式でダウンロード (現在)",
     textgrid: {
       title: `${TEXTGRID.name} のダウンロード`,
-      textgrid: "Download as textgrid file",
+      textgrid: `TextGrid 形式でダウンロード (${TEXTGRID.name})`,
       json: `JSON 形式でダウンロード (${TEXTGRID.name})`,
       xlsx: `XLSX 形式でダウンロード (${TEXTGRID.name})`
     },

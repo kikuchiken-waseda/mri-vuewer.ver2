@@ -11,6 +11,13 @@
         <v-toolbar dense color="primary" dark>
           <v-toolbar-title>VUWER-MENU</v-toolbar-title>
         </v-toolbar>
+        <input
+          ref="input"
+          :accept="accept"
+          @change="onChange"
+          type="file"
+          style="display:none"
+        />
         <v-list dense subheader class="overflow-y-auto" max-height="450">
           <div v-for="(item, key) in items" :key="key">
             <v-subheader
@@ -78,6 +85,10 @@ export default {
   components: {
     MContextMenu
   },
+  data: () => ({
+    accept: "",
+    clicked: null
+  }),
   computed: {
     fps: function() {
       return this.$store.state.current.video.fps;
@@ -169,17 +180,62 @@ export default {
           }
         },
         {
-          text: "インポート",
+          text: "$vuetify.uploads.name",
           show: false,
           icon: "mdi-upload",
           items: [
             {
-              text: "テキスト補完辞書の追加",
+              text: "$vuetify.uploads.dict",
               icon: "",
               click: () => {
                 setTimeout(function() {
                   vm.$emit("click-complate");
                 }, 10);
+              }
+            },
+            {
+              text: "$vuetify.uploads.textgrid.textgrid",
+              icon: "",
+              click: () => {
+                vm.accept = ".TextGrid,.textgrid,.Textgrid";
+                vm.clicked = "TEXTGRID/TEXTGRID";
+                vm.$nextTick(() => vm.$refs.input.click());
+              }
+            },
+            {
+              text: "$vuetify.uploads.textgrid.json.v2",
+              icon: "",
+              click: () => {
+                vm.accept = "application/json";
+                vm.clicked = "TEXTGRID/JSON";
+                vm.$nextTick(() => vm.$refs.input.click());
+              }
+            },
+            {
+              text: "$vuetify.uploads.textgrid.json.v1",
+              icon: "",
+              click: () => {
+                vm.accept = "application/json";
+                vm.clicked = "TEXTGRID/JSON/VER1";
+                vm.$nextTick(() => vm.$refs.input.click());
+              }
+            },
+            {
+              text: "$vuetify.uploads.textgrid.json.v1left",
+              icon: "",
+              click: () => {
+                vm.accept = "application/json";
+                vm.clicked = "TEXTGRID/JSON/VER1/LEFT";
+                vm.$nextTick(() => vm.$refs.input.click());
+              }
+            },
+            {
+              text: "$vuetify.uploads.textgrid.json.v1left",
+              icon: "",
+              click: () => {
+                vm.accept = "application/json";
+                vm.clicked = "TEXTGRID/JSON/VER1/RIGHT";
+                vm.$nextTick(() => vm.$refs.input.click());
               }
             }
           ]
@@ -262,7 +318,7 @@ export default {
               }
             },
             {
-              text: "$vuetify.downloads.textgrid.xlsx",
+              text: "$vuetify.downloads.textgrid.textgrid",
               icon: "",
               click: () => {
                 setTimeout(function() {
@@ -480,6 +536,13 @@ export default {
     }
   },
   methods: {
+    onChange() {
+      const item = {
+        click: this.clicked,
+        files: this.$refs.input.files
+      };
+      this.$emit("click-upload", item);
+    },
     incPxPerSec() {
       if (this.$minPxPerSec < 500) {
         this.$minPxPerSec = this.$minPxPerSec + 50;
