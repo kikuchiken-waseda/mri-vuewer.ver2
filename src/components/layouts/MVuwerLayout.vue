@@ -103,6 +103,9 @@ export default {
       });
     }
   },
+  mounted: function() {
+    this.$videoCols = this.$vuetify.breakpoint.mdAndUp == false ? 12 : 6;
+  },
   beforeDestroy: function() {
     this.$store.dispatch("current/layout/init");
   }
