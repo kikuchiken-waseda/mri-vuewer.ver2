@@ -1,7 +1,6 @@
 import kuromoji from "kuromoji";
-
 const builder = kuromoji.builder({
-  dicPath: process.env.VUE_APP_KUROHUNE_DICT
+  dicPath: process.env.VUE_APP_KUROMOJI_DICT
 });
 
 const tokenize = function(text) {

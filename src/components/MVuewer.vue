@@ -863,6 +863,13 @@ export default {
             } else {
               this.deleteRecord(item.key, item.index);
             }
+          } else {
+            const record = this.$textgrid[item.key].values[item.index];
+            if (record.text.length) {
+              const text = record.text.slice(0, record.text.length - 1);
+              this.current.tier.record.text = record.text = text;
+              this.wavesurfer.setTierValue(item.key, item.index, record);
+            }
           }
         } else if (this.$deleteRecordKey == "ctrl") {
           if (payload.ctrl) {
@@ -871,10 +878,24 @@ export default {
             } else {
               this.deleteRecord(item.key, item.index);
             }
+          } else {
+            const record = this.$textgrid[item.key].values[item.index];
+            if (record.text.length) {
+              const text = record.text.slice(0, record.text.length - 1);
+              this.current.tier.record.text = record.text = text;
+              this.wavesurfer.setTierValue(item.key, item.index, record);
+            }
           }
         } else {
           if (payload.shift) {
             this.onClickTierDelete();
+          } else if (payload.ctrl) {
+            const record = this.$textgrid[item.key].values[item.index];
+            if (record.text.length) {
+              const text = record.text.slice(0, record.text.length - 1);
+              this.current.tier.record.text = record.text = text;
+              this.wavesurfer.setTierValue(item.key, item.index, record);
+            }
           } else {
             this.deleteRecord(item.key, item.index);
           }
@@ -967,6 +988,7 @@ export default {
       // ctrl + s で明示的に保存
       if (payload.keycode == 83 && payload.ctrl == true) {
         this.saveTextGrid();
+        this.$emit("save-dropbox");
       }
 
       // VIM モード
