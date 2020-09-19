@@ -45,4 +45,22 @@ yarn lint
 ```
 
 ### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+
+.env
+```
+VUE_APP_DROPBOX_REDIRECT="https://<path to this page>/"
+VUE_APP_KUROMOJI_DICT="/<repo name>/dict"
+```
+
+.env.local
+```
+VUE_APP_DROPBOX_KEY="<DROPBOX APP KEY>"
+```
+
+vue.config.js
+```
+module.exports = {
+    publicPath: process.env.NODE_ENV === "production" ? "/<repo name>/" : "/",
+    ...
+};
+```
