@@ -69,7 +69,10 @@ const read = function(path, blob = false) {
 
 export default {
   auth: auth,
-  hasToken: () => (conf.token == null ? false : true),
+  hasToken: () => {
+    if (storages.dropbox.get("token")) return true;
+    return false;
+  },
   setToken: setToken,
   write: write,
   read: read,

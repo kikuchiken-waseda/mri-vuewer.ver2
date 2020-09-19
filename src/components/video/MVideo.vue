@@ -6,34 +6,36 @@
     :flat="flat"
     :tile="tile"
   >
-    <video
-      ref="video"
-      :style="videoStyle"
-      @loadeddata="onLoaded"
-      @timeupdate="onTimeupdate"
-      :muted="muted"
-      :src="src"
-    />
-    <v-stage
-      @click="onClickEvent($event, 'click')"
-      @dblclick="onClickEvent($event, 'dblclick')"
-      :style="canvasStyle"
-      ref="stage"
-      :config="canvas"
-    >
-      <v-layer v-if="$store.state.setting.showPointsInVideo">
-        <v-circle v-for="(x, i) in frame.circles" :key="i" :config="x" />
-      </v-layer>
-      <v-layer v-if="$store.state.setting.showRectsInVideo">
-        <v-rect v-for="(x, i) in frame.rects" :key="i" :config="x" />
-      </v-layer>
-      <v-layer>
-        <v-text v-for="(x, i) in frame.texts" :key="i" :config="x" />
-      </v-layer>
-      <v-layer v-if="$store.state.setting.showFrameInVideo">
-        <v-text :config="label" />
-      </v-layer>
-    </v-stage>
+    <m-key-context :style="canvasWrapperStyle" @keyup="onKeyup">
+      <video
+        ref="video"
+        :style="videoStyle"
+        @loadeddata="onLoaded"
+        @timeupdate="onTimeupdate"
+        :muted="muted"
+        :src="src"
+      />
+      <v-stage
+        @click="onClickEvent($event, 'click')"
+        @dblclick="onClickEvent($event, 'dblclick')"
+        :style="canvasStyle"
+        ref="stage"
+        :config="canvas"
+      >
+        <v-layer v-if="$store.state.setting.showPointsInVideo">
+          <v-circle v-for="(x, i) in frame.circles" :key="i" :config="x" />
+        </v-layer>
+        <v-layer v-if="$store.state.setting.showRectsInVideo">
+          <v-rect v-for="(x, i) in frame.rects" :key="i" :config="x" />
+        </v-layer>
+        <v-layer>
+          <v-text v-for="(x, i) in frame.texts" :key="i" :config="x" />
+        </v-layer>
+        <v-layer v-if="$store.state.setting.showFrameInVideo">
+          <v-text :config="label" />
+        </v-layer>
+      </v-stage>
+    </m-key-context>
 
     <v-card-actions v-if="controls">
       <v-btn dark icon color="primary" @click="downloadImage">
@@ -52,9 +54,11 @@
 </template>
 <script>
 import utils from "@/utils";
+import MKeyContext from "@/components/contextmenus/MKeyContext";
 
 export default {
   name: "m-video",
+  components: { MKeyContext },
   props: {
     src: {
       type: String,
@@ -340,6 +344,9 @@ export default {
     // ウインドウサイズ変更時
     onResize: function() {
       this.setCanvasSize();
+    },
+    onKeyup: function(payload) {
+      this.$emit("keyup", payload);
     },
     // 動画時刻変更時の処理
     onTimeupdate: function() {

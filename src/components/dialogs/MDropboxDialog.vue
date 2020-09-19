@@ -36,13 +36,15 @@ export default {
     tag: "component:m-dropbox-dialog",
     title: "$vuetify.pages.dropbox.load",
     isLoading: false,
-    files: [],
     selected: null
   }),
   props: {
     value: { type: Boolean }
   },
   computed: {
+    files: function() {
+      return this.$store.state.files.chaches || [];
+    },
     dialog: {
       get() {
         return this.value;
@@ -72,25 +74,8 @@ export default {
         const files = await this.$vuewer.db.gets();
         this.$store.commit("files/files", files);
         this.$vuewer.loading.end();
+        this.dialog = false;
       }
-    }
-  },
-  mounted: function() {
-    if (this.$vuewer.dropbox.hasToken()) {
-      this.isLoading = true;
-      this.$vuewer.dropbox
-        .get("/data")
-        .then(res => {
-          this.files = res.entries.filter(x => x[".tag"] == "file");
-        })
-        .catch(res => {
-          const msg = `DROPBOX ERROR: ${res.status} :${res.error.error_summary}`;
-          this.$vuewer.snackbar.error(msg);
-          this.$vuewer.console.error(this.tag, msg);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
     }
   }
 };

@@ -9,6 +9,7 @@
         :origin-size="originSize"
         :src="src"
         :frames="frames"
+        @keyup="onKeyup('prev', $event)"
         @mouseover="$emit('mouseover')"
       />
     </template>
@@ -23,6 +24,7 @@
       :style="videoStyle"
       :src="src"
       :frames="frames"
+      @keyup="onKeyup('prev', $event)"
       @mouseover="$emit('mouseover')"
     />
     <template v-slot:next>
@@ -34,6 +36,7 @@
         :origin-size="originSize"
         :style="videoStyle"
         :frames="frames"
+        @keyup="onKeyup('prev', $event)"
         @mouseover="$emit('mouseover')"
       />
     </template>
@@ -125,6 +128,10 @@ export default {
       }
     },
     // イベント発火
+    onKeyup(ref, event) {
+      const payload = { ref, event };
+      this.$emit("keyup", payload);
+    },
     onLoadeddata(elm) {
       // 完全に 0 にすると画像取得ができない
       this.$refs.video.setCurrentTime(0);

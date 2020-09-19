@@ -29,9 +29,6 @@ export default {
   },
   data: () => ({}),
   mounted: function() {
-    if (window.location.hash) {
-      this.$vuewer.dropbox.setToken(window.location.hash);
-    }
     this.$store.commit("lang", this.$vuetify.lang);
     this.$store.dispatch("files/init");
   }

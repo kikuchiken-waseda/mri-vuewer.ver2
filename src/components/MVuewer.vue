@@ -24,6 +24,7 @@
           @loadeddata="onLoadeddata"
           @frame-updated="onFrameUpdated"
           @mouseover="onMouseover('video-array')"
+          @keyup="onVideoArrayKeyup"
         />
         <m-vuwer-actions
           @download-click="onDownloadClick"
@@ -38,6 +39,7 @@
           ref="tables"
           @click-image-edit="onClickImageEdit"
           @click-ruler="onClickRuler"
+          @keyup="onTableKeyup"
           @mouseover="onMouseover('tables')"
           :frames="$frames"
           :textgrid="$textgrid"
@@ -69,6 +71,8 @@
           :progressColor="$progressColor"
           @spectrogram-render-end="onSpectrogramRenderEnd"
           @spectrogram-render-start="onSpectrogramRenderStart"
+          @spectrogram-keyup="onWaveSurferKeyup"
+          @waveform-keyup="onWaveSurferKeyup"
           @textgrid-click="onTextGridClick"
           @textgrid-current-update="onRecordUpdated"
           @textgrid-dblclick="onTextGridDblClick"
@@ -410,6 +414,17 @@ export default {
     }
   },
   methods: {
+    playPause: function() {
+      const key = this.current.tier.key || null;
+      const idx = this.current.tier.record.idx || null;
+      const time = this.current.tier.record.time || null;
+      const currentTime = this.wavesurfer.getCurrentTime();
+      if (key && idx && time > currentTime) {
+        this.playRecord(key, idx);
+      } else {
+        this.wavesurfer.playPause();
+      }
+    },
     // レコード操作
     addRecord: function(key, time, text = "") {
       const item = { time: time, text: text };
@@ -852,9 +867,9 @@ export default {
         this.addRecord(payload.key, payload.time);
       }
     },
+    // key 操作系
     onTextGridKeydown: function(payload) {
       const item = payload.current;
-
       // DELETE 系の動作
       if (payload.keycode == 8 || payload.keycode == 46) {
         if (this.$deleteRecordKey == "alt") {
@@ -1039,24 +1054,24 @@ export default {
         // i でフォーカス: 73
         setTimeout(() => this.$refs.input.focus());
       }
+      console.log("onTextGridKeydown", payload);
     },
-    onVoiceUpdateRecordText: function() {
-      const recog =
-        window.webkitSpeechRecognition || window.SpeechRecognition || null;
-      if (recog) {
-        const rec = new recog();
-        rec.lang = this.$vuetify.lang.current == "ja" ? "ja-JP" : "en-US";
-        rec.onresult = e => {
-          if (e.results[0].isFinal) {
-            this.current.tier.record.text = e.results[0][0].transcript;
-            this.onUpdateRecordText();
-          }
-        };
-        rec.start();
-      } else {
-        this.$vuewer.snackbar.warn(
-          this.$vuetify.lang.t("$vuetify.contexts.browserError")
-        );
+    onWaveSurferKeyup: function(event) {
+      console.log("onWaveSurferKeyup", event);
+      // タブキー時に現在時刻の再生
+      if (event.key == "Tab") {
+        this.playPause();
+      }
+    },
+    onTableKeyup: function(event) {
+      console.log("onTableKeyup", event);
+    },
+    onVideoArrayKeyup: function(payload) {
+      console.log("onVideoArrayKeyUp", payload.ref, payload.event);
+      const event = payload.event;
+      // タブキー時に現在時刻の再生
+      if (event.key == "Tab") {
+        this.playPause();
       }
     },
     onUpdateRecordText: function(opt) {
@@ -1087,6 +1102,26 @@ export default {
         this.$refs.input.blur();
         if (key) this.focusTier(key);
       });
+    },
+
+    onVoiceUpdateRecordText: function() {
+      const recog =
+        window.webkitSpeechRecognition || window.SpeechRecognition || null;
+      if (recog) {
+        const rec = new recog();
+        rec.lang = this.$vuetify.lang.current == "ja" ? "ja-JP" : "en-US";
+        rec.onresult = e => {
+          if (e.results[0].isFinal) {
+            this.current.tier.record.text = e.results[0][0].transcript;
+            this.onUpdateRecordText();
+          }
+        };
+        rec.start();
+      } else {
+        this.$vuewer.snackbar.warn(
+          this.$vuetify.lang.t("$vuetify.contexts.browserError")
+        );
+      }
     },
     onTextGridUpdate: function(textgrid) {
       if (textgrid) {

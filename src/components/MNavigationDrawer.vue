@@ -92,6 +92,41 @@
         </v-list-item>
       </v-list-group>
       <v-divider />
+      <v-list-group
+        v-if="!isLoading"
+        prepend-icon="mdi-dropbox"
+        sub-group
+        :value="false"
+      >
+        <template v-slot:activator>
+          <v-list-item-title>DROPBOX</v-list-item-title>
+        </template>
+        <v-list-item link @click="dropboxAuth">
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ $vuetify.lang.t("$vuetify.pages.dropbox.auth") }}
+            </v-list-item-title>
+          </v-list-item-content>
+          <v-list-item-action>
+            <v-chip v-if="hasToken" small color="success">
+              {{ $vuetify.lang.t("$vuetify.pages.dropbox.connected") }}
+            </v-chip>
+          </v-list-item-action>
+        </v-list-item>
+        <v-list-item v-if="hasToken" link @click="loadDropbox">
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ $vuetify.lang.t("$vuetify.pages.dropbox.load") }}
+            </v-list-item-title>
+          </v-list-item-content>
+          <v-list-item-action>
+            <v-chip v-if="this.diff.length" small color="success">
+              + {{ this.diff.length }}
+            </v-chip>
+          </v-list-item-action>
+        </v-list-item>
+      </v-list-group>
+
       <v-list-group prepend-icon="mdi-database" sub-group :value="false">
         <template v-slot:activator>
           <v-list-item-title>DATABASE</v-list-item-title>
@@ -140,6 +175,7 @@
           </v-list-item-content>
         </v-list-item>
       </v-list-group>
+      <v-divider />
 
       <v-list-group
         v-if="$showDev"
@@ -161,31 +197,6 @@
           </v-list-item-content>
         </v-list-item>
       </v-list-group>
-
-      <v-list-group prepend-icon="mdi-dropbox" sub-group :value="false">
-        <template v-slot:activator>
-          <v-list-item-title>DROPBOX</v-list-item-title>
-        </template>
-        <v-list-item link @click="dropboxAuth">
-          <v-list-item-content>
-            <v-list-item-title>
-              {{ $vuetify.lang.t("$vuetify.pages.dropbox.auth") }}
-            </v-list-item-title>
-          </v-list-item-content>
-          <v-list-item-action>
-            <v-chip v-if="hasToken" small color="success">
-              {{ $vuetify.lang.t("$vuetify.pages.dropbox.connected") }}
-            </v-chip>
-          </v-list-item-action>
-        </v-list-item>
-        <v-list-item v-if="hasToken" link @click="loadDropbox">
-          <v-list-item-content>
-            <v-list-item-title>
-              {{ $vuetify.lang.t("$vuetify.pages.dropbox.load") }}
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list-group>
     </v-list>
 
     <m-file-upload-dialog v-model="uploadDialog" />
@@ -204,7 +215,8 @@ export default {
     current: null,
     dropboxDialog: false,
     uploadDialog: false,
-    dbImportDialog: false
+    dbImportDialog: false,
+    updateToken: false
   }),
   computed: {
     $showDev: function() {
@@ -214,9 +226,17 @@ export default {
       return this.$store.state.files.isLoading;
     },
     files: function() {
-      const files = this.$store.state.files.files;
-      if (files) return files;
-      return [];
+      return this.$store.state.files.files || [];
+    },
+    chaches: function() {
+      return this.$store.state.files.chaches || [];
+    },
+    diff: function() {
+      const cnames = this.chaches.map(x => x.name.split(".")[0]);
+      const fnames = this.files.map(x => x.name.split(".")[0]);
+      return cnames.filter(c => {
+        return fnames.indexOf(c) == -1;
+      });
     },
     drawer: {
       get() {
@@ -268,6 +288,7 @@ export default {
         });
     },
     hasToken: function() {
+      if (this.updateToken) return true;
       return this.$vuewer.dropbox.hasToken();
     }
   },
@@ -346,6 +367,13 @@ export default {
           this.drawer = false;
         });
     }
+  },
+  mounted: function() {
+    if (window.location.hash) {
+      this.$vuewer.dropbox.setToken(window.location.hash);
+      this.updateToken = true;
+    }
+    this.$store.dispatch("files/dropbox");
   }
 };
 </script>

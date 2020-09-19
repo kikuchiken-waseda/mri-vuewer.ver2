@@ -1,12 +1,17 @@
 import db from "@/storage/db";
+import dropbox from "../utils/dropbox";
 
 export default {
   namespaced: true,
   state: () => ({
     files: [],
+    chaches: [],
     isLoading: false
   }),
   mutations: {
+    chaches: function(state, files) {
+      if (Array.isArray(files)) state.chaches = files;
+    },
     files: function(state, files) {
       if (Array.isArray(files)) state.files = files;
     },
@@ -41,18 +46,24 @@ export default {
     postLog: function(context, msg) {
       context.dispatch(
         "logging/dblog",
-        { tag: "POST", table: "files", msg: msg },
+        { tag: "POST", table: "files", msg },
         { root: true }
       );
     },
     deleteLog: function(context, msg) {
       context.dispatch(
         "logging/dblog",
-        { tag: "DELETE", table: "files", msg: msg },
+        { tag: "DELETE", table: "files", msg },
         { root: true }
       );
     },
-    // ファイルストア初期化
+    errorLog: function(context, msg) {
+      context.dispatch(
+        "logging/error",
+        { tag: "store/files", msg },
+        { root: true }
+      );
+    },
     init: function(context) {
       return new Promise((resolve, reject) => {
         context.commit("isLoading", true);
@@ -69,6 +80,23 @@ export default {
             context.commit("isLoading", false);
             reject(error);
           });
+      });
+    },
+    // ファイルストア初期化
+    dropbox: function(context) {
+      return new Promise((resolve, reject) => {
+        if (dropbox.hasToken()) {
+          dropbox
+            .get("/data")
+            .then(res => {
+              const chaches = res.entries.filter(x => x[".tag"] == "file");
+              context.commit("chaches", chaches);
+              resolve(true);
+            })
+            .catch(res => reject(res));
+        } else {
+          resolve(false);
+        }
       });
     },
     // ファイル一覧の取得
@@ -139,7 +167,6 @@ export default {
                 resolve(true);
               })
               .catch(error => {
-                console.log("push:toArray:catch");
                 context.commit("isLoading", false);
                 reject(error);
               });

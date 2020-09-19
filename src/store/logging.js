@@ -41,6 +41,9 @@ export default {
   actions: {
     dblog: function(context, payload) {
       context.commit("dblog", payload);
+    },
+    error: function(context, payload) {
+      context.commit("error", payload);
     }
   }
 };
