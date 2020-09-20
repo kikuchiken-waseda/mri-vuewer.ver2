@@ -5,6 +5,7 @@
     :style="canvasWrapperStyle"
     :flat="flat"
     :tile="tile"
+    tabindex="0"
   >
     <m-key-context :style="canvasWrapperStyle" @keyup="onKeyup">
       <video

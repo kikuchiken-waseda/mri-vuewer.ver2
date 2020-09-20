@@ -199,6 +199,9 @@ export default {
         },
         showDev: {
           label: "Show Develop page"
+        },
+        syncDropbox: {
+          label: "Auto backup in dropbox"
         }
       },
       metadata: {

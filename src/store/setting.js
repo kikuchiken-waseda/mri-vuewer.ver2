@@ -2,6 +2,7 @@ import storage from "@/storage/localStorage.js";
 const S = storage.wavesurfer;
 
 const DEFAULTSTATE = {
+  syncDropbox: false,
   addRecordKey: "dbl",
   cursorColor: "#333",
   deleteRecordKey: "delete",
@@ -36,6 +37,8 @@ export default {
     minPxPerSec: Number(S.get("minPxPerSec")) || DS.minPxPerSec,
     playOffset: Number(S.get("playOffset")) || DS.playOffset,
     progressColor: S.get("progressColor") || DS.progressColor,
+    syncDropbox:
+      S.get("syncDropbox") == null ? DS.syncDropbox : S.get("syncDropbox"),
     shouldGetFrameInfo:
       S.get("shouldGetFrameInfo") == null
         ? DS.shouldGetFrameInfo
@@ -80,6 +83,10 @@ export default {
     showFrameInVideo(state, payload) {
       state.showFrameInVideo = payload;
       S.set("showFrameInVideo", payload);
+    },
+    syncDropbox(state, payload) {
+      state.syncDropbox = payload;
+      S.set("syncDropbox", payload);
     },
     showPointsInVideo(state, payload) {
       state.showPointsInVideo = payload;
@@ -162,6 +169,7 @@ export default {
   },
   actions: {
     setDefault(context) {
+      context.commit("syncDropbox", DS.syncDropbox);
       context.commit("showDev", DS.showDev);
       context.commit("showFrameInVideo", DS.showFrameInVideo);
       context.commit("showPointsInVideo", DS.showPointsInVideo);

@@ -26,6 +26,15 @@ export default {
         this.$store.commit("setting/showRectsInVideo", val);
       }
     },
+    // ドロップボックへの自動送信
+    $syncDropbox: {
+      get() {
+        return this.$store.state.setting.syncDropbox;
+      },
+      set(val) {
+        this.$store.commit("setting/syncDropbox", val);
+      }
+    },
     // 開発者ページを表示する
     $showDev: {
       get() {

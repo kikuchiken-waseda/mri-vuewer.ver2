@@ -44,62 +44,64 @@
       class="overflow-y-auto"
       :style="`max-height: ${canvasMaxHeight}px`"
     >
-      <v-stage
-        ref="stage"
-        :config="canvas"
-        @mousedown="onStageMouseDown"
-        @touchstart="onStageMouseDown"
-      >
-        <v-layer ref="layer">
-          <v-image @dblclick="onDblClick" :config="background" />
-        </v-layer>
-        <v-layer ref="layer">
-          <v-circle
-            v-for="(x, i) in points"
-            :key="i"
-            :config="{
-              x: x.x,
-              y: x.y,
-              stroke: 'white',
-              strokeWidth: 1,
-              opacity: x.opacity || 1,
-              radius: x.size,
-              fill: x.color,
-              draggable: true
-            }"
-            @click="onPointClick"
-            @mouseenter="onPointMouseEnter"
-            @mouseleave="onPointMouseLeave"
-            @dragstart="onPointDragStart"
-            @dragend="onPointDragEnd"
-          />
-        </v-layer>
-        <v-layer ref="layer">
-          <v-rect
-            v-for="x in rects"
-            :key="x.name"
-            :config="{
-              name: x.name,
-              x: x.x,
-              y: x.y,
-              width: x.width,
-              height: x.height,
-              rotation: x.rotation || 1,
-              scaleX: x.scaleX || 1,
-              scaleY: x.scaleY || 1,
-              stroke: x.color,
-              strokeWidth: x.size || 1,
-              opacity: x.opacity || 1,
-              draggable: true
-            }"
-            @click="onRectClick"
-            @dragstart="onRectDragStart"
-            @dragend="onRectDragEnd"
-            @transformend="onTransformEnd"
-          />
-          <v-transformer ref="transformer" />
-        </v-layer>
-      </v-stage>
+      <m-key-context ref="context" @keyup="onKeyup">
+        <v-stage
+          ref="stage"
+          :config="canvas"
+          @mousedown="onStageMouseDown"
+          @touchstart="onStageMouseDown"
+        >
+          <v-layer ref="layer">
+            <v-image @dblclick="onDblClick" :config="background" />
+          </v-layer>
+          <v-layer ref="layer">
+            <v-circle
+              v-for="(x, i) in points"
+              :key="i"
+              :config="{
+                x: x.x,
+                y: x.y,
+                stroke: 'white',
+                strokeWidth: 1,
+                opacity: x.opacity || 1,
+                radius: x.size,
+                fill: x.color,
+                draggable: true
+              }"
+              @click="onPointClick"
+              @mouseenter="onPointMouseEnter"
+              @mouseleave="onPointMouseLeave"
+              @dragstart="onPointDragStart"
+              @dragend="onPointDragEnd"
+            />
+          </v-layer>
+          <v-layer ref="layer">
+            <v-rect
+              v-for="x in rects"
+              :key="x.name"
+              :config="{
+                name: x.name,
+                x: x.x,
+                y: x.y,
+                width: x.width,
+                height: x.height,
+                rotation: x.rotation || 1,
+                scaleX: x.scaleX || 1,
+                scaleY: x.scaleY || 1,
+                stroke: x.color,
+                strokeWidth: x.size || 1,
+                opacity: x.opacity || 1,
+                draggable: true
+              }"
+              @click="onRectClick"
+              @dragstart="onRectDragStart"
+              @dragend="onRectDragEnd"
+              @transformend="onTransformEnd"
+            />
+            <v-transformer ref="transformer" />
+          </v-layer>
+        </v-stage>
+      </m-key-context>
     </v-card>
     <v-tabs v-model="tab" fixed-tabs background-color="primary" dark>
       <v-tab> Points </v-tab>
@@ -130,11 +132,13 @@ import MWavesurferMixin from "@/mixins/MWavesurferMixin";
 import MColorMenu from "@/components/menus/MColorMenu";
 import MPointTable from "@/components/table/MPointTable";
 import MRectTable from "@/components/table/MRectTable";
+import MKeyContext from "@/components/contextmenus/MKeyContext";
 import db from "@/storage/db";
 export default {
   name: "m-frame-editor",
   mixins: [MWavesurferMixin],
   components: {
+    MKeyContext,
     MColorMenu,
     MPointTable,
     MRectTable
@@ -167,13 +171,16 @@ export default {
       width: 600,
       height: 600
     },
-    mouse: {
-      x: null,
-      y: null
-    },
+    cursor: { x: null, y: null, show: false },
     tab: null
   }),
   methods: {
+    focus: function() {
+      this.$refs.context.focus();
+    },
+    blur: function() {
+      this.$refs.context.blur();
+    },
     zoomIn: function() {
       if (this.scale < 0) this.scale = 0;
       const cw = this.$refs.card.$el.clientWidth || 500;
@@ -208,6 +215,7 @@ export default {
         this.background.image = img;
         this.syncPoints();
         this.syncRects();
+        this.focus();
       };
     },
     downloadImage: function() {
@@ -356,18 +364,23 @@ export default {
       this.background.width = $ch;
       this.canvasMaxHeight = ch - (64 + 64);
     },
+    // キー操作
+    onKeyup: function(payload) {
+      console.log("FrameEditor:onKeyup", payload);
+      this.$emit("keyup", payload);
+    },
     onDblClick: function() {
-      this.mouse = this.$refs.stage.getNode().getPointerPosition();
+      this.cursor = this.$refs.stage.getNode().getPointerPosition();
       // 点を追加
       if (this.mode == 0) {
-        this.addPoint(this.mouse.x, this.mouse.y, this.color, this.size);
+        this.addPoint(this.cursor.x, this.cursor.y, this.color, this.size);
       }
       if (this.mode == 1) {
         const width = this.canvas.width / 5;
         const height = this.canvas.height / 5;
         this.addRect(
-          this.mouse.x - width / 2,
-          this.mouse.y - height / 2,
+          this.cursor.x - width / 2,
+          this.cursor.y - height / 2,
           width,
           height,
           0,

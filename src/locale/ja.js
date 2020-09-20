@@ -231,6 +231,9 @@ export default {
         },
         showDev: {
           label: "開発者用デモページを表示する"
+        },
+        syncDropbox: {
+          label: "ページ遷移時に dropbox へ自動バックアップを行う"
         }
       },
       video: {

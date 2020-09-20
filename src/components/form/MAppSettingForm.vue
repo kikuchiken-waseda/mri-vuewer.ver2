@@ -39,6 +39,13 @@
       v-model="$showDev"
       :label="t(`${locale}.app.showDev.label`)"
     />
+
+    <v-checkbox
+      class="mt-0"
+      hide-details
+      v-model="$syncDropbox"
+      :label="t(`${locale}.app.syncDropbox.label`)"
+    />
   </v-form>
 </template>
 <script>

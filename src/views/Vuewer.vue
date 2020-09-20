@@ -33,9 +33,13 @@ export default {
     frames: [],
     item: {}, // DB データ更新用オブジェクト
     textgrid: {},
-    isLoading: false
+    isLoading: false,
+    isChange: false
   }),
   computed: {
+    syncDropbox: function() {
+      return this.$store.state.setting.syncDropbox;
+    },
     source: {
       get() {
         return this.$store.state.current.video.source;
@@ -82,12 +86,13 @@ export default {
         const file = await this.$vuewer.db.get(Number(this.id));
         const name = `${file.name.split(".")[0]}.json`;
         const blob = this.$vuewer.io.json.toFile(name, file);
-        const res = this.$vuewer.dropbox
+        this.$vuewer.dropbox
           .write("data/" + name, blob)
-          .then(() => {
+          .then(res => {
             this.$vuewer.snackbar.success(
               `sended file to ${res.path_display} in dropbox`
             );
+            this.isChange = false;
           })
           .catch(res => {
             // res.error.error_summary
@@ -111,6 +116,7 @@ export default {
      */
     onIdChanged: async function(id) {
       if (id) {
+        this.isChange = false;
         this.id = id;
         this.$vuewer.console.log(this.tag, `change page id ${id}`);
         this.isLoading = true;
@@ -158,6 +164,7 @@ export default {
     },
     onTextGridUpdated: function(textgrid) {
       if (textgrid) {
+        this.isChange = true;
         const vm = this;
         this.item.textgrid = Object.assign({}, textgrid);
         for (const key in this.item.textgrid) {
@@ -180,6 +187,7 @@ export default {
       }
     },
     onFrameRectUpdated: function(frame) {
+      this.isChange = true;
       const vm = this;
       const tag = "vuewer:onFrameRectUpdated";
       for (const r of frame.rects) {
@@ -207,6 +215,7 @@ export default {
       }
     },
     onFramePointUpdated: async function(frame) {
+      this.isChange = true;
       const vm = this;
       const tag = "vuewer:onFramePointUpdated";
       for (const i in frame.points) {
@@ -230,6 +239,7 @@ export default {
       }
     },
     onFramePointDeleted: function(point) {
+      this.isChange = true;
       const vm = this;
       const tag = "vuewer:onFramePointDeleted";
       db.points
@@ -243,6 +253,7 @@ export default {
         });
     },
     onFrameRectDeleted: function(rect) {
+      this.isChange = true;
       const vm = this;
       const tag = "vuewer:onFrameRectDeleted";
       db.rects
@@ -254,16 +265,57 @@ export default {
           vm.$vuewer.snackbar.error(error);
           vm.$vuewer.console.error(tag, error);
         });
+    },
+    onUnload: function(event) {
+      if ((this.isChange, this.syncDropbox)) {
+        if (this.$vuewer.dropbox.hasToken()) {
+          const msg = "Data you've inputted won't be synced in dropbox.";
+          event.returnValue = msg;
+        }
+      }
     }
   },
   watch: {
-    "$route.params.id": function(val) {
-      this.onIdChanged(val);
+    "$route.params.id": function(val, old) {
+      if (val !== old && val) {
+        if (this.syncDropbox) {
+          this.saveDropbox()
+            .then(() => {
+              this.onIdChanged(val);
+            })
+            .catch(error => {
+              this.$vuewer.snackbar.error(error);
+              this.onIdChanged(val);
+            });
+        } else {
+          this.onIdChanged(val);
+        }
+      }
     }
+  },
+  created: function() {
+    window.addEventListener("beforeunload", this.onUnload);
+  },
+  destroyed: function() {
+    window.removeEventListener("beforeunload", this.onUnload);
   },
   mounted: function() {
     const id = this.$route.params.id;
     this.onIdChanged(id);
+  },
+  // ページ遷移時
+  beforeRouteLeave(to, from, next) {
+    if ((this.isChange, this.syncDropbox)) {
+      if (this.$vuewer.dropbox.hasToken()) {
+        this.saveDropbox()
+          .then(() => next())
+          .catch(() => next(false));
+      } else {
+        next();
+      }
+    } else {
+      next();
+    }
   }
 };
 </script>
