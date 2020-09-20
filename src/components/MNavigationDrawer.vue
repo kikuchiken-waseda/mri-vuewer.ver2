@@ -69,8 +69,12 @@
           <v-progress-circular indeterminate color="primary" />
         </v-list-item-action>
       </v-list-item>
-
-      <v-list-group sub-group v-else :value="true" prepend-icon="mdi-menu-open">
+      <v-list-group
+        sub-group
+        v-else-if="files.length"
+        :value="true"
+        prepend-icon="mdi-menu-open"
+      >
         <template v-slot:activator>
           <v-list-item-title>FILES</v-list-item-title>
         </template>
@@ -306,7 +310,22 @@ export default {
       }
     },
     loadDropbox: function() {
-      this.dropboxDialog = true;
+      let file = null;
+      const path = this.$route.matched[0].path;
+      if (path && path.indexOf("/files/:id") != -1) {
+        file = this.files.find(f => {
+          return f.id == this.$route.params.id;
+        });
+      }
+      if (file) {
+        const path = `/data/${file.name.split(".")[0]}.json`;
+        this.$vuewer.dropbox.read(path).then(text => {
+          const obj = JSON.parse(text);
+          this.$store.dispatch("current/loadObj", obj);
+        });
+      } else {
+        this.dropboxDialog = true;
+      }
     },
     dropboxAuth: function() {
       this.$vuewer.dropbox.auth();

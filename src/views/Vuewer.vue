@@ -267,7 +267,7 @@ export default {
         });
     },
     onUnload: function(event) {
-      if ((this.isChange, this.syncDropbox)) {
+      if (this.isChange && this.syncDropbox) {
         if (this.$vuewer.dropbox.hasToken()) {
           const msg = "Data you've inputted won't be synced in dropbox.";
           event.returnValue = msg;
@@ -278,7 +278,7 @@ export default {
   watch: {
     "$route.params.id": function(val, old) {
       if (val !== old && val) {
-        if (this.syncDropbox) {
+        if (this.syncDropbox && this.isChange) {
           this.saveDropbox()
             .then(() => {
               this.onIdChanged(val);

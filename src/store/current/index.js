@@ -30,6 +30,25 @@ export default {
       context.state.wavesurfer = null;
       context.state.textgrid = null;
     },
+    // 現在表示されている VUEWER の転記情報を更新します
+    loadObj: function(context, payload) {
+      if (payload.frames && payload.frames.length) {
+        context.commit("frames", payload.frames);
+      }
+      if (payload.textgrid) {
+        context.dispatch("updateTextGrid", payload.textgrid);
+      }
+    },
+    // 現在表示されている TEXTGRID を更新ます.
+    updateTextGrid: function(context, textgrid) {
+      const ws = context.state.wavesurfer;
+      if (ws) {
+        ws.setTextGrid(textgrid);
+      } else {
+        context.commit("textgrid", textgrid);
+      }
+    },
+    // frames の内の特定のデータを更新します
     updateFrame: function(context, payload) {
       const i = context.state.frames.findIndex(x => x.id == payload.id);
       if (i !== -1) {

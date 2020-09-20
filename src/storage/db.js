@@ -26,6 +26,7 @@ db.version(4).stores({
   rects:
     "++id, x, y, width, height, rotation, scaleX, scaleY, size, color, label, frameId -> frames.id"
 });
+db.open();
 
 const dump = function() {
   return new Promise((resolve, reject) => {
