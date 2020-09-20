@@ -310,19 +310,24 @@ export default {
       }
     },
     loadDropbox: function() {
-      let file = null;
-      const path = this.$route.matched[0].path;
-      if (path && path.indexOf("/files/:id") != -1) {
-        file = this.files.find(f => {
-          return f.id == this.$route.params.id;
-        });
-      }
-      if (file) {
-        const path = `/data/${file.name.split(".")[0]}.json`;
-        this.$vuewer.dropbox.read(path).then(text => {
-          const obj = JSON.parse(text);
-          this.$store.dispatch("current/loadObj", obj);
-        });
+      const path = this.$store.getters["current/video/dropboxPath"];
+      if (path) {
+        this.$vuewer.loading.start("$vuetify.loading");
+        this.$vuewer.dropbox
+          .read(path)
+          .then(text => {
+            const obj = JSON.parse(text);
+            this.$store.dispatch("current/loadObj", obj);
+            this.$vuewer.snackbar.success("$vuetify.loaded");
+          })
+          .catch(res => {
+            const msg = `DROPBOX ERROR: ${res.status} :${res.error.error_summary}`;
+            this.$vuewer.snackbar.error(msg);
+          })
+          .finally(() => {
+            this.$vuewer.loading.end();
+            this.drawer = false;
+          });
       } else {
         this.dropboxDialog = true;
       }

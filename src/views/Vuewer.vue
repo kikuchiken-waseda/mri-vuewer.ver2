@@ -8,13 +8,13 @@
       :frames="frames"
       :origin-size="$originSize"
       :textgrid="textgrid"
+      @data-updated="onDataUpdated"
       @textgrid-updated="onTextGridUpdated"
       @frame-point-updated="onFramePointUpdated"
       @frame-rect-updated="onFrameRectUpdated"
       @frame-point-deleted="onFramePointDeleted"
       @frame-rect-deleted="onFrameRectDeleted"
       @download-json="downloadJson"
-      @save-dropbox="saveDropbox"
     />
   </v-container>
 </template>
@@ -28,19 +28,21 @@ export default {
   mixins: [MVideoTWBMixin],
   components: { MVuewer },
   data: () => ({
-    tag: "views:vuewer",
-    videoElm: null,
-    frames: [],
-    item: {}, // DB データ更新用オブジェクト
-    textgrid: {},
-    isLoading: false,
-    isChange: false
+    id: null,
+    item: {}, // DB データ登録用オブジェクト
+    frames: [], // フレーム転記情報
+    textgrid: {}, // 時系列転記情報
+    isLoading: false, // 読み込み状態
+    isChange: false // データ変更の有無
   }),
   computed: {
+    tag: () => "views:vuewer", // LOG 用識別子
     syncDropbox: function() {
+      // ページ離脱時に Dropbox にログを残すか否か
       return this.$store.state.setting.syncDropbox;
     },
     source: {
+      // 解析動画データ
       get() {
         return this.$store.state.current.video.source;
       },
@@ -58,6 +60,7 @@ export default {
     }
   },
   methods: {
+    // エラーハンドラ
     onError: function(error, msg = null, next = false) {
       if (msg) {
         this.$vuewer.snackbar.error(msg);
@@ -67,6 +70,7 @@ export default {
       this.$vuewer.console.error(this.tag, error);
       if (next) this.$router.push({ name: next });
     },
+    // 最新データを JSON 形式でダウンロード
     downloadJson: async function() {
       try {
         const file = await this.$vuewer.db.get(Number(this.id));
@@ -80,22 +84,20 @@ export default {
         }
       }
     },
+    // DROPBOX 保存関数
     saveDropbox: async function() {
       if (this.$vuewer.dropbox.hasToken()) {
-        this.$vuewer.loading.start("ファイル送信中...");
+        this.$vuewer.loading.start("$vuetify.sending");
         const file = await this.$vuewer.db.get(Number(this.id));
         const name = `${file.name.split(".")[0]}.json`;
         const blob = this.$vuewer.io.json.toFile(name, file);
         this.$vuewer.dropbox
           .write("data/" + name, blob)
-          .then(res => {
-            this.$vuewer.snackbar.success(
-              `sended file to ${res.path_display} in dropbox`
-            );
+          .then(() => {
+            this.$vuewer.snackbar.success("$vuetify.sended");
             this.isChange = false;
           })
           .catch(res => {
-            // res.error.error_summary
             const msg = `DROPBOX ERROR: ${res.status} :${res.error.error_summary}`;
             this.onError(res.error, msg);
           })
@@ -116,13 +118,14 @@ export default {
      */
     onIdChanged: async function(id) {
       if (id) {
-        this.isChange = false;
         this.id = id;
         this.$vuewer.console.log(this.tag, `change page id ${id}`);
+
+        this.isChange = false;
         this.isLoading = true;
         this.$vuewer.loading.start("$vuetify.loading");
-        // 画面表示する動画情報を初期化する
-        this.$initVideo();
+
+        this.$initVideo(); // 画面表示する動画情報を初期化する
         try {
           const file = await db.files.get(Number(id));
           this.$vuewer.db.log("files", "GET", `get file ${id}`);
@@ -162,6 +165,7 @@ export default {
         this.$router.push({ name: "Home" });
       }
     },
+    // EVENT ハンドラ
     onTextGridUpdated: function(textgrid) {
       if (textgrid) {
         this.isChange = true;
@@ -169,9 +173,9 @@ export default {
         this.item.textgrid = Object.assign({}, textgrid);
         for (const key in this.item.textgrid) {
           this.item.textgrid[key] = {
-            parent: textgrid[key].parent,
-            type: textgrid[key].type,
-            values: textgrid[key].values
+            values: this.item.textgrid[key].values,
+            type: this.item.textgrid[key].type,
+            parent: this.item.textgrid[key].parent
           };
         }
         db.files
@@ -266,6 +270,27 @@ export default {
           vm.$vuewer.console.error(tag, error);
         });
     },
+    onDataUpdated: async function(payload) {
+      // DB の保存
+      this.item.textgrid = Object.assign({}, payload.textgrid);
+      for (const key in this.item.textgrid) {
+        this.item.textgrid[key] = {
+          values: this.item.textgrid[key].values,
+          type: this.item.textgrid[key].type,
+          parent: this.item.textgrid[key].parent
+        };
+      }
+      await db.files.put(this.item);
+      for (const frame of payload.frames) {
+        if (frame.points && frame.points.length) {
+          await db.points.bulkPut(frame.points);
+        }
+        if (frame.rects && frame.rects.length) {
+          await db.rects.bulkPut(frame.rects);
+        }
+      }
+      this.saveDropbox();
+    },
     onUnload: function(event) {
       if (this.isChange && this.syncDropbox) {
         if (this.$vuewer.dropbox.hasToken()) {
@@ -305,6 +330,7 @@ export default {
   },
   // ページ遷移時
   beforeRouteLeave(to, from, next) {
+    this.$initVideo(); // 画面表示する動画情報を初期化する
     if ((this.isChange, this.syncDropbox)) {
       if (this.$vuewer.dropbox.hasToken()) {
         this.saveDropbox()

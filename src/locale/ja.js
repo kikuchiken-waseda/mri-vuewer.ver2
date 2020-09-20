@@ -87,7 +87,6 @@ const home = {
 
 export default {
   ...ja,
-  prev: "戻る",
   validations: {
     required: "この項目は必須項目です!",
     positiveInteger: "この項目は正の整数です!",
@@ -336,14 +335,6 @@ export default {
       }
     }
   },
-  loading: "読み込み中 ...",
-  loaded: "データの読み込みが終了しました",
-  notAcceptable: "不正なファイルです",
-  yet: "この関数は作成中です",
-  textgrid: TEXTGRID,
-  annotation: ANNOTATION,
-  frame: FRAME,
-  browserError: "このブラウザでは, 該当の機能を使用することはできません.",
   contexts: {
     playPause: "再生/停止",
     skip: "スキップ",
@@ -355,6 +346,7 @@ export default {
     setting: "設定",
     save: "保存",
     saveDropbox: "ドロップボックスに保存",
+    loadDropbox: "ドロップボックスから読み込み",
     tier: {
       add: `${TEXTGRID.tier.name} を追加`,
       edit: `${TEXTGRID.tier.name} を編集`,
@@ -417,6 +409,18 @@ export default {
       xlsx: `XLSX 形式でダウンロード (${FRAME.name})`
     }
   },
+  textgrid: TEXTGRID,
+  frame: FRAME,
+  prev: "戻る",
+  yet: "この関数は作成中です",
+  loading: "読み込み中 ...",
+  loaded: "データの読み込みが終了しました",
+  sending: "データ送信中 (ドロップボックス) ...",
+  sended: "ドロップボックスへのデータ送信が終了しました",
+  notFound: "ファイルは存在しません",
+  notAcceptable: "不正なファイルです",
+  browserError: "このブラウザでは, 該当の機能を使用することはできません.",
+  annotation: ANNOTATION,
   ver1: "MRI Vuewer ver.1 系"
 };
 //# sourceMappingURL=ja.js.map

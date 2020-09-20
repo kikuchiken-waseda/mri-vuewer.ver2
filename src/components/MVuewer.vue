@@ -1,8 +1,8 @@
 <template>
   <m-w-context-menu
     @click-setting="onClickSetting"
-    @click-save="onClickSave"
-    @click-save-dropbox="onClickSaveDropbox"
+    @click-save="fireUpdateData"
+    @click-load-dropbox="onClickLoadDropbox"
     @click-image-edit="onClickImageEdit"
     @click-tier-add="onClickTierAdd"
     @click-tier-edit="onClickTierEdit"
@@ -123,8 +123,8 @@
       <template v-slot:bottom>
         <m-speed-dial
           v-model="fab"
-          @click-save="onClickSave"
-          @click-save-dropbox="onClickSaveDropbox"
+          @click-save="fireUpdateData"
+          @click-save-dropbox="fireUpdateData"
           @click-setting="onClickSetting"
           @click-detail="onClickDetail"
           @click-ruler="onClickRuler"
@@ -657,13 +657,6 @@ export default {
         tg.tiers[key].canvas.focus();
       });
     },
-    // TextGrid 操作
-    saveTextGrid: function() {
-      if (!this.isSyncing) {
-        this.$vuewer.console.log(this.tag, "save textgrid");
-        this.$emit("textgrid-updated", this.$textgrid);
-      }
-    },
     seekTo: function(time, center) {
       const d = this.wavesurfer.getDuration();
       const p = time / d;
@@ -674,7 +667,19 @@ export default {
         this.wavesurfer.seekTo(progress);
       }
     },
-
+    // EVENT 発火
+    fireUpdateTextGrid: function() {
+      if (!this.isSyncing) {
+        this.$emit("textgrid-updated", this.$textgrid);
+      }
+    },
+    fireUpdateData: function() {
+      const payload = {
+        textgrid: this.$textgrid,
+        frames: this.$frames
+      };
+      this.$emit("data-updated", payload);
+    },
     // EVENT ハンドラー
     onResize: function(payload) {
       this.$vuewer.console.log(this.tag, `on resize`);
@@ -1003,10 +1008,11 @@ export default {
 
       // ctrl + s で明示的に保存
       if (payload.keycode == 83 && payload.ctrl == true) {
-        this.saveTextGrid();
-        this.$emit("save-dropbox");
+        this.fireUpdateData();
       }
-
+      if (payload.keycode == 82 && payload.ctrl == true) {
+        this.onClickLoadDropbox();
+      }
       // VIM モード
       if (payload.keycode == 74) {
         if (payload.ctrl) {
@@ -1054,25 +1060,27 @@ export default {
         // i でフォーカス: 73
         setTimeout(() => this.$refs.input.focus());
       }
-      console.log("onTextGridKeydown", payload);
     },
     onWaveSurferKeyup: function(event) {
-      console.log("onWaveSurferKeyup", event);
-      // タブキー時に現在時刻の再生
-      if (event.key == "Tab") {
-        this.playPause();
-      }
+      const { key, xKey } = this.$vuewer.key.summary(event);
+      console.log("onWaveSurferKeyup", key, xKey, event);
+      if (key == "Tab" && xKey == "default") this.playPause();
+      if (key == "s" && xKey == "ctrl") this.fireUpdateData();
+      if (key == "r" && xKey == "ctrl") this.onClickLoadDropbox();
     },
     onTableKeyup: function(event) {
-      console.log("onTableKeyup", event);
+      const { key, xKey } = this.$vuewer.key.summary(event);
+      console.log("onTableKeyup", key, xKey, event);
+      if (key == "s" && xKey == "ctrl") this.fireUpdateData();
+      if (key == "r" && xKey == "ctrl") this.onClickLoadDropbox();
     },
     onVideoArrayKeyup: function(payload) {
-      console.log("onVideoArrayKeyUp", payload.ref, payload.event);
       const event = payload.event;
-      // タブキー時に現在時刻の再生
-      if (event.key == "Tab") {
-        this.playPause();
-      }
+      const { key, xKey } = this.$vuewer.key.summary(event);
+      console.log("onVideoArrayKeyUp", payload.ref, key, xKey, event);
+      if (key == "Tab" && xKey == "default") this.playPause();
+      if (key == "s" && xKey == "ctrl") this.fireUpdateData();
+      if (key == "r" && xKey == "ctrl") this.onClickLoadDropbox();
     },
     onUpdateRecordText: function(opt) {
       const tier = this.current.tier;
@@ -1126,7 +1134,7 @@ export default {
     onTextGridUpdate: function(textgrid) {
       if (textgrid) {
         this.$textgrid = Object.assign({}, textgrid);
-        this.saveTextGrid();
+        this.fireUpdateTextGrid();
       }
     },
     onRecordUpdated: function(payload) {
@@ -1159,13 +1167,6 @@ export default {
       } else {
         this.dialog.detail.show = true;
       }
-    },
-    onClickSave: function() {
-      this.saveTextGrid();
-      this.$vuewer.snackbar.success("save data !");
-    },
-    onClickSaveDropbox: function() {
-      this.$emit("save-dropbox");
     },
     onClickSetting: function() {
       this.$vuewer.console.log(this.tag, `on click setting`);
@@ -1204,6 +1205,29 @@ export default {
     onClickComplate: function() {
       this.$vuewer.console.log(this.tag, `on click complate`);
       this.dialog.complates.show = true;
+    },
+    onClickLoadDropbox: function() {
+      const path = this.$store.getters["current/video/dropboxPath"];
+      if (path !== null && this.$vuewer.dropbox.hasToken()) {
+        this.$vuewer.loading.start("$vuetify.loading");
+        this.$vuewer.dropbox
+          .read(path)
+          .then(text => {
+            const obj = JSON.parse(text);
+            this.$store.dispatch("current/loadObj", obj);
+            this.$vuewer.snackbar.success("$vuetify.loaded");
+          })
+          .catch(res => {
+            let msg = `DROPBOX ERROR: ${res.status} :${res.error.error_summary}`;
+            if (res.status == 409) {
+              msg = "$vuetify.notFound";
+            }
+            this.$vuewer.snackbar.error(msg);
+          })
+          .finally(() => this.$vuewer.loading.end());
+      } else {
+        this.$vuewer.dropbox.auth();
+      }
     },
     // context menu の record 関連処理
     onClickRecordContextMenu: function(payload) {
@@ -1259,6 +1283,7 @@ export default {
     onPointsUpdated: function(points) {
       this.current.frame.points = points;
       this.$store.dispatch("current/updateFrame", this.current.frame);
+      // TODO
       this.$emit("frame-point-updated", this.current.frame);
       this.$vuewer.console.log(
         this.tag,

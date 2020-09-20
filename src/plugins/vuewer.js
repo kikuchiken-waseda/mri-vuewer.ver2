@@ -79,6 +79,23 @@ const Vuewer = {
       loading: {
         start: message => $store.dispatch("loading/start", message),
         end: () => $store.dispatch("loading/finish")
+      },
+      key: {
+        summary: function(event) {
+          const key = event.key;
+
+          const ctrl = { text: "ctrl", val: event.ctrlKey };
+          const alt = { text: "alt", val: event.altKey };
+          const shift = { text: "shift", val: event.shiftKey };
+          const meta = { text: "meta", val: event.metaKey };
+
+          const keys = [ctrl, alt, shift, meta];
+          const xkeys = keys.filter(x => x.val == true).map(x => x.text);
+          const xKey = keys.every(x => x.val !== true)
+            ? "default"
+            : xkeys.join("+");
+          return { key, xKey };
+        }
       }
     };
   }

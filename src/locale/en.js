@@ -302,7 +302,10 @@ export default {
   },
   loading: "Now Loading ...",
   loaded: "The data was loaded",
+  sending: "Sending the data to dropbox ...",
+  sended: "Sended the data to dropbox",
   notAcceptable: "The data is not acceptable!!",
+  notFound: "Your file is not founded.",
   yet: "This function is under construction",
   textgrid: {
     name: "TextGrid",
@@ -334,7 +337,8 @@ export default {
     zoom_out: "zoom out",
     setting: "setting",
     save: "save",
-    saveDropbox: "save to dropbox",
+    saveDropbox: "save the data to dropbox",
+    loadDropbox: "load the data from dropbox",
     tier: {
       add: "Add a Tier",
       edit: "Edit a Tier",

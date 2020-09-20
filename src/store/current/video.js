@@ -51,5 +51,19 @@ export default {
       context.commit("audioStream", null);
       context.commit("originSize", { width: null, height: null });
     }
+  },
+  getters: {
+    bname: function(state) {
+      if (state.filename) {
+        return state.filename.split(".")[0];
+      }
+      return null;
+    },
+    dropboxPath: function(state) {
+      if (state.filename) {
+        return `/data/${state.filename.split(".")[0]}.json`;
+      }
+      return null;
+    }
   }
 };

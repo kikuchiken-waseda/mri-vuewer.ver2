@@ -112,6 +112,10 @@ export default {
     },
     items: function() {
       const vm = this;
+      const hasToken = this.$vuewer.dropbox.hasToken();
+      const saveText = hasToken
+        ? "$vuetify.contexts.saveDropbox"
+        : "$vuetify.contexts.save";
       return [
         {
           text: "$vuetify.contexts.playPause",
@@ -162,7 +166,7 @@ export default {
           }
         },
         {
-          text: "$vuetify.contexts.save",
+          text: saveText,
           icon: "mdi-content-save",
           click: () => {
             setTimeout(function() {
@@ -171,11 +175,11 @@ export default {
           }
         },
         {
-          text: "$vuetify.contexts.saveDropbox",
+          text: "$vuetify.contexts.loadDropbox",
           icon: "mdi-dropbox",
           click: () => {
             setTimeout(function() {
-              vm.$emit("click-save-dropbox");
+              vm.$emit("click-load-dropbox");
             }, 10);
           }
         },
