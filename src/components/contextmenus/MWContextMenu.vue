@@ -42,20 +42,23 @@
                 </v-list-item-content>
               </template>
               <v-list-item
-                sub-group
                 v-for="(x, key) in item.items"
                 :key="key"
                 @click="x.click"
               >
-                <v-list-item-icon> </v-list-item-icon>
+                <v-list-item-icon>
+                  <v-icon></v-icon>
+                </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title>
+                    <v-icon v-if="x.icon"> {{ x.icon }} </v-icon>
                     {{ $vuetify.lang.t(x.text) }}
                   </v-list-item-title>
                 </v-list-item-content>
-                <v-list-item-icon>
-                  <v-icon> {{ x.icon }} </v-icon>
-                </v-list-item-icon>
+                <v-list-item-action v-if="x.kbd">
+                  <v-spacer />
+                  <v-list-item-action-text v-text="x.kbd" />
+                </v-list-item-action>
               </v-list-item>
             </v-list-group>
 
@@ -68,6 +71,9 @@
                   {{ $vuetify.lang.t(item.text) }}
                 </v-list-item-title>
               </v-list-item-content>
+              <v-list-item-action v-if="item.kbd">
+                <v-list-item-action-text v-text="item.kbd" />
+              </v-list-item-action>
             </v-list-item>
           </div>
         </v-list>
@@ -119,6 +125,7 @@ export default {
       return [
         {
           text: "$vuetify.contexts.playPause",
+          kbd: "TAB",
           icon: "mdi-play-pause",
           click: this.playPause
         },
@@ -129,12 +136,14 @@ export default {
           items: [
             {
               text: "$vuetify.contexts.skipBackward",
-              icon: "mdi-skip-backward",
+              icon: "mdi-skip-previous",
+              kbd: "J",
               click: this.skipBackward
             },
             {
               text: "$vuetify.contexts.skipForward",
-              icon: "mdi-skip-forward",
+              icon: "mdi-skip-next",
+              kbd: "K",
               click: this.skipForward
             }
           ]
@@ -147,11 +156,13 @@ export default {
             {
               text: "$vuetify.contexts.zoom_in",
               icon: "mdi-magnify-plus",
+              kbd: "CTRL + +",
               click: this.incPxPerSec
             },
             {
               text: "$vuetify.contexts.zoom_out",
               icon: "mdi-magnify-minus",
+              kbd: "CTRL + -",
               click: this.decPxPerSec
             }
           ]
@@ -168,6 +179,7 @@ export default {
         {
           text: saveText,
           icon: "mdi-content-save",
+          kbd: "CTRL + S",
           click: () => {
             setTimeout(function() {
               vm.$emit("click-save");
@@ -177,6 +189,7 @@ export default {
         {
           text: "$vuetify.contexts.loadDropbox",
           icon: "mdi-dropbox",
+          kbd: "CTRL + R",
           click: () => {
             setTimeout(function() {
               vm.$emit("click-load-dropbox");
@@ -338,6 +351,7 @@ export default {
         {
           text: "$vuetify.contexts.tier.add",
           icon: "mdi-plus",
+          kbd: "CTRL + SHIFT + C",
           click: () => {
             setTimeout(function() {
               vm.$emit("click-tier-add");
@@ -356,6 +370,7 @@ export default {
         {
           text: "$vuetify.contexts.tier.delete",
           icon: "mdi-delete",
+          kbd: "CTRL + SHIFT + DELETE",
           click: () => {
             setTimeout(function() {
               vm.$emit("click-tier-delete");
@@ -370,6 +385,7 @@ export default {
             {
               text: "$vuetify.contexts.record.play",
               icon: "",
+              kbd: "TAB",
               click: () => {
                 setTimeout(function() {
                   vm.$emit("click-record", "play");
@@ -379,6 +395,7 @@ export default {
             {
               text: "$vuetify.contexts.record.copy",
               icon: "",
+              kbd: "CTRL + C",
               click: () => {
                 setTimeout(function() {
                   vm.$emit("click-record", "copy");
@@ -388,6 +405,7 @@ export default {
             {
               text: "$vuetify.contexts.record.paste",
               icon: "",
+              kbd: "CTRL + V",
               click: () => {
                 setTimeout(function() {
                   vm.$emit("click-record", "paste");
@@ -395,16 +413,8 @@ export default {
               }
             },
             {
-              text: "$vuetify.contexts.record.next",
-              icon: "",
-              click: () => {
-                setTimeout(function() {
-                  vm.$emit("click-record", "next");
-                }, 10);
-              }
-            },
-            {
               text: "$vuetify.contexts.record.prev",
+              kbd: "CTRL + J",
               icon: "",
               click: () => {
                 setTimeout(function() {
@@ -413,11 +423,12 @@ export default {
               }
             },
             {
-              text: "$vuetify.contexts.record.toStart",
+              text: "$vuetify.contexts.record.next",
               icon: "",
+              kbd: "CTRL + K",
               click: () => {
                 setTimeout(function() {
-                  vm.$emit("click-record", "to-start");
+                  vm.$emit("click-record", "next");
                 }, 10);
               }
             },
@@ -431,20 +442,31 @@ export default {
               }
             },
             {
-              text: "$vuetify.contexts.record.extend",
+              text: "$vuetify.contexts.record.toStart",
               icon: "",
               click: () => {
                 setTimeout(function() {
-                  vm.$emit("click-record", "extend");
+                  vm.$emit("click-record", "to-start");
                 }, 10);
               }
             },
             {
               text: "$vuetify.contexts.record.shrink",
+              kbd: "CTRL + SHIFT + J",
               icon: "",
               click: () => {
                 setTimeout(function() {
                   vm.$emit("click-record", "shrink");
+                }, 10);
+              }
+            },
+            {
+              text: "$vuetify.contexts.record.extend",
+              kbd: "CTRL + SHIFT + K",
+              icon: "",
+              click: () => {
+                setTimeout(function() {
+                  vm.$emit("click-record", "extend");
                 }, 10);
               }
             },
