@@ -63,6 +63,11 @@ export default {
         text: "JSON (VER1: RIGHT)",
         val: "TEXTGRID/JSON/VER1/RIGHT",
         accept: "application/json"
+      },
+      {
+        text: "JSON (VER1: UP-DOWN)",
+        val: "TEXTGRID/JSON/VER1/UP-DOWN",
+        accept: "application/json"
       }
     ],
     textgrid: [

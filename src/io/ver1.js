@@ -15,6 +15,7 @@ const loadPoints = obj => {
 
 const loadRegions = (obj, type) => {
   const regions = [];
+  const regionsDown = [];
   const checked = [];
   if (obj.regions) {
     for (const i in obj.regions) {
@@ -22,17 +23,19 @@ const loadRegions = (obj, type) => {
       if (type == "left") {
         if (r.start) {
           const text = i == 0 ? "" : obj.regions[i - 1].attributes.label || "";
-          regions.push({
-            time: r.start,
-            text: text
-          });
+          regions.push({ time: r.start, text: text });
         }
       } else if (type == "right") {
         if (r.end) {
-          regions.push({
-            time: r.end,
-            text: r.attributes.label || ""
-          });
+          regions.push({ time: r.end, text: r.attributes.label || "" });
+        }
+      } else if (type == "up-down") {
+        if (i % 2 == 0) {
+          regions.push({ time: r.start, text: "" });
+          regions.push({ time: r.end, text: r.attributes.label || "" });
+        } else {
+          regionsDown.push({ time: r.start, text: "" });
+          regionsDown.push({ time: r.end, text: r.attributes.label || "" });
         }
       } else {
         if (i != 0) {
@@ -58,6 +61,7 @@ const loadRegions = (obj, type) => {
         }
       }
     }
+
     for (const i in checked) {
       const obj_idx = checked[i][0];
       const regions_idx = checked[i][1];
@@ -73,18 +77,26 @@ const loadRegions = (obj, type) => {
       }
     }
   }
-
-  return regions;
+  if (regionsDown.length) {
+    return { regions, regionsDown };
+  }
+  return { regions };
 };
 
 export default {
   loadTextGrid: (obj, type) => {
     const textgrid = {};
     const points = loadPoints(obj);
-    const regions = loadRegions(obj, type);
     if (points.length) textgrid["points"] = { type: "point", values: points };
-    if (regions.length)
-      textgrid["regions"] = { type: "interval", values: regions };
+
+    const { regions, regionsDown } = loadRegions(obj, type);
+    if (regionsDown.length) {
+      textgrid["region_up"] = { type: "interval", values: regions };
+      textgrid["region_down"] = { type: "interval", values: regionsDown };
+    } else {
+      if (regions.length)
+        textgrid["regions"] = { type: "interval", values: regions };
+    }
     return textgrid;
   }
 };

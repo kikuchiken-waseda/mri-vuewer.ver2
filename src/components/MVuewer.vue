@@ -789,6 +789,13 @@ export default {
             this.wavesurfer.setTextGrid(textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
+        } else if (payload.click == "TEXTGRID/JSON/VER1/UP-DOWN") {
+          io.json.read(file).then(obj => {
+            this.wavesurfer.setTextGrid({});
+            const textgrid = io.obj.ver1.loadTextGrid(obj, "up-down");
+            this.wavesurfer.setTextGrid(textgrid);
+            this.$vuewer.snackbar.success("$vuetify.loaded");
+          });
         } else if (payload.click == "TEXTGRID/TEXTGRID") {
           this.wavesurfer.setTextGrid({});
           this.wavesurfer.loadTextGrid(file);
