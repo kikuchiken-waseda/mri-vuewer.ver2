@@ -12,7 +12,7 @@
         />
       </v-col>
     </v-row>
-    <m-file-upload-dialog v-model="fileRegistDialog" />
+    <m-file-upload-dialog v-model="dialog" />
   </m-view-layout>
 </template>
 
@@ -36,6 +36,20 @@ export default {
     }
   },
   computed: {
+    dialog: {
+      get() {
+        if (this.$store.state.hash.info["file-update"] || false) {
+          return true;
+        }
+        return this.fileRegistDialog;
+      },
+      set(val) {
+        if (val == false && this.$store.state.hash.info["file-update"]) {
+          this.$store.state.hash.info["file-update"] = false;
+        }
+        this.fileRegistDialog = val;
+      }
+    },
     name: function() {
       return this.$store.state.appName;
     },
@@ -106,6 +120,11 @@ export default {
       const path = nextpage.replace("-", "/");
       this.$router.push({ path: path });
     }
+    this.$nextTick(() => {
+      if (this.$store.state.hash.info["drawer"] || false) {
+        this.$store.commit("drawer", true);
+      }
+    });
   }
 };
 </script>

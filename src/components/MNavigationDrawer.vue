@@ -247,7 +247,7 @@ export default {
         return this.$store.state.drawer;
       },
       set(val) {
-        this.$store.commit("setDrawer", val);
+        this.$store.commit("drawer", val);
       }
     },
     developPages: function() {

@@ -1375,7 +1375,7 @@ export default {
         // 中ボタンが押された場合
         e.preventDefault();
         if (e.ctrlKey) {
-          this.$store.commit("setDrawer", true);
+          this.$store.commit("drawer", true);
         } else if (e.altKey) {
           this.$store.commit("logging/show", true);
         } else {

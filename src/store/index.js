@@ -11,6 +11,7 @@ import setting from "./setting.js";
 import current from "./current";
 import files from "./files";
 import metadata from "./metadata.js";
+import hash from "./hash.js";
 
 Vue.use(Vuex);
 
@@ -33,7 +34,7 @@ export default new Vuex.Store({
     max_z_index: function(state, val) {
       state.max_z_index = val;
     },
-    setDrawer: function(state, val) {
+    drawer: function(state, val) {
       state.drawer = val;
     }
   },
@@ -54,6 +55,7 @@ export default new Vuex.Store({
     setting,
     current,
     files,
-    metadata
+    metadata,
+    hash
   }
 });

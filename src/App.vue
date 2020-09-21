@@ -28,8 +28,14 @@ export default {
     MAppLoadingDialog
   },
   data: () => ({}),
+  watch: {
+    "$route.hash": function(val, old) {
+      if (val != old) this.$store.dispatch("hash/text", this.$route.hash);
+    }
+  },
   mounted: function() {
     this.$store.commit("lang", this.$vuetify.lang);
+    this.$store.dispatch("hash/text", this.$route.hash);
     this.$store.dispatch("files/init");
   }
 };
