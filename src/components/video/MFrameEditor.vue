@@ -275,6 +275,14 @@ export default {
         this.focus();
       };
     },
+    copyImage: async function() {
+      const stage = this.$refs.stage.getStage();
+      const dataURL = stage.toDataURL();
+      const blob = this.$vuewer.io.file.toBlob(dataURL);
+      await navigator.clipboard.write([
+        new ClipboardItem({ "image/png": blob })
+      ]);
+    },
     downloadImage: function() {
       const name = `file-${this.frame.fileId}-frame-${this.frame.idx}.png`;
       const stage = this.$refs.stage.getStage();
@@ -447,14 +455,22 @@ export default {
       console.log("FrameEditor:onKeyup", payload);
       const { key, xKey } = this.$vuewer.key.summary(payload);
       if (key == "Tab" && xKey == "default") {
+        // TAB でモード変更
         const idx = this.modes.findIndex(x => x.val == this.mode);
         if (idx + 1 == this.modes.length) {
           this.mode = this.modes[0].val;
         } else {
           this.mode = this.modes[idx + 1].val;
         }
+      } else if (key == "c" && xKey == "ctrl") {
+        // ctrl + c で現在画像をクリップボードに挿入
+        this.copyImage();
+      } else if (key == "s" && xKey == "ctrl") {
+        // ctrl + s で現在画像をダウンロード
+        this.downloadImage();
+      } else {
+        this.$emit("keyup", payload);
       }
-      this.$emit("keyup", payload);
     },
     // image 系イベントハンドラ
     onDblClick: function() {

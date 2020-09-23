@@ -249,6 +249,13 @@ export default {
     getDuration: function() {
       return this.$refs.video.duration;
     },
+    copyImage: async function() {
+      const dataURL = await this.toDataURL();
+      const blob = this.$vuewer.io.file.toBlob(dataURL);
+      await navigator.clipboard.write([
+        new ClipboardItem({ "image/png": blob })
+      ]);
+    },
     downloadImage: async function() {
       let name = `time-${this.getCurrentTime()}.png`;
       if (this.frames.length > 0) {
@@ -347,7 +354,12 @@ export default {
       this.setCanvasSize();
     },
     onKeyup: function(payload) {
-      this.$emit("keyup", payload);
+      const { key, xKey } = this.$vuewer.key.summary(event);
+      if (key == "c" && xKey == "ctrl") {
+        this.copyImage();
+      } else {
+        this.$emit("keyup", payload);
+      }
     },
     // 動画時刻変更時の処理
     onTimeupdate: function() {
