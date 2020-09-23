@@ -77,9 +77,6 @@ export default {
     MVideoDownloadMenu,
     MVideoUploadMenu
   },
-  data: () => ({
-    pxPerSec: 100
-  }),
   props: {
     fps: {
       type: Number,
@@ -90,20 +87,37 @@ export default {
       default: 5
     }
   },
+  computed: {
+    $minPxPerSec: {
+      get() {
+        return this.$store.state.setting.minPxPerSec;
+      },
+      set(val) {
+        const type = typeof val;
+        let minPxPerSec = null;
+        if (type == "number") {
+          minPxPerSec = val;
+        } else if (type == "string") {
+          minPxPerSec = Number(val);
+        }
+        if (minPxPerSec) {
+          this.$store.commit("setting/setMinPxPerSec", minPxPerSec);
+        }
+      }
+    }
+  },
   methods: {
     onUploadClick(payload) {
       this.$emit("upload-click", payload);
     },
     incPxPerSec() {
-      if (this.pxPerSec < 500) {
-        this.pxPerSec = this.pxPerSec + 50;
-        this.zoom(this.pxPerSec);
+      if (this.$minPxPerSec < 500) {
+        this.$minPxPerSec = this.$minPxPerSec + 50;
       }
     },
     decPxPerSec: function() {
-      if (this.pxPerSec > 100) {
-        this.pxPerSec = this.pxPerSec - 50;
-        this.zoom(this.pxPerSec);
+      if (this.$minPxPerSec > 100) {
+        this.$minPxPerSec = this.$minPxPerSec - 50;
       }
     }
   }
