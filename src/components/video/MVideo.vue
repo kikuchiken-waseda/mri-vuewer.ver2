@@ -7,7 +7,11 @@
     :tile="tile"
     tabindex="0"
   >
-    <m-key-context :style="canvasWrapperStyle" @keyup="onKeyup">
+    <m-key-context
+      ref="keycontext"
+      :style="canvasWrapperStyle"
+      @keyup="onKeyup"
+    >
       <video
         ref="video"
         :style="videoStyle"
@@ -228,6 +232,9 @@ export default {
     }
   },
   methods: {
+    focus: function() {
+      this.$refs.keycontext.focus();
+    },
     // 動画再生速度を変更
     setPlaybackRate: function(val) {
       this.$refs.video.defaultPlaybackRate = val;

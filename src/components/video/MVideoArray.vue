@@ -91,6 +91,9 @@ export default {
     t: function(key) {
       return this.$vuetify.lang.t(`$vuetify.wVideo.${key}`);
     },
+    focus: function() {
+      this.$refs.video.focus();
+    },
     setPlaybackRate: function(val) {
       this.$refs.video.setPlaybackRate(val);
     },

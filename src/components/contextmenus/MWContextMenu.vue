@@ -551,6 +551,7 @@ export default {
         {
           text: "$vuetify.contexts.frame.edit",
           icon: "mdi-selection-drag",
+          kbd: "CTRL + SHIFT + i",
           click: () => {
             setTimeout(function() {
               vm.$emit("click-image-edit");

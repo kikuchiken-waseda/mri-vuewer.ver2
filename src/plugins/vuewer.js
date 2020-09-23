@@ -82,7 +82,7 @@ const Vuewer = {
       },
       key: {
         summary: function(event) {
-          const key = event.key;
+          const key = event.key.toLowerCase();
 
           const ctrl = { text: "ctrl", val: event.ctrlKey };
           const alt = { text: "alt", val: event.altKey };

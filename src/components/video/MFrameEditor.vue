@@ -43,6 +43,7 @@
         <v-stage
           ref="stage"
           :config="canvas"
+          @mousemove="onStageMouseMove"
           @mousedown="onStageMouseDown"
           @touchstart="onStageMouseDown"
         >
@@ -112,10 +113,6 @@
               @dragend="onRectDragEnd"
               @transformend="onTransformEnd"
             />
-            <v-transformer v-if="mode == 'rect'" ref="transformer" />
-          </v-layer>
-
-          <v-layer ref="layer">
             <v-circle
               v-for="(x, i) in points"
               :key="i"
@@ -134,6 +131,40 @@
               @mouseleave="onPointMouseLeave"
               @dragstart="onPointDragStart"
               @dragend="onPointDragEnd"
+            />
+            <v-transformer v-if="mode == 'rect'" ref="transformer" />
+          </v-layer>
+
+          <v-layer v-if="cursor.show" ref="layer">
+            <v-line
+              :config="{
+                points: [
+                  this.cursor.x || 0,
+                  0,
+                  this.cursor.x || 0,
+                  this.canvas.height
+                ],
+                stroke: cursor.color,
+                strokeWidth: 1,
+                lineCap: 'round',
+                lineJoin: 'round',
+                dash: [2, 5]
+              }"
+            />
+            <v-line
+              :config="{
+                points: [
+                  0,
+                  this.cursor.y || 0,
+                  this.canvas.width,
+                  this.cursor.y || 0
+                ],
+                stroke: cursor.color,
+                strokeWidth: 1,
+                lineCap: 'round',
+                lineJoin: 'round',
+                dash: [2, 5]
+              }"
             />
           </v-layer>
         </v-stage>
@@ -228,7 +259,7 @@ export default {
       width: 600,
       height: 600
     },
-    cursor: { x: null, y: null, show: false },
+    cursor: { x: null, y: null, show: false, color: "#00B8D4" },
     tab: null
   }),
   methods: {
@@ -454,7 +485,7 @@ export default {
     onKeyup: function(payload) {
       console.log("FrameEditor:onKeyup", payload);
       const { key, xKey } = this.$vuewer.key.summary(payload);
-      if (key == "Tab" && xKey == "default") {
+      if (key == "tab" && xKey == "default") {
         // TAB でモード変更
         const idx = this.modes.findIndex(x => x.val == this.mode);
         if (idx + 1 == this.modes.length) {
@@ -468,13 +499,35 @@ export default {
       } else if (key == "s" && xKey == "ctrl") {
         // ctrl + s で現在画像をダウンロード
         this.downloadImage();
+      } else if (key == "i" && xKey == "default") {
+        // i でキーボード操作に切り替え
+        this.cursor.show = true;
+      } else if (key == "[" && xKey == "ctrl") {
+        // ctrl + [ でキーボード操作を抜ける
+        this.cursor.show = false;
+      } else if (key == "Escape" && xKey == "default") {
+        // ect でキーボード操作を抜ける
+        this.cursor.show = false;
+      } else if (key == "j" && xKey == "default") {
+        if (this.cursor.show)
+          this.cursor.x = this.cursor.x - this.canvas.width / 100;
+      } else if (key == "j" && xKey == "ctrl") {
+        if (this.cursor.show)
+          this.cursor.y = this.cursor.y - this.canvas.height / 100;
+      } else if (key == "k" && xKey == "default") {
+        if (this.cursor.show)
+          this.cursor.x = this.cursor.x + this.canvas.width / 100;
+      } else if (key == "k" && xKey == "ctrl") {
+        if (this.cursor.show)
+          this.cursor.y = this.cursor.y + this.canvas.height / 100;
+      } else if (key == " " && xKey == "default") {
+        if (this.cursor.show) this.onDblClick();
       } else {
         this.$emit("keyup", payload);
       }
     },
     // image 系イベントハンドラ
     onDblClick: function() {
-      this.cursor = this.$refs.stage.getNode().getPointerPosition();
       if (this.mode == "circ") {
         this.addPoint(this.cursor.x, this.cursor.y, this.color, this.size);
       } else if (this.mode == "rect") {
@@ -581,6 +634,11 @@ export default {
       this.rects[i].label = rect.label;
       this.rects[i].color = rect.color;
       this.emitUpdateRects();
+    },
+    onStageMouseMove() {
+      const cursor = this.$refs.stage.getNode().getPointerPosition();
+      this.cursor.x = cursor.x;
+      this.cursor.y = cursor.y;
     },
     onStageMouseDown(e) {
       if (e.target === e.target.getStage()) {

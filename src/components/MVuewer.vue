@@ -411,6 +411,12 @@ export default {
         }
       },
       deep: true
+    },
+    "dialog.imageEdit.show": function(val) {
+      if (val == false) {
+        // console.log(this.wavesurfer.$el.children[0].focus());
+        this.$refs.videoArray.focus();
+      }
     }
   },
   methods: {
@@ -1064,31 +1070,96 @@ export default {
         this.prevTier();
       }
       if (payload.keycode == 73) {
-        // i でフォーカス: 73
-        setTimeout(() => this.$refs.input.focus());
+        if (payload.ctrl && payload.shift) {
+          this.onClickImageEdit();
+        } else {
+          setTimeout(() => this.$refs.input.focus());
+        }
       }
     },
     onWaveSurferKeyup: function(event) {
       const { key, xKey } = this.$vuewer.key.summary(event);
-      console.log("onWaveSurferKeyup", key, xKey, event);
-      if (key == "Tab" && xKey == "default") this.playPause();
-      if (key == "s" && xKey == "ctrl") this.fireUpdateData();
-      if (key == "r" && xKey == "ctrl") this.onClickLoadDropbox();
+      const item = {
+        key: this.current.tier.key,
+        idx: this.current.tier.record.idx || 0
+      };
+      if (key == "tab" && xKey == "default") {
+        this.playPause();
+      } else if (key == "j" && xKey == "default") {
+        this.wavesurfer.skipBackward();
+      } else if (key == "j" && xKey == "ctrl") {
+        this.prevRecord(item.key, item.idx, false);
+      } else if (key == "j" && xKey == "ctrl+shift") {
+        this.shrinkRecord(item.key, item.idx);
+      } else if (key == "j" && xKey == "ctrl+alt") {
+        this.toStartRecord(item.key, item.idx);
+      } else if (key == "k" && xKey == "default") {
+        this.wavesurfer.skipForward();
+      } else if (key == "k" && xKey == "ctrl") {
+        this.nextRecord(item.key, item.idx, false);
+      } else if (key == "k" && xKey == "ctrl+shift") {
+        this.extendRecord(item.key, item.idx);
+      } else if (key == "k" && xKey == "ctrl+alt") {
+        this.toEndRecord(item.key, item.idx);
+      } else if (key == "s" && xKey == "ctrl") {
+        this.fireUpdateData();
+      } else if (key == "r" && xKey == "ctrl") {
+        this.onClickLoadDropbox();
+      } else if (key == "i" && xKey == "ctrl+shift") {
+        this.onClickImageEdit();
+      } else {
+        console.log("onWaveSurferKeyup", key, xKey, event);
+      }
     },
     onTableKeyup: function(event) {
       const { key, xKey } = this.$vuewer.key.summary(event);
-      console.log("onTableKeyup", key, xKey, event);
-      if (key == "s" && xKey == "ctrl") this.fireUpdateData();
-      if (key == "r" && xKey == "ctrl") this.onClickLoadDropbox();
+      if (key == "s" && xKey == "ctrl") {
+        this.fireUpdateData();
+      } else if (key == "r" && xKey == "ctrl") {
+        this.onClickLoadDropbox();
+      } else if (key == "i" && xKey == "ctrl+shift") {
+        this.onClickImageEdit();
+      } else {
+        console.log("onTableKeyup", key, xKey, event);
+      }
     },
     onVideoArrayKeyup: function(payload) {
       const event = payload.event;
       const { key, xKey } = this.$vuewer.key.summary(event);
-      console.log("onVideoArrayKeyUp", payload.ref, key, xKey, event);
-      if (key == "Tab" && xKey == "default") this.playPause();
-      if (key == "s" && xKey == "ctrl") this.fireUpdateData();
-      if (key == "r" && xKey == "ctrl") this.onClickLoadDropbox();
+      const item = {
+        key: this.current.tier.key,
+        idx: this.current.tier.record.idx
+      };
+
+      if (key == "tab" && xKey == "default") {
+        this.playPause();
+      } else if (key == "j" && xKey == "default") {
+        this.wavesurfer.skipBackward();
+      } else if (key == "j" && xKey == "ctrl") {
+        this.prevRecord(item.key, item.idx, false);
+      } else if (key == "j" && xKey == "ctrl+shift") {
+        this.shrinkRecord(item.key, item.idx);
+      } else if (key == "j" && xKey == "ctrl+alt") {
+        this.toStartRecord(item.key, item.idx);
+      } else if (key == "k" && xKey == "default") {
+        this.wavesurfer.skipForward();
+      } else if (key == "k" && xKey == "ctrl + shift") {
+        this.extendRecord(item.key, item.idx);
+      } else if (key == "k" && xKey == "ctrl + alt") {
+        this.toEndRecord(item.key, item.idx);
+      } else if (key == "k" && xKey == "ctrl") {
+        this.nextRecord(item.key, item.idx, false);
+      } else if (key == "s" && xKey == "ctrl") {
+        this.fireUpdateData();
+      } else if (key == "r" && xKey == "ctrl") {
+        this.onClickLoadDropbox();
+      } else if (key == "i" && xKey == "ctrl+shift") {
+        this.onClickImageEdit();
+      } else {
+        console.log("onVideoArrayKeyup", payload.ref, key, xKey, event);
+      }
     },
+    // TextField 操作
     onUpdateRecordText: function(opt) {
       const tier = this.current.tier;
       const key = tier.key;
@@ -1118,7 +1189,7 @@ export default {
         if (key) this.focusTier(key);
       });
     },
-
+    // 音声認識
     onVoiceUpdateRecordText: function() {
       const recog =
         window.webkitSpeechRecognition || window.SpeechRecognition || null;
