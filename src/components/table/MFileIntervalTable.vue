@@ -39,9 +39,9 @@
     <template v-slot:footer>
       <v-card flat>
         <m-video-dialog v-model="dialog" :src="src" :start="start" :end="end" />
-        <v-card-actions v-if="$selected.length > 1">
+        <v-card-actions v-if="selected.length > 1">
           <v-spacer />
-          <v-btn color="primary" @click="resynthesis">Download (MP4)</v-btn>
+          <v-btn color="primary" @click="resynthesis">Download (ZIP)</v-btn>
         </v-card-actions>
       </v-card>
     </template>
@@ -81,12 +81,6 @@ export default {
     $keyword: function() {
       return this.$store.state.search.keyword;
     },
-    $selected: function() {
-      if (this.items) {
-        return this.items.filter(x => x.id in this.selected);
-      }
-      return [];
-    },
     $items: function() {
       if (this.items) {
         return this.items.map((x, i) => {
@@ -122,23 +116,19 @@ export default {
     openItem: function(item) {
       this.$router.push({ path: `/files/${item.fileId}?start=${item.start}` });
     },
-    resynthesis: function() {
-      const buffs = [];
-      for (const item of this.$selected) {
+    resynthesis: async function() {
+      const files = [];
+      for (const item of this.selected) {
         const buff = io.file.toBuff(item.src);
         const result = io.video.trim(buff, item.start, item.end);
         const out = result.MEMFS[0];
-        buffs.push(Buffer(out.data));
+        const blob = new Blob([out.data], { type: "video/mp4" });
+        const base64 = await io.file.toBase64(blob);
+        const name = `${item.fileName}-${item.start}-${item.end}.mp4`;
+        files.push({ name, base64 });
       }
-      const dist = io.video.concat(buffs);
-      const out = dist.MEMFS[0];
-      if (out) {
-        const blob = io.video.toBlob(Buffer(out.data));
-        const name = this.$selected
-          .map(x => x.fileName.split(".")[0])
-          .join("-");
-        io.file.download(blob, name + ".mp4");
-      }
+      const zip = await io.zip.toZip(files);
+      io.file.download(zip, "result.zip");
     }
   }
 };

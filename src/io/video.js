@@ -123,22 +123,42 @@ const trim = (buff, start, end) => {
   return result;
 };
 
+// const concat = buffs => {
+//   const datas = buffs.map((x, i) => {
+//     const video = new Uint8Array(x);
+//     return { name: `v${i}.mp4`, data: video };
+//   });
+//
+//   const args = [];
+//   for (const x of datas) {
+//     args.push("-i");
+//     args.push(x.name);
+//   }
+//   args.push("-filter_complex");
+//   args.push('"' + `concat=n=${datas.length}:v=1:a=1` + '"');
+//   args.push("output.mp4");
+//   const result = ffmpeg({
+//     MEMFS: datas,
+//     arguments: args,
+//     print: function(data) {
+//       console.log(data);
+//     },
+//     printErr: function(data) {
+//       console.log(data);
+//     }
+//   });
+//   return result;
+// };
+
 const concat = buffs => {
   const datas = buffs.map((x, i) => {
     const video = new Uint8Array(x);
     return { name: `v${i}.mp4`, data: video };
   });
-  const args = [];
-  for (const x of datas) {
-    args.push("-i");
-    args.push(x.name);
-  }
-  args.push("-filter_complex");
-  args.push('"' + `concat=n=${datas.length}:v=1:a=1` + '"');
-  args.push("output.mp4");
+  const args = datas.map(x => x.name).join("|");
   const result = ffmpeg({
     MEMFS: datas,
-    arguments: args,
+    arguments: `-i "concat:${args}" -codec copy output.mp4`.split(" "),
     print: function(data) {
       console.log(data);
     },
