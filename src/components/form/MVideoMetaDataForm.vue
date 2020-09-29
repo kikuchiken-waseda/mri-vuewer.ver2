@@ -43,6 +43,10 @@ export default {
     MMetaFieldForm
   },
   props: {
+    vname: {
+      type: String,
+      default: ""
+    },
     currentItem: {
       type: Object,
       default: function() {
@@ -86,7 +90,6 @@ export default {
       }
     },
     reset() {
-      this.$refs.form.reset();
       for (const key in this.item) {
         this.item[key] = this.currentItem[key] || "";
       }

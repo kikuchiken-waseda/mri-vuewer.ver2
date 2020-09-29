@@ -223,6 +223,7 @@ export default {
         label: "File upload settings",
         nameFormat: {
           label: "File Name Format",
+          show: "Change file name format",
           hint: [
             "Meta data is added when registering a video.",
             "Register some field names you plan to register, separated by'-'.",

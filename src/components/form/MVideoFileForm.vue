@@ -6,6 +6,19 @@
       v-model="$shouldGetVideoInfo"
       :label="t(`$vuetify.setting.form.loading.shouldGetVideoInfo.label`)"
     />
+    <v-checkbox
+      class="mt-0"
+      hide-details
+      v-model="showNameFormat"
+      :label="t(`$vuetify.setting.form.loading.nameFormat.show`)"
+    />
+    <v-text-field
+      v-if="showNameFormat"
+      v-model="$nameFormat"
+      :suffix="`sep = '${$nameSep}'`"
+      :label="t(`$vuetify.setting.form.loading.nameFormat.label`)"
+      :hint="t(`$vuetify.setting.form.loading.nameFormat.hint`)"
+    />
     <m-video-input
       v-if="$shouldGetVideoInfo"
       @loading="onLoading"
@@ -31,6 +44,7 @@ export default {
   mixins: [MValidationMixin, MSettingMixin],
   components: { MVideoInput },
   data: () => ({
+    showNameFormat: false,
     video: io.video.initObj()
   }),
   methods: {

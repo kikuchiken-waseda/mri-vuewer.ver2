@@ -10,9 +10,10 @@
     <v-stepper-items>
       <v-stepper-content class="pb-0" step="1">
         <v-card>
-          <m-help :text="`${t('$vuetify.forms.video.desc.select')}`" />
-          <span>{{ stepName }}</span>
-
+          <v-card-title>
+            <span class="ml-2">{{ stepName }}</span>
+            <m-help text="$vuetify.forms.video.desc.select" />
+          </v-card-title>
           <v-card-text>
             <m-video-file-form v-if="e1 == 1" @validated="onValidateVideo" />
           </v-card-text>
@@ -21,8 +22,10 @@
 
       <v-stepper-content step="2">
         <v-card>
-          <m-help :text="`${t('$vuetify.forms.video.desc.confirmation')}`" />
-          <span>{{ stepName }}</span>
+          <v-card-title>
+            <span class="ml-2">{{ stepName }}</span>
+            <m-help text="$vuetify.forms.video.desc.confirmation" />
+          </v-card-title>
           <v-card-text>
             <m-video-codec-form
               v-if="e1 == 2"
@@ -65,10 +68,12 @@
         <v-card v-else>
           <v-card-title>
             <span class="ml-2">{{ stepName }}</span>
-            <m-help :text="`${t('$vuetify.forms.video.desc.meta')}`" />
+            <m-help text="$vuetify.forms.video.desc.meta" />
           </v-card-title>
           <v-card-text>
             <m-video-meta-data-form
+              v-if="video.name"
+              :currentItem="metadata"
               @validated="onValidateMetaData"
               ref="metaForm"
             />
@@ -153,6 +158,13 @@ export default {
     },
     nSteps: function() {
       return this.steps.length;
+    },
+    metadata: function() {
+      if (this.video.name) {
+        const data = this.$store.getters["setting/fname2meta"](this.video.name);
+        if (data) return data;
+      }
+      return {};
     }
   },
   methods: {

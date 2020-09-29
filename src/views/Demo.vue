@@ -62,6 +62,7 @@ export default {
               video.originSize = res.size;
               video.videoStream = res.videoStream;
               video.audioStream = res.audioStream;
+              video.metaData = { demo: true };
               io.file.toBase64(file).then(source => {
                 video.source = source;
                 video.name = `DEMO: ${filename}`;

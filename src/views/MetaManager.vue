@@ -2,14 +2,6 @@
   <m-drag-context>
     <m-view-layout :heading="heading" :desc="$vuetify.lang.t(desc)">
       <v-col>
-        <v-text-field
-          solo
-          rounded
-          label="Search"
-          v-model="keyword"
-          prepend-inner-icon="mdi-magnify"
-        />
-
         <v-card class="mt-6">
           <v-tabs v-model="tab" fixed-tabs background-color="primary" dark>
             <v-tab>File</v-tab>
