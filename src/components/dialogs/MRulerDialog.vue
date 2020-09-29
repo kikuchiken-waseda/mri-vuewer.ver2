@@ -11,9 +11,7 @@
       <slot name="activator" :on="on" :attrs="attrs"></slot>
     </template>
     <template v-slot:toolbar-actions>
-      <span v-if="frame">
-        FRAME: {{ frame.idx }}: {{ $vuewer.math.round(frame.time, 3) }} sec
-      </span>
+      <span> {{ header }} </span>
       <v-btn icon @click="close" color="white">
         <v-icon>mdi-close</v-icon>
       </v-btn>
@@ -23,8 +21,6 @@
         ref="editor"
         @update-max-width="onUpdateMaxWidth"
         @skip="onSkip"
-        :src="src"
-        :frame="frame"
         :origin-size="originSize"
       />
     </div>
@@ -37,25 +33,11 @@ export default {
   name: "m-ruler-dialog",
   components: { MCardDialog, MRulerEditor },
   data: () => ({
-    title: "$vuetify.forms.ruler.title",
     maxWidth: "700"
   }),
   props: {
-    value: {
-      type: Boolean
-    },
-    src: {
-      type: String,
-      required: true
-    },
-    frame: {
-      type: Object,
-      required: true
-    },
-    originSize: {
-      type: Object,
-      required: true
-    }
+    value: { type: Boolean, required: true },
+    originSize: { type: Object, required: true }
   },
   methods: {
     onUpdateMaxWidth: function(maxWidth) {
@@ -73,6 +55,18 @@ export default {
     }
   },
   computed: {
+    title: function() {
+      return "$vuetify.forms.ruler.title";
+    },
+    header: function() {
+      const time = this.$store.state.current.frame.time;
+      const id = this.$store.state.current.frame.id;
+      if (id) {
+        return `FRAME: ${id}: ${this.$vuewer.math.round(time, 3)} sec`;
+      } else {
+        return `${this.$vuewer.math.round(time, 3)} sec`;
+      }
+    },
     dialog: {
       get() {
         return this.value;

@@ -252,15 +252,27 @@ export default {
       },
       loading: {
         label: "ファイル登録設定",
+        nameFormat: {
+          label: "ファイル名フォーマット",
+          hint: [
+            "動画登録時にメタ情報を付与します.",
+            "登録を行う予定のフィールド名を '-' 区切りで登録してください.",
+            "拡張子は不要です.",
+            "この処理を実施しない場合, 空欄にしてください",
+            "ex: material-speaker-date-record_id"
+          ].join(" ")
+        },
         maxVideoSize: {
           label: "ファイル最大容量.",
           hint:
             "この項目が大きい場合, 登録可能なファイル数が減ります. 登録可能なファイル数は使用端末のスペックに依存します."
         },
+        shouldMovePageAferAddingFile: {
+          label: "ファイル登録後に解析ページに移動する."
+        },
         shouldGetVideoInfo: {
           label: `ファイル登録時に${VIDEO}コーディックを確認する.`,
-          hint:
-            "この項目が false の場合, ${VIDEO} の時間, fps, 縦横サイズ等を手動で入力することになります."
+          hint: `この項目が false の場合, ${VIDEO} の時間, fps, 縦横サイズ等を手動で入力することになります.`
         },
         shouldGetFrameInfo: {
           label: "ファイル登録時に全てのフレーム画像を取得する.",
@@ -414,6 +426,7 @@ export default {
   prev: "戻る",
   yet: "この関数は作成中です",
   loading: "読み込み中 ...",
+  converting: "変換中 ...",
   loaded: "データの読み込みが終了しました",
   sending: "データ送信中 (ドロップボックス) ...",
   sended: "ドロップボックスへのデータ送信が終了しました",

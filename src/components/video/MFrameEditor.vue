@@ -29,6 +29,10 @@
         </v-btn>
       </v-btn-toggle>
 
+      <v-btn text @click="threshold">
+        二値化
+      </v-btn>
+
       <v-btn text @click="downloadImage">
         png <v-icon>mdi-download</v-icon>
       </v-btn>
@@ -48,7 +52,11 @@
           @touchstart="onStageMouseDown"
         >
           <v-layer ref="layer">
-            <v-image @dblclick="onDblClick" :config="background" />
+            <v-image
+              ref="background"
+              @dblclick="onDblClick"
+              :config="background"
+            />
           </v-layer>
 
           <v-layer ref="layer">
@@ -211,18 +219,25 @@ export default {
     MRectTable
   },
   props: {
-    src: {
-      type: String,
-      required: true
-    },
-    frame: {
-      type: Object
-    },
     originSize: {
       type: Object
     }
   },
   computed: {
+    src: {
+      get() {
+        return this.$store.state.current.frame.src;
+      },
+      set(val) {
+        this.$store.commit("current/frame/src", val);
+      }
+    },
+    id: function() {
+      return this.$store.state.current.frame.id;
+    },
+    idx: function() {
+      return this.$store.state.current.frame.idx;
+    },
     modes: function() {
       return [
         { val: "circ", icon: "mdi-shape-circle-plus" },
@@ -315,7 +330,8 @@ export default {
       ]);
     },
     downloadImage: function() {
-      const name = `file-${this.frame.fileId}-frame-${this.frame.idx}.png`;
+      const bname = this.$store.state.current.video.filename.split(".")[0];
+      const name = `${bname}-f${this.idx}.png`;
       const stage = this.$refs.stage.getStage();
       const dataURL = stage.toDataURL();
       const link = document.createElement("a");
@@ -323,16 +339,22 @@ export default {
       link.download = name;
       link.click();
     },
+    threshold: function() {
+      this.$vuewer.image
+        .adaptiveThreshold(this.src, this.originSize)
+        .then(dst => (this.src = dst));
+    },
     syncPoints: function() {
       this.points = [];
-      if (this.frame) {
+      const points = this.$store.state.current.frame.points;
+      if (points.length) {
         const cw = this.canvas.width;
         const ow = this.originSize.width;
         const ch = this.canvas.height;
         const oh = this.originSize.height;
-        for (const p of this.frame.points || []) {
+        for (const p of points || []) {
           this.points.push({
-            id: p.id || this.frame.points.length + 1,
+            id: p.id || points.length + 1,
             label: p.label || `point-${p.id}`,
             x: (p.x * cw) / ow,
             y: (p.y * ch) / oh,
@@ -344,15 +366,16 @@ export default {
     },
     syncRects: function() {
       this.rects = [];
-      if (this.frame) {
+      const rects = this.$store.state.current.frame.rects;
+      if (rects.length) {
         const cw = this.canvas.width;
         const ow = this.originSize.width;
         const ch = this.canvas.height;
         const oh = this.originSize.height;
-        for (const r of this.frame.rects || []) {
+        for (const r of rects || []) {
           this.rects.push({
-            id: r.id || this.frame.rects.length,
-            name: `rect-${r.id || this.frame.rects.length}`,
+            id: r.id || rects.length,
+            name: `rect-${r.id || rects.length}`,
             label: r.label || `rect-${r.id}`,
             x: (r.x * cw) / ow,
             y: (r.y * ch) / oh,
@@ -440,7 +463,7 @@ export default {
         size: size,
         color: color
       };
-      if (this.frame.id) {
+      if (this.id) {
         const count = await db.points.count();
         item.id = count + 1;
         item.label = `points-${count + 1}`;
@@ -461,7 +484,7 @@ export default {
         size: size,
         color: color
       };
-      if (this.frame.id) {
+      if (this.id) {
         const count = await db.rects.count();
         item.id = count + 1;
         item.name = `rect-${count + 1}`;

@@ -53,7 +53,7 @@
             {{ converting.status }} ({{ converting.step }} /
             {{ converting.total }})
           </m-loading-card>
-          <v-card-actions v-if="isSaved">
+          <v-card-actions v-if="isSaved && movePage == false">
             <slot name="finishedActions">
               <v-spacer />
               <v-btn color="primary" @click="restart">
@@ -123,6 +123,9 @@ export default {
     video: io.video.initObj()
   }),
   computed: {
+    movePage: function() {
+      return this.$store.state.setting.shouldMovePageAferAddingFile;
+    },
     shouldGetFrameInfo: function() {
       return this.$store.state.setting.shouldGetFrameInfo;
     },

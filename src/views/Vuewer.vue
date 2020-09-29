@@ -1,32 +1,35 @@
 <template>
-  <v-container fluid>
-    <m-vuewer
-      v-if="!isLoading && $source"
-      ref="video"
-      :src="$source"
-      :fps="$fps"
-      :frames="frames"
-      :origin-size="$originSize"
-      :textgrid="textgrid"
-      @data-updated="onDataUpdated"
-      @textgrid-updated="onTextGridUpdated"
-      @frame-point-updated="onFramePointUpdated"
-      @frame-rect-updated="onFrameRectUpdated"
-      @frame-point-deleted="onFramePointDeleted"
-      @frame-rect-deleted="onFrameRectDeleted"
-      @download-json="downloadJson"
-    />
-  </v-container>
+  <m-drag-context>
+    <v-container fluid>
+      <m-vuewer
+        v-if="!isLoading && $source"
+        ref="video"
+        :src="$source"
+        :fps="$fps"
+        :frames="frames"
+        :origin-size="$originSize"
+        :textgrid="textgrid"
+        @data-updated="onDataUpdated"
+        @textgrid-updated="onTextGridUpdated"
+        @frame-point-updated="onFramePointUpdated"
+        @frame-rect-updated="onFrameRectUpdated"
+        @frame-point-deleted="onFramePointDeleted"
+        @frame-rect-deleted="onFrameRectDeleted"
+        @download-json="downloadJson"
+      />
+    </v-container>
+  </m-drag-context>
 </template>
 <script>
 import db from "@/storage/db";
 import MVuewer from "@/components/MVuewer";
 import MVideoTWBMixin from "@/mixins/MVideoTWBMixin";
+import MDragContext from "@/components/contextmenus/MDragContext.vue";
 import io from "@/io";
 export default {
   name: "vuewer",
   mixins: [MVideoTWBMixin],
-  components: { MVuewer },
+  components: { MVuewer, MDragContext },
   data: () => ({
     id: null,
     item: {}, // DB データ登録用オブジェクト
@@ -40,6 +43,14 @@ export default {
     syncDropbox: function() {
       // ページ離脱時に Dropbox にログを残すか否か
       return this.$store.state.setting.syncDropbox;
+    },
+    metaData: {
+      get() {
+        return this.$store.state.current.metaData;
+      },
+      set(val) {
+        this.$store.commit("current/metaData", val);
+      }
     },
     source: {
       // 解析動画データ
@@ -138,6 +149,7 @@ export default {
             this.$videoStream = file.videoStream || {};
             this.$audioStream = file.audioStream || {};
             this.$originSize = file.originSize || {};
+            this.metaData = file.metaData || {};
             this.textgrid = file.textgrid || {};
             this.frames = await db.frames
               .where({ fileId: file.id })

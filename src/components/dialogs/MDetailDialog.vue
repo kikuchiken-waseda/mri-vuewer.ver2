@@ -28,6 +28,23 @@
       <m-video-stream-list :video-stream="videoStream" />
       <v-divider inset></v-divider>
       <m-audio-stream-list :audio-stream="audioStream" />
+      <v-divider inset></v-divider>
+
+      <v-list subheader>
+        <v-subheader>MetaData</v-subheader>
+        <v-list-item v-for="x in metaData" :key="x.key">
+          <v-list-item-avatar>
+            <v-icon></v-icon>
+          </v-list-item-avatar>
+          <v-list-item-content>
+            <v-list-item-title> {{ x.key.toUpperCase() }}: </v-list-item-title>
+          </v-list-item-content>
+          <v-list-item-action>
+            {{ x.val }}
+          </v-list-item-action>
+        </v-list-item>
+        <v-divider inset></v-divider>
+      </v-list>
     </v-card>
   </m-card-dialog>
 </template>
@@ -52,14 +69,24 @@ export default {
     title: "$vuetify.forms.detail.title"
   }),
   props: {
-    value: {
-      type: Boolean
-    },
-    src: {
-      default: null
-    }
+    value: { type: Boolean, required: true }
   },
   computed: {
+    metaData: function() {
+      const src = this.$store.state.current.metaData;
+      if (src) {
+        return Object.keys(src).map(x => {
+          return {
+            key: x,
+            val: src[x]
+          };
+        });
+      }
+      return [];
+    },
+    src() {
+      return this.$store.state.current.frame.src;
+    },
     dialog: {
       get() {
         return this.value;

@@ -69,6 +69,7 @@
           <v-progress-circular indeterminate color="primary" />
         </v-list-item-action>
       </v-list-item>
+
       <v-list-group
         sub-group
         v-else-if="files.length"
@@ -96,6 +97,7 @@
         </v-list-item>
       </v-list-group>
       <v-divider />
+
       <v-list-group
         v-if="!isLoading"
         prepend-icon="mdi-dropbox"
@@ -181,6 +183,26 @@
       </v-list-group>
       <v-divider />
 
+      <v-list-group prepend-icon="mdi-file-swap" sub-group :value="false">
+        <template v-slot:activator>
+          <v-list-item-title>CONVATER</v-list-item-title>
+        </template>
+        <v-list-item
+          v-for="x in converters"
+          :key="x.text"
+          @click="x.function"
+          link
+        >
+          <v-list-item-icon>
+            <v-icon>{{ x.icon }}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>{{ x.text }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-group>
+      <v-divider />
+
       <v-list-group
         v-if="$showDev"
         prepend-icon="mdi-flask"
@@ -224,7 +246,7 @@ export default {
   }),
   computed: {
     $showDev: function() {
-      return this.$store.state.setting.$showDev;
+      return this.$store.state.setting.showDev;
     },
     isLoading: function() {
       return this.$store.state.files.isLoading;
@@ -249,6 +271,23 @@ export default {
       set(val) {
         this.$store.commit("drawer", val);
       }
+    },
+    converters: function() {
+      const moveTo = path => {
+        if (this.$route.path !== path) this.$router.push({ path });
+      };
+      return [
+        {
+          text: "video2png",
+          icon: "mdi-filmstrip-box-multiple",
+          function: () => moveTo("/convarters/video2png")
+        },
+        {
+          text: "video2wav",
+          icon: "mdi-file-music",
+          function: () => moveTo("/convarters/video2wav")
+        }
+      ];
     },
     developPages: function() {
       if (process.env.NODE_ENV) {

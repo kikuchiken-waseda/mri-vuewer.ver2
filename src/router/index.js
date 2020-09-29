@@ -5,6 +5,9 @@ import Vuewer from "../views/Vuewer.vue";
 import MetaManager from "../views/MetaManager.vue";
 import Setting from "../views/Setting.vue";
 import Demo from "../views/Demo.vue";
+import VideoPngConverter from "@/views/convarters/VideoPngConverter";
+import VideoWavConverter from "@/views/convarters/VideoWavConverter";
+import AviMp4Converter from "@/views/convarters/AviMp4Converter.vue";
 import example from "./example.js";
 
 Vue.use(VueRouter);
@@ -22,6 +25,9 @@ let routes = [
     icon: "mdi-database-search",
     component: MetaManager
   },
+  { path: "/convarters/video2png", component: VideoPngConverter },
+  { path: "/convarters/video2wav", component: VideoWavConverter },
+  { path: "/convarters/avi2mp4", component: AviMp4Converter },
   { path: "/files/", component: Vuewer },
   { path: "/files/:id", component: Vuewer },
   {
@@ -40,9 +46,6 @@ let routes = [
     path: "/about",
     icon: "mdi-information",
     name: "About",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/About.vue")
   }

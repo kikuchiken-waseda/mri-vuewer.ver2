@@ -221,10 +221,23 @@ export default {
       },
       loading: {
         label: "File upload settings",
+        nameFormat: {
+          label: "File Name Format",
+          hint: [
+            "Meta data is added when registering a video.",
+            "Register some field names you plan to register, separated by'-'.",
+            "No extension required.",
+            "If you do not want to do this, leave it blank",
+            "ex: material-speaker-date-record_id"
+          ].join(" ")
+        },
         maxVideoSize: {
           label: "Max Video Size",
           hint:
             "Registerable video size. If this value is large, the number of data that can be registered will decrease."
+        },
+        shouldMovePageAferAddingFile: {
+          label: "Move analysis page when uploaded a video file."
         },
         shouldGetVideoInfo: {
           label: "Get video codec at file upload.",
@@ -300,6 +313,7 @@ export default {
       }
     }
   },
+  converting: "Now Converting ...",
   loading: "Now Loading ...",
   loaded: "The data was loaded",
   sending: "Sending the data to dropbox ...",

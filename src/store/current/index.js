@@ -8,11 +8,15 @@ export default {
   state: () => ({
     wavesurfer: null,
     textgrid: null,
+    metaData: {},
     frames: []
   }),
   mutations: {
     waveSurfer(state, payload) {
       state.wavesurfer = payload;
+    },
+    metaData(state, payload) {
+      state.metaData = payload;
     },
     textGrid(state, payload) {
       state.textgrid = payload;
@@ -52,6 +56,7 @@ export default {
     updateFrame: function(context, payload) {
       const i = context.state.frames.findIndex(x => x.id == payload.id);
       if (i !== -1) {
+        console.log(payload);
         Vue.set(context.state.frames, i, payload);
       }
     }

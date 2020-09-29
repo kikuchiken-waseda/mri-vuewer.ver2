@@ -18,7 +18,9 @@ export default {
   actions: {
     start(context, payload) {
       context.commit("message", payload);
-      context.commit("show", true);
+      if (context.state.show == false) {
+        context.commit("show", true);
+      }
     },
     finish(context) {
       context.commit("show", false);

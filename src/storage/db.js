@@ -151,6 +151,7 @@ const add_frames = async function(fileId, obj) {
 };
 
 const add = async function(obj) {
+  let fileId;
   const keys = Object.keys(obj);
   if (obj.name && obj.source) {
     // 動画解析が必要かをチェック
@@ -175,7 +176,7 @@ const add = async function(obj) {
           videoStream: res.videoStream,
           audioStream: res.audioStream
         };
-        const fileId = await db.files.put(item);
+        fileId = await db.files.put(item);
         add_frames(fileId, {
           frames: obj.frames,
           fps: item.fps,
@@ -194,7 +195,7 @@ const add = async function(obj) {
         videoStream: obj.videoStream,
         audioStream: obj.audioStream
       };
-      const fileId = await db.files.put(item);
+      fileId = await db.files.put(item);
       await add_frames(fileId, {
         frames: obj.frames,
         fps: item.fps,
@@ -202,6 +203,7 @@ const add = async function(obj) {
       });
     }
   }
+  return fileId;
 };
 
 const destory = async function(id) {
@@ -222,10 +224,9 @@ const destory = async function(id) {
 
 const put = async function(obj) {
   const files = await db.files.where({ name: obj.name }).toArray();
-  if (files.length > 0) {
-    await destory(files[0].id);
-  }
-  add(obj);
+  if (files.length > 0) await destory(files[0].id);
+  const id = await add(obj);
+  return id;
 };
 
 const gets = async function() {

@@ -1,28 +1,33 @@
 <template>
-  <m-view-layout :heading="heading" :desc="desc">
-    <v-row>
-      <v-col cols="12" :md="cardCols" v-for="(nav, key) in navs" :key="key">
-        <m-h-card
-          :color="nav.color"
-          :icon="nav.icon"
-          :title="nav.title"
-          sub-icon="mdi-information"
-          :sub-text="nav.subText"
-          :actions="nav.actions"
-        />
-      </v-col>
-    </v-row>
-    <m-file-upload-dialog v-model="dialog" />
-  </m-view-layout>
+  <m-drag-context>
+    <m-view-layout ref="layout" :heading="heading" :desc="desc">
+      <v-row>
+        <v-col cols="12" :md="cardCols" v-for="(nav, key) in navs" :key="key">
+          <m-h-card
+            :color="nav.color"
+            :icon="nav.icon"
+            :title="nav.title"
+            sub-icon="mdi-information"
+            :sub-text="nav.subText"
+            :actions="nav.actions"
+          />
+        </v-col>
+        <v-col cols="12"> </v-col>
+      </v-row>
+      <m-file-upload-dialog v-model="dialog" />
+    </m-view-layout>
+  </m-drag-context>
 </template>
 
 <script>
 import MHCard from "@/components/base/card/MHCard.vue";
 import MFileUploadDialog from "@/components/dialogs/MFileUploadDialog";
 import MViewLayout from "@/components/base/MViewLayout";
+import MDragContext from "@/components/contextmenus/MDragContext.vue";
 export default {
   name: "Home",
   components: {
+    MDragContext,
     MViewLayout,
     MHCard,
     MFileUploadDialog
@@ -30,11 +35,6 @@ export default {
   data: () => ({
     fileRegistDialog: false
   }),
-  methods: {
-    to: function(payload) {
-      this.$router.push(payload);
-    }
-  },
   computed: {
     dialog: {
       get() {
@@ -88,7 +88,7 @@ export default {
             {
               icon: "mdi-dots-vertical",
               function: () => {
-                vm.to({ name: "Meta" });
+                vm.$router.push({ name: "Meta" });
               }
             }
           ]
@@ -102,7 +102,7 @@ export default {
             {
               icon: "mdi-dots-vertical",
               function: () => {
-                vm.to({ name: "Demo" });
+                vm.$router.push({ name: "Meta" });
               }
             }
           ]
@@ -115,11 +115,6 @@ export default {
     }
   },
   mounted: function() {
-    const nextpage = this.$route.query.nextpage;
-    if (nextpage) {
-      const path = nextpage.replace("-", "/");
-      this.$router.push({ path: path });
-    }
     this.$nextTick(() => {
       if (this.$store.state.hash.info["drawer"] || false) {
         this.$store.commit("drawer", true);
@@ -128,3 +123,4 @@ export default {
   }
 };
 </script>
+<style scoped></style>

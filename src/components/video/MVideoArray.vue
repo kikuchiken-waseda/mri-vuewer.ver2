@@ -116,6 +116,7 @@ export default {
         const dataURL = video.getVideoDataURL();
         if (payload) {
           payload.src = dataURL;
+          this.$store.dispatch("current/frame/frame", payload);
           this.$emit("frame-updated", payload);
         }
       }

@@ -1,5 +1,6 @@
 import GetVideoInfoInput from "@/views/example/GetVideoInfoInput/GetVideoInfoInput.vue";
 import Current from "@/views/example/Current.vue";
+import GetFo from "@/views/example/GetFo.vue";
 import VideoRegister from "@/views/example/VideoRegister";
 import VideoTrim from "@/views/example/VideoTrim";
 import VideoCard from "@/views/example/VideoCard.vue";
@@ -11,10 +12,11 @@ import Rects from "@/views/example/rects";
 const basename = "example";
 const components = [
   Current,
+  GetVideoInfoInput,
   VideoRegister,
   VideoTrim,
-  GetVideoInfoInput,
   VideoCard,
+  GetFo,
   WindowCard,
   ImageEdit,
   Rects

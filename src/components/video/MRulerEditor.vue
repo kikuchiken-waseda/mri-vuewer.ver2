@@ -128,13 +128,6 @@ export default {
     MLineTable
   },
   props: {
-    src: {
-      type: String,
-      required: true
-    },
-    frame: {
-      type: Object
-    },
     originSize: {
       type: Object
     }
@@ -155,6 +148,20 @@ export default {
     canvas: { width: 600, height: 600 },
     mouse: { x: null, y: null }
   }),
+  computed: {
+    src() {
+      return this.$store.state.current.frame.src;
+    },
+    id() {
+      return this.$store.state.current.frame.id;
+    },
+    idx() {
+      return this.$store.state.current.frame.idx;
+    },
+    time() {
+      return this.$store.state.current.frame.time;
+    }
+  },
   methods: {
     // 全体操作
     close: function() {
@@ -163,7 +170,8 @@ export default {
       this.lines = [];
     },
     downloadImage: function() {
-      const name = `file-${this.frame.fileId}-frame-${this.frame.idx}.png`;
+      const bname = this.$store.state.current.video.filename.split(".")[0];
+      const name = `${bname}-f${this.idx}.png`;
       const stage = this.$refs.stage.getStage();
       const dataURL = stage.toDataURL();
       this.$vuewer.download.url(dataURL, name);
@@ -209,7 +217,8 @@ export default {
       }
       const obj = { points: points, lines: lines };
       const blob = this.$vuewer.io.xlsx.dump(obj);
-      this.$vuewer.download.blob(blob, "result.xlsx");
+      const bname = this.$store.state.current.video.filename.split(".")[0];
+      this.$vuewer.download.blob(blob, `${bname}-measurement.xlsx`);
     },
     skipNext: function() {
       this.skipForward();
@@ -243,15 +252,14 @@ export default {
         mode: this.mode,
         id: this.points.length + 1,
         label: `point-${this.points.length + 1}`,
+        frame: { time: this.time, idx: this.idx },
         x: x,
         y: y,
-        frame: this.frame,
         size: size,
         color: color
       };
-      if (this.frame.id) {
+      if (this.id) {
         const count = this.points.length;
-        item.frame = this.frame;
         item.id = count + 1;
         item.label = `points-${count + 1}`;
       }
@@ -301,7 +309,7 @@ export default {
         ref: [i1, i2],
         size: 5,
         color: this.color,
-        frame: this.frame,
+        frame: { time: this.time, idx: this.idx },
         label: `lines-${count + 1}`
       });
     },
@@ -403,7 +411,7 @@ export default {
         this.scale = 0;
         this.loadImage(val);
         for (const i in this.points) {
-          const depth = this.frame.idx - this.points[i].frame.idx;
+          const depth = this.idx - this.points[i].frame.idx;
           if (depth == 0) {
             this.points[i].color = this.color;
           }
@@ -414,7 +422,7 @@ export default {
           }
         }
         for (const i in this.lines) {
-          const depth = this.frame.idx - this.points[i].frame.idx;
+          const depth = this.idx - this.points[i].frame.idx;
           if (depth < 6) {
             this.lines[i].color = this.oldColors[depth - 1];
           } else {

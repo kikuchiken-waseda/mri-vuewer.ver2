@@ -13,6 +13,7 @@ const DEFAULTSTATE = {
   progressColor: "#555",
   shouldGetFrameInfo: true,
   shouldGetVideoInfo: true,
+  shouldMovePageAferAddingFile: false,
   showDev: false,
   showFrameInVideo: true,
   showPointsInVideo: true,
@@ -22,7 +23,9 @@ const DEFAULTSTATE = {
   showTimeLine: true,
   spectrogramHeight: 256,
   targetChannel: 0,
-  waveColor: "#333"
+  waveColor: "#333",
+  nameSep: "-",
+  nameFormat: ""
 };
 const DS = DEFAULTSTATE;
 
@@ -47,6 +50,10 @@ export default {
       S.get("shouldGetVideoInfo") == null
         ? DS.shouldGetVideoInfo
         : S.get("shouldGetVideoInfo"),
+    shouldMovePageAferAddingFile:
+      S.get("shouldMovePageAferAddingFile") == null
+        ? DS.shouldMovePageAferAddingFile
+        : S.get("shouldMovePageAferAddingFile"),
     showDev: S.get("showDev") == null ? DS.showDev : S.get("showDev"),
     showFrameInVideo:
       S.get("showFrameInVideo") == null
@@ -73,7 +80,9 @@ export default {
     spectrogramHeight:
       Number(S.get("spectrogramHeight")) || DS.spectrogramHeight,
     targetChannel: Number(S.get("targetChannel")) || DS.targetChannel,
-    waveColor: S.get("waveColor") || DS.waveColor
+    waveColor: S.get("waveColor") || DS.waveColor,
+    nameFormat: S.get("nameFormat") || DS.nameFormat,
+    nameSep: S.get("nameSep") || DS.nameSep
   }),
   mutations: {
     showDev(state, payload) {
@@ -107,6 +116,10 @@ export default {
     setShouldGetFrameInfo(state, payload) {
       state.shouldGetFrameInfo = payload;
       S.set("shouldGetFrameInfo", payload);
+    },
+    shouldMovePageAferAddingFile(state, payload) {
+      state.shouldMovePageAferAddingFile = payload;
+      S.set("shouldMovePageAferAddingFile", payload);
     },
     setMinPxPerSec(state, payload) {
       state.minPxPerSec = Number(payload);
@@ -165,6 +178,14 @@ export default {
         state.deleteRecordKey = payload;
         S.set("deleteRecordKey", payload);
       }
+    },
+    nameFormat(state, payload) {
+      state.nameFormat = payload;
+      S.set("nameFormat", payload);
+    },
+    nameSep(state, payload) {
+      state.nameSep = payload;
+      S.set("nameSep", payload);
     }
   },
   actions: {
@@ -190,6 +211,22 @@ export default {
       context.commit("setPlayOffset", DS.playOffset);
       context.commit("setAddRecordKey", DS.addRecordKey);
       context.commit("setDeleteRecordKey", DS.deleteRecordKey);
+    }
+  },
+  getters: {
+    fname2meta: state => filename => {
+      if (state.nameFormat) {
+        const vals = filename.split(".")[0].split(state.nameSep);
+        const fields = state.nameFormat.split(state.nameSep);
+        const data = {};
+        if (fields.length == vals.length) {
+          for (const i in fields) {
+            data[fields[i]] = vals[i];
+          }
+          return data;
+        }
+      }
+      return null;
     }
   }
 };

@@ -101,6 +101,72 @@ const info = (buff, callback) => {
   return result;
 };
 
+const toMp4 = buff => {
+  const video = new Uint8Array(buff);
+  const args = `-i data.avi -vcodec libx264 -pix_fmt yuv420p output.mp4 -c:a libfdk_aac -threads 4 -loglevel error`;
+  const result = ffmpeg({
+    MEMFS: [{ name: "data.avi", data: video }],
+    arguments: args.split(" "),
+    print: () => {},
+    printErr: error => console.error(error)
+  });
+  return result;
+};
+
+// 全てのフレームを個別の png として分割します.
+const toPng = (buff, frame, fps, duration, crop = null) => {
+  const video = new Uint8Array(buff);
+  const lank = String(Math.round(duration * fps)).length;
+  let args;
+  const farg = `-vf trim=start_frame=${frame - 1}:end_frame=${frame}`;
+  if (crop) {
+    const { x, y, w, h } = crop;
+    args = `-i data.mp4 ${farg},crop=${w}:${h}:${x}:${y} -vsync 0 %0${lank}d.png -loglevel error`;
+  } else {
+    args = `-i data.mp4 ${farg} %0${lank}d.png -vsync 0 -loglevel error`;
+  }
+  const result = ffmpeg({
+    MEMFS: [{ name: "data.mp4", data: video }],
+    arguments: args.split(" "),
+    print: () => {},
+    printErr: error => console.error(error)
+  });
+  return result;
+};
+
+// 全てのフレームを個別の png として分割します.
+const toPngs = (buff, fps, duration, crop = null) => {
+  const video = new Uint8Array(buff);
+  const lank = String(Math.round(duration * fps)).length;
+  let args;
+  if (crop) {
+    const { x, y, w, h } = crop;
+    args = `-i data.mp4 -vf crop=${w}:${h}:${x}:${y} %0${lank}d.png -loglevel error`;
+  } else {
+    args = `-i data.mp4 %0${lank}d.png -loglevel error`;
+  }
+  const result = ffmpeg({
+    MEMFS: [{ name: "data.mp4", data: video }],
+    arguments: args.split(" "),
+    print: () => {},
+    printErr: error => console.error(error)
+  });
+  return result;
+};
+
+const toWav = buff => {
+  const video = new Uint8Array(buff);
+  const args =
+    "-i data.mp4 -vn -ac 2 -ar 48000 -acodec pcm_s16le -f wav output.wav -loglevel error";
+  const result = ffmpeg({
+    MEMFS: [{ name: "data.mp4", data: video }],
+    arguments: args.split(" "),
+    print: () => {},
+    printErr: error => console.error(error)
+  });
+  return result;
+};
+
 const trim = (buff, start, end) => {
   const video = new Uint8Array(buff);
   const duration = end - start;
@@ -201,11 +267,15 @@ const toBase64 = blob => {
 };
 
 export default {
-  version: version,
-  info: info,
-  trim: trim,
-  concat: concat,
-  initObj: initVideoObject,
-  toBlob: toBlob,
-  toBase64: toBase64
+  version,
+  info,
+  trim,
+  concat,
+  toWav,
+  toMp4,
+  toPngs,
+  toPng,
+  toBlob,
+  toBase64,
+  initObj: initVideoObject
 };

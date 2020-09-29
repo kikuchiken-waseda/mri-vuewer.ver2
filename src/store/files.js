@@ -157,14 +157,14 @@ export default {
       return new Promise((resolve, reject) => {
         context.commit("isLoading", true);
         db.put(obj)
-          .then(() => {
+          .then(x => {
             db.files
               .toArray()
               .then(files => {
                 context.commit("files", files);
                 context.dispatch("postLog", "add a data.");
                 context.commit("isLoading", false);
-                resolve(true);
+                resolve(x);
               })
               .catch(error => {
                 context.commit("isLoading", false);

@@ -61,6 +61,15 @@ export default {
       }
     },
     // 動画読み込みに情報を取得する
+    $shouldMovePageAferAddingFile: {
+      get() {
+        return this.$store.state.setting.shouldMovePageAferAddingFile;
+      },
+      set(val) {
+        this.$store.commit("setting/shouldMovePageAferAddingFile", val);
+      }
+    },
+    //
     $shouldGetVideoInfo: {
       get() {
         return this.$store.state.setting.shouldGetVideoInfo;
@@ -216,6 +225,22 @@ export default {
             this.$store.commit("setting/setPlayOffset", Number(val));
           }
         }
+      }
+    },
+    $nameSep: {
+      get() {
+        return this.$store.state.setting.nameSep;
+      },
+      set(val) {
+        this.$store.commit("setting/nameSep", val);
+      }
+    },
+    $nameFormat: {
+      get() {
+        return this.$store.state.setting.nameFormat;
+      },
+      set(val) {
+        this.$store.commit("setting/nameFormat", val);
       }
     }
   },

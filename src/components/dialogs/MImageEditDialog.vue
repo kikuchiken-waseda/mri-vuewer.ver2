@@ -11,17 +11,13 @@
       <slot name="activator" :on="on" :attrs="attrs"></slot>
     </template>
     <template v-slot:toolbar-actions>
-      <span v-if="frame">
-        FRAME: {{ frame.idx }}: {{ $vuewer.math.round(frame.time, 3) }} sec
-      </span>
+      <span> {{ header }} </span>
       <v-btn icon @click="close" color="white">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </template>
     <m-frame-editor
       ref="editor"
-      :src="src"
-      :frame="frame"
       :origin-size="originSize"
       @skip="onSkip"
       @update-max-width="onUpdateMaxWidth"
@@ -39,19 +35,8 @@ export default {
   name: "m-image-edit-dialog",
   components: { MCardDialog, MFrameEditor },
   props: {
-    value: {
-      type: Boolean
-    },
-    src: {
-      type: String,
-      required: true
-    },
-    frame: {
-      type: Object
-    },
-    originSize: {
-      type: Object
-    }
+    value: { type: Boolean, required: true },
+    originSize: { type: Object, required: true }
   },
   data: () => ({
     maxWidth: "700"
@@ -74,6 +59,15 @@ export default {
   computed: {
     title: function() {
       return "$vuetify.forms.imageEdit.title";
+    },
+    header: function() {
+      const time = this.$store.state.current.frame.time;
+      const id = this.$store.state.current.frame.id;
+      if (id) {
+        return `FRAME: ${id}: ${this.$vuewer.math.round(time, 3)} sec`;
+      } else {
+        return `${this.$vuewer.math.round(time, 3)} sec`;
+      }
     },
     dialog: {
       get() {

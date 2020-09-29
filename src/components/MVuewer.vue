@@ -135,7 +135,6 @@
         />
         <m-detail-dialog
           v-model="dialog.detail.show"
-          :src="current.frame.src"
           @download-click="onDownloadClick"
           @upload-click="onUploadClick"
         />
@@ -163,22 +162,13 @@
           :tiers="tiers"
           :current="current.tier.key"
         />
-        <m-ruler-dialog
-          v-if="current.frame.src"
-          v-model="dialog.ruler.show"
-          :origin-size="originSize"
-          :frame="current.frame"
-          :src="current.frame.src"
-        />
+        <m-ruler-dialog v-model="dialog.ruler.show" :origin-size="originSize" />
         <m-image-edit-dialog
-          v-if="current.frame.src"
           v-model="dialog.imageEdit.show"
           @rects-updated="onRectsUpdated"
           @points-updated="onPointsUpdated"
           @rect-deleted="onRectDeleted"
           @point-deleted="onPointDeleted"
-          :frame="current.frame"
-          :src="current.frame.src"
           :origin-size="originSize"
         />
         <m-complates-dialog v-model="dialog.complates.show" />
@@ -322,7 +312,7 @@ export default {
       },
       // 現在時刻のフレーム情報
       frame: {
-        i: null, // 現在フレーム番号
+        idx: null, // 現在フレーム番号
         time: null, // 現在フレーム時刻
         src: null, // 現在フレーム画像
         points: [],
@@ -349,6 +339,9 @@ export default {
       set(val) {
         this.$store.commit("current/textGrid", val);
       }
+    },
+    $frameIdx() {
+      return this.$store.state.current.frame.idx;
     },
     $frames: {
       get() {
@@ -414,7 +407,6 @@ export default {
     },
     "dialog.imageEdit.show": function(val) {
       if (val == false) {
-        // console.log(this.wavesurfer.$el.children[0].focus());
         this.$refs.videoArray.focus();
       }
     }
@@ -842,7 +834,7 @@ export default {
     onSpectrogramRenderEnd() {
       this.$vuewer.console.log(this.tag, `on spectrogram render end`);
       if (this.textgrid) {
-        if (this.current.frame.i == null) {
+        if (this.$frameIdx == null) {
           this.isSyncing = true;
           this.wavesurfer.setTextGrid(this.textgrid);
 
@@ -1361,11 +1353,10 @@ export default {
     onPointsUpdated: function(points) {
       this.current.frame.points = points;
       this.$store.dispatch("current/updateFrame", this.current.frame);
-      // TODO
       this.$emit("frame-point-updated", this.current.frame);
       this.$vuewer.console.log(
         this.tag,
-        `update points (idx: ${this.current.frame.idx})`
+        `update points (idx: ${this.$frameIdx})`
       );
     },
     onRectsUpdated: function(rects) {
@@ -1374,7 +1365,7 @@ export default {
       this.$emit("frame-rect-updated", this.current.frame);
       this.$vuewer.console.log(
         this.tag,
-        `update rects (idx: ${this.current.frame.idx})`
+        `update rects (idx: ${this.$frameIdx})`
       );
     },
     onPointDeleted: function(point) {
@@ -1385,7 +1376,7 @@ export default {
         this.$emit("frame-point-deleted", point);
         this.$vuewer.console.log(
           this.tag,
-          `delete point (idx: ${this.current.frame.idx}: id ${point.id})`
+          `delete point (idx: ${this.$frameIdx}: id ${point.id})`
         );
       }
     },
@@ -1397,7 +1388,7 @@ export default {
         this.$emit("frame-rect-deleted", rect);
         this.$vuewer.console.log(
           this.tag,
-          `delete rect (idx: ${this.current.frame.idx}, id: ${rect.id})`
+          `delete rect (idx: ${this.$frameIdx}, id: ${rect.id})`
         );
       }
     },
@@ -1492,9 +1483,7 @@ export default {
     const layout = this.$refs.layout;
     if (layout) {
       const el = layout.$el;
-      el.addEventListener("mouseup", this.onLayoutMouseUp, {
-        passive: false
-      });
+      el.addEventListener("mouseup", this.onLayoutMouseUp, { passive: false });
     }
   },
   beforeDestroy: function() {
