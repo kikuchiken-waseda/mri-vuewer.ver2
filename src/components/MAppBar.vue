@@ -18,17 +18,21 @@
       :append-icon="recIcon"
       @click:append="rec"
     />
-    <v-spacer />
+    <v-spacer v-if="$vuetify.breakpoint.smAndUp" />
     <v-toolbar-title class="mr-3" v-if="!$store.state.current.layout.mini">
       {{ fileInfo }}
     </v-toolbar-title>
-    <v-btn icon @click="to({ name: 'Home' })">
+    <v-btn
+      icon
+      @click="to({ name: 'Home' })"
+      v-if="$vuetify.breakpoint.smAndUp"
+    >
       <v-icon>mdi-home</v-icon>
     </v-btn>
-    <v-btn icon :href="$store.state.github">
+    <v-btn icon :href="$store.state.github" v-if="$vuetify.breakpoint.smAndUp">
       <v-icon>mdi-github</v-icon>
     </v-btn>
-    <v-menu bottom left>
+    <v-menu bottom left v-if="$vuetify.breakpoint.smAndUp">
       <template v-slot:activator="{ on, attrs }">
         <v-btn dark icon v-bind="attrs" v-on="on">
           <v-icon>mdi-translate</v-icon>

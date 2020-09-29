@@ -7,7 +7,7 @@
     <template v-slot:activator="{ on, attrs }">
       <slot name="activator" :on="on" :attrs="attrs"></slot>
     </template>
-    <v-card>
+    <v-card flat tile>
       <v-card-text>
         <m-tier-form
           ref="form"

@@ -4,6 +4,7 @@
       <v-row>
         <v-col cols="12" :md="cardCols" v-for="(nav, key) in navs" :key="key">
           <m-h-card
+            :class="mhClass"
             :color="nav.color"
             :icon="nav.icon"
             :title="nav.title"
@@ -36,6 +37,9 @@ export default {
     fileRegistDialog: false
   }),
   computed: {
+    mhClass: function() {
+      return this.$vuetify.breakpoint.smAndUp ? "" : "mt-5";
+    },
     dialog: {
       get() {
         if (this.$store.state.hash.info["file-update"] || false) {

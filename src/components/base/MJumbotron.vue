@@ -4,7 +4,12 @@
       class="font-weight-light display-3 text-truncate"
       v-text="`${heading}`"
     />
-    <div v-if="desc" class="font-weight-light subtitle-1" v-html="desc" />
+    <div
+      v-show="$vuetify.breakpoint.smAndUp"
+      v-if="desc"
+      class="font-weight-light subtitle-1"
+      v-html="desc"
+    />
   </section>
 </template>
 <script>

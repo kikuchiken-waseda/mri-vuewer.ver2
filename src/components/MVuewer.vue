@@ -46,7 +46,7 @@
           :video-height="videoHeight"
         />
       </template>
-      <v-card @mouseover="onMouseover('wave-surfer')">
+      <v-card flat @mouseover="onMouseover('wave-surfer')">
         <wave-surfer
           normalize
           responsive

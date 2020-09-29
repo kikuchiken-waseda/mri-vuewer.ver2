@@ -1,7 +1,7 @@
 <template>
   <m-drag-context>
     <m-view-layout :heading="heading" :desc="$vuetify.lang.t(desc)">
-      <v-col>
+      <v-col :class="colClass">
         <v-card class="mt-6">
           <v-tabs v-model="tab" fixed-tabs background-color="primary" dark>
             <v-tab>File</v-tab>
@@ -62,6 +62,9 @@ export default {
     }
   },
   computed: {
+    colClass: function() {
+      return this.$vuetify.breakpoint.smAndUp ? "" : "ma-0 pa-0";
+    },
     keyword: {
       get() {
         return this.$store.state.search.keyword;

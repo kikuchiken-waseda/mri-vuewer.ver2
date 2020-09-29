@@ -1,6 +1,5 @@
 <template>
   <m-card-dialog
-    persistent
     titleColor="warning darken-1"
     :title="$vuetify.lang.t(title)"
     v-model="dialog"

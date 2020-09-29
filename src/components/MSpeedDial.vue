@@ -45,21 +45,56 @@ export default {
       }
     },
     btns: function() {
-      const btns = [
-        { event: "click-detail", color: "black", icon: "mdi-eye" },
-        { event: "click-setting", color: "black", icon: "mdi-cog" },
-        { event: "click-save", color: "black", icon: "mdi-content-save" },
-        { event: "click-ruler", color: "orange", icon: "mdi-ruler" },
-        {
-          event: "click-image-edit",
-          color: "orange",
-          icon: "mdi-selection-drag"
-        },
-        { event: "click-tier-edit", color: "green", icon: "mdi-pencil" },
-        { event: "click-tier-add", color: "indigo", icon: "mdi-plus" },
-        { event: "click-tier-delete", color: "red", icon: "mdi-delete" }
-      ];
-      return btns;
+      if (this.$vuetify.breakpoint.smAndUp) {
+        return [
+          {
+            event: "click-detail",
+            color: "black",
+            icon: "mdi-eye"
+          },
+          {
+            event: "click-setting",
+            color: "black",
+            icon: "mdi-cog"
+          },
+          {
+            event: "click-save",
+            color: "black",
+            icon: "mdi-content-save"
+          },
+          {
+            event: "click-ruler",
+            color: "orange",
+            icon: "mdi-ruler",
+            hideSM: true
+          },
+          {
+            event: "click-image-edit",
+            color: "orange",
+            icon: "mdi-selection-drag"
+          },
+          { event: "click-tier-edit", color: "green", icon: "mdi-pencil" },
+          { event: "click-tier-add", color: "indigo", icon: "mdi-plus" },
+          { event: "click-tier-delete", color: "red", icon: "mdi-delete" }
+        ];
+      } else {
+        return [
+          {
+            event: "click-ruler",
+            color: "orange",
+            icon: "mdi-ruler",
+            hideSM: true
+          },
+          {
+            event: "click-image-edit",
+            color: "orange",
+            icon: "mdi-selection-drag"
+          },
+          { event: "click-tier-edit", color: "green", icon: "mdi-pencil" },
+          { event: "click-tier-add", color: "indigo", icon: "mdi-plus" },
+          { event: "click-tier-delete", color: "red", icon: "mdi-delete" }
+        ];
+      }
     }
   }
 };
