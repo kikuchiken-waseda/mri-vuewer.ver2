@@ -13,8 +13,12 @@
         <v-card class="mt-6">
           <v-tabs v-model="tab" fixed-tabs background-color="primary" dark>
             <v-tab>File</v-tab>
-            <v-tab>Intervals</v-tab>
-            <v-tab>Points</v-tab>
+            <v-tab>
+              {{ $vuetify.lang.t("$vuetify.textgrid.tier.interval") }}
+            </v-tab>
+            <v-tab>
+              {{ this.$vuetify.lang.t("$vuetify.textgrid.tier.point") }}
+            </v-tab>
           </v-tabs>
           <v-tabs-items v-model="tab">
             <v-tab-item>

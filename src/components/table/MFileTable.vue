@@ -64,12 +64,13 @@ export default {
   data: () => ({
     dialog: false,
     id: null,
-    files: [],
-    fields: [],
     metaData: {},
     expanded: []
   }),
   computed: {
+    files: function() {
+      return this.$store.state.files.files || [];
+    },
     keyword: {
       get() {
         return this.$store.state.search.keyword;
@@ -80,6 +81,9 @@ export default {
     },
     isLoading: function() {
       return this.$store.state.files.isLoading;
+    },
+    fields: function() {
+      return this.$store.getters["files/fields"];
     },
     headers: function() {
       const headers = [
@@ -174,11 +178,6 @@ export default {
           });
       }
     }
-  },
-  mounted: function() {
-    const fields = this.$store.state.metadata.fields;
-    this.fields = Array.from(fields);
-    this.files = this.$store.state.files.files;
   }
 };
 </script>

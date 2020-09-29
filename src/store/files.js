@@ -208,6 +208,17 @@ export default {
     }
   },
   getters: {
+    fields: function(state) {
+      const fields = new Set();
+      for (const f of state.files) {
+        if (f.metaData) {
+          for (const k of Object.keys(f.metaData)) {
+            fields.add(k);
+          }
+        }
+      }
+      return Array.from(fields);
+    },
     records: function(state) {
       const records = [];
       let id = 0;

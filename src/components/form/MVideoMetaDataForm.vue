@@ -93,8 +93,7 @@ export default {
     }
   },
   mounted: function() {
-    const fields = this.$store.state.metadata.fields;
-    this.fields = Array.from(fields);
+    this.fields = this.$store.getters["files/fields"];
     for (const key of this.fields) {
       this.item[key] = this.currentItem[key] || "";
     }

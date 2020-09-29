@@ -10,7 +10,6 @@ import loading from "./loading.js";
 import setting from "./setting.js";
 import current from "./current";
 import files from "./files";
-import metadata from "./metadata.js";
 import hash from "./hash.js";
 
 Vue.use(Vuex);
@@ -55,7 +54,6 @@ export default new Vuex.Store({
     setting,
     current,
     files,
-    metadata,
     hash
   }
 });

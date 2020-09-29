@@ -19,9 +19,8 @@ export default {
   }),
   methods: {
     checkName(v) {
-      const fields = Array.from(this.$store.state.metadata.fields);
       if (v) {
-        if (fields.indexOf(v) > -1) {
+        if (this.fields.indexOf(v) > -1) {
           return this.$vuetify.lang.t("$vuetify.validations.alreadyExists");
         }
         return true;
@@ -45,6 +44,9 @@ export default {
     }
   },
   computed: {
+    fields: function() {
+      return this.$store.getters["files/fields"];
+    },
     keyRules: function() {
       const locale = "$vuetify.validations";
       return [

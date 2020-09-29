@@ -73,11 +73,16 @@
       <v-list-group
         sub-group
         v-else-if="files.length"
-        :value="true"
+        v-model="open.files"
         prepend-icon="mdi-menu-open"
       >
         <template v-slot:activator>
-          <v-list-item-title>FILES</v-list-item-title>
+          <v-list-item-title>
+            FILES
+            <v-chip v-if="!open.files" small class="ml-2" color="info">
+              {{ files.length }}
+            </v-chip>
+          </v-list-item-title>
         </template>
         <v-divider />
         <v-list-item
@@ -239,6 +244,9 @@ export default {
   components: { MFileUploadDialog, MDbImportDialog, MDropboxDialog },
   data: () => ({
     current: null,
+    open: {
+      files: false
+    },
     dropboxDialog: false,
     uploadDialog: false,
     dbImportDialog: false,
