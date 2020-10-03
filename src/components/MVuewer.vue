@@ -834,22 +834,18 @@ export default {
     onSpectrogramRenderEnd() {
       this.$vuewer.console.log(this.tag, `on spectrogram render end`);
       if (this.textgrid) {
-        if (this.$frameIdx == null) {
-          this.isSyncing = true;
-          this.wavesurfer.setTextGrid(this.textgrid);
-
-          // start が指定されている場合そこに移動
-          const start = Number(this.$route.query.start) || this.$frames[1].time;
-          this.seekTo(start);
-
-          // current.tier を初期化
-          this.current.tier.key = null;
-          this.current.tier.values = [];
-          this.current.tier.record.idx = 0;
-          this.current.tier.record.text = "";
-          this.current.tier.record.time = 0;
-          this.isSyncing = false;
-        }
+        this.isSyncing = true;
+        this.wavesurfer.setTextGrid(this.textgrid);
+        // start が指定されている場合そこに移動
+        const start = Number(this.$route.query.start) || this.$frames[1].time;
+        this.seekTo(start);
+        // current.tier を初期化
+        this.current.tier.key = null;
+        this.current.tier.values = [];
+        this.current.tier.record.idx = 0;
+        this.current.tier.record.text = "";
+        this.current.tier.record.time = 0;
+        this.isSyncing = false;
       }
       this.isLoading = false;
     },
@@ -1479,7 +1475,6 @@ export default {
     this.$frames = this.frames;
     this.minPxPerSec = this.$minPxPerSec;
     this.$store.dispatch("search/show");
-
     const layout = this.$refs.layout;
     if (layout) {
       const el = layout.$el;

@@ -1,7 +1,9 @@
 <template>
   <v-data-table
     show-expand
+    show-select
     loading-text="Loading... Please wait"
+    v-model="selected"
     :headers="headers"
     :items="files"
     :search="keyword"
@@ -47,6 +49,23 @@
         <m-audio-stream-list :audio-stream="item.audioStream" />
       </td>
     </template>
+    <template v-slot:footer v-if="isSelected">
+      <v-card flat>
+        <v-card-text>
+          <v-text-field
+            filled
+            v-model="tierTemplate"
+            type="text"
+            append-icon="mdi-send"
+            label="Set Tiers (name:[interval|point]-name2:[interval|point]...)"
+            @click:append="onClickAddTiers"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+        </v-card-actions>
+      </v-card>
+    </template>
   </v-data-table>
 </template>
 <script>
@@ -62,12 +81,17 @@ export default {
     MAudioStreamList
   },
   data: () => ({
+    tierTemplate: "",
     dialog: false,
     id: null,
     metaData: {},
+    selected: [],
     expanded: []
   }),
   computed: {
+    isSelected: function() {
+      return this.selected.length > 0;
+    },
     files: function() {
       return this.$store.state.files.files || [];
     },
@@ -133,14 +157,46 @@ export default {
     }
   },
   methods: {
+    // 選択された全てのファイルに指定の Tier を付与します.
+    onClickAddTiers: async function() {
+      this.$vuewer.loading.start("set tiers ...");
+      const fields = this.tierTemplate.split("-");
+      for (const file of this.selected) {
+        const textgrid = {};
+        for (const field of fields) {
+          if (~field.indexOf(":")) {
+            const [tName, tType] = field.split(":");
+            if (~["interval", "point"].indexOf(tType)) {
+              textgrid[tName] = {
+                type: tType,
+                parent: null,
+                values: []
+              };
+            }
+          }
+        }
+        try {
+          const origin = await db.files.get(file.id);
+          console.log(origin.textgrid, textgrid);
+          origin.textgrid = textgrid;
+          await db.files.put(origin);
+        } catch (error) {
+          this.$vuewer.snackbar.error(error);
+        }
+      }
+      this.$vuewer.loading.end();
+    },
+    // 選択されたファイルの詳細情報を取得します.
     openItem: function(item) {
       this.$router.push({ path: `/files/${item.id}` });
     },
+    // 選択されたファイルのメタ情報を変更します.
     editItem: function(payload) {
       this.metaData = payload.metaData;
       this.id = payload.id;
       this.dialog = true;
     },
+    // 選択されたファイルを削除します.
     deleteItem: function(item) {
       const name = item.name;
       const vm = this;
