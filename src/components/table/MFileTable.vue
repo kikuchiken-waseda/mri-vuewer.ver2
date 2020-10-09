@@ -6,7 +6,6 @@
     v-model="selected"
     :headers="headers"
     :items="files"
-    :search="keyword"
     :loading="isLoading"
     :expanded.sync="expanded"
     item-key="name"
@@ -92,16 +91,73 @@ export default {
     isSelected: function() {
       return this.selected.length > 0;
     },
-    files: function() {
-      return this.$store.state.files.files || [];
+    query: function() {
+      return {
+        args: this.$store.getters["search/args"],
+        kwargs: this.$store.getters["search/kwargs"],
+        norargs: this.$store.getters["search/norargs"]
+      };
     },
-    keyword: {
-      get() {
-        return this.$store.state.search.keyword;
-      },
-      set(val) {
-        this.$store.commit("search/keyword", val);
+    files: function() {
+      let files = this.$store.state.files.files || [];
+      const args = this.query.args;
+      const kwargs = this.query.kwargs;
+      const norargs = this.query.norargs;
+      if (args.length) {
+        files = files.filter(x => {
+          const search = [
+            x.name,
+            String(x.fps),
+            String(x.duration),
+            String(x.originSize.width),
+            String(x.originSize.height),
+            ...Object.keys(x.metaData).map(m => x.metaData[m])
+          ];
+          return args
+            .map(x => search.join(" ").indexOf(x) !== -1)
+            .every(val => val === true);
+        });
       }
+      if (Object.keys(kwargs).length) {
+        files = files.filter(x => {
+          const search = {
+            name: x.name,
+            duration: String(x.duration),
+            width: String(x.originSize.width),
+            height: String(x.originSize.height),
+            ...x.metaData
+          };
+          return Object.keys(kwargs)
+            .map(key => {
+              if (key in search) {
+                return search[key].indexOf(kwargs[key]) !== -1;
+              }
+              return false;
+            })
+            .every(val => val === true);
+        });
+      }
+      if (Object.keys(norargs).length) {
+        files = files.filter(x => {
+          const search = {
+            name: x.name,
+            duration: String(x.duration),
+            width: String(x.originSize.width),
+            height: String(x.originSize.height),
+            ...x.metaData
+          };
+          return Object.keys(norargs)
+            .map(key => {
+              if (key in search) {
+                return search[key].indexOf(norargs[key]) == -1;
+              }
+              return false;
+            })
+            .every(val => val === true);
+        });
+      }
+
+      return files;
     },
     isLoading: function() {
       return this.$store.state.files.isLoading;
@@ -177,7 +233,6 @@ export default {
         }
         try {
           const origin = await db.files.get(file.id);
-          console.log(origin.textgrid, textgrid);
           origin.textgrid = textgrid;
           await db.files.put(origin);
         } catch (error) {

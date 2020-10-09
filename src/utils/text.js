@@ -6,11 +6,36 @@ const builder = kuromoji.builder({
 });
 
 const clean = str => {
-  const reg = /[\t|\x20\u3000|\s]+/g;
-  return str.replace(reg, " ");
+  const sreg = /[\t|\x20\u3000|\s]+/g;
+  const zreg = /[Ａ-Ｚａ-ｚ０-９！＂＃＄％＆＇（）＊＋，－．／：；＜＝＞？＠［＼］＾＿｀｛｜｝]/g;
+  return str
+    .replace(sreg, " ")
+    .replace(zreg, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0))
+    .replace(/[‐－―]/g, "-")
+    .replace(/[～〜]/g, "~");
+};
+const trim = str => clean(str).replace(/^\s+|\s+$/g, "");
+
+const toParam = str => {
+  const reg = /\s*[||,|+]\s*/g;
+  return trim(str)
+    .replace(/\s=\s/g, "=")
+    .replace(" !=", "!=")
+    .replace("!= ", "!=")
+    .replace(" != ", "!=")
+    .replace(reg, "+")
+    .replace(/\s/g, "&");
 };
 
-const trim = str => clean(str).replace(/^\s+|\s+$/g, "");
+const toQuery = param => {
+  return [...new URLSearchParams(param).entries()].reduce((obj, e) => {
+    const val = e[1].indexOf(" ") > -1 ? e[1].split(" ") : e[1];
+    return {
+      ...obj,
+      [e[0]]: val ? val : true
+    };
+  }, {});
+};
 
 const checker = {
   isSafe: str => (str.match(/^[0-9a-zA-Z|\s]*$/) ? true : false)
@@ -106,6 +131,8 @@ const toHebon = s => {
 export default {
   clean,
   trim,
+  toParam,
+  toQuery,
   checker,
   tokenize: tokenize,
   owakati: owakati,

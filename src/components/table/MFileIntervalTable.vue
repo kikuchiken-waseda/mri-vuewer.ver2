@@ -83,11 +83,7 @@ export default {
     },
     $items: function() {
       if (this.items) {
-        return this.items.map((x, i) => {
-          x.start = i == 0 ? 0 : this.items[i - 1].time;
-          x.end = x.time;
-          return x;
-        });
+        return this.items;
       }
       return [];
     }

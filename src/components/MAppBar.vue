@@ -71,10 +71,10 @@ export default {
     },
     keyword: {
       get() {
-        return this.$store.state.search.keyword;
+        return this.$store.state.search.input;
       },
       set(val) {
-        this.$store.commit("search/keyword", val);
+        this.$store.commit("search/input", val);
       }
     },
     fileInfo: function() {

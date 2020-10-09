@@ -35,4 +35,31 @@ describe("utils/text.js", () => {
     expect(util.trim("hoge　 ")).toEqual("hoge");
     expect(util.trim("hoge	 ")).toEqual("hoge");
   });
+  test("toParam", () => {
+    expect(util.toParam("a=1&b=2")).toEqual("a=1&b=2");
+    expect(util.toParam("hoge ")).toEqual("hoge");
+    expect(util.toParam("hoge = foo")).toEqual("hoge=foo");
+    expect(util.toParam("hoge  = foo")).toEqual("hoge=foo");
+    expect(util.toParam("hoge =  foo")).toEqual("hoge=foo");
+    expect(util.toParam("hoge = a + b")).toEqual("hoge=a+b");
+    expect(util.toParam("hoge = a+ b")).toEqual("hoge=a+b");
+    expect(util.toParam("hoge = a +b")).toEqual("hoge=a+b");
+    expect(util.toParam("hoge = a,b")).toEqual("hoge=a+b");
+    expect(util.toParam("a = 1 b = 2")).toEqual("a=1&b=2");
+    expect(util.toParam("a = 1,2 b = 2")).toEqual("a=1+2&b=2");
+
+    expect(util.toParam("a=1 b!=2")).toEqual("a=1&b!=2");
+    expect(util.toParam("a=1 b !=2")).toEqual("a=1&b!=2");
+    expect(util.toParam("a=1 b!= 2")).toEqual("a=1&b!=2");
+    expect(util.toParam("a=1 b != 2")).toEqual("a=1&b!=2");
+    expect(util.toParam("a=1     b != 2")).toEqual("a=1&b!=2");
+    expect(util.toParam("a=1 b  != 2")).toEqual("a=1&b!=2");
+  });
+  test("toQuery", () => {
+    expect(util.toQuery("")).toEqual({});
+    expect(util.toQuery("a=1&b=2")).toEqual({ a: "1", b: "2" });
+    expect(util.toQuery("a=1&b!=2")).toEqual({ a: "1", "b!": "2" });
+    expect(util.toQuery("a=1&b")).toEqual({ a: "1", b: true });
+    expect(util.toQuery("a=1+2")).toEqual({ a: ["1", "2"] });
+  });
 });
