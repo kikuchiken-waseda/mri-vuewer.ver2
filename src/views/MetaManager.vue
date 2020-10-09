@@ -51,7 +51,7 @@ export default {
     MFilePointTable
   },
   data: () => ({
-    heading: "Meta Data Manager",
+    heading: "Data Manager",
     desc: "$vuetify.meta.disc",
     dialog: false,
     tab: null

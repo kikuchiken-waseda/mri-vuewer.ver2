@@ -1,7 +1,6 @@
 <template>
   <v-data-table
     v-model="selected"
-    :search="$keyword"
     :headers="headers"
     :items="$items"
     item-key="id"
@@ -78,12 +77,37 @@ export default {
     }
   },
   computed: {
-    $keyword: function() {
-      return this.$store.state.search.keyword;
+    query: function() {
+      return {
+        args: this.$store.getters["search/args"],
+        kwargs: this.$store.getters["search/kwargs"],
+        norargs: this.$store.getters["search/norargs"]
+      };
     },
     $items: function() {
       if (this.items) {
-        return this.items;
+        let records = this.items;
+        const args = this.query.args;
+        const kwargs = this.query.kwargs;
+        if (args.length) {
+          records = records.filter(x => {
+            const search = [...new Set(Object.values(x.search))].join(" ");
+            return args
+              .map(x => search.indexOf(x) !== -1)
+              .every(val => val === true);
+          });
+        }
+
+        if (Object.keys(kwargs).length) {
+          records = records.filter(x => {
+            return Object.keys(kwargs)
+              .map(key =>
+                key in x.search ? x.search[key] == kwargs[key] : false
+              )
+              .every(val => val === true);
+          });
+        }
+        return records;
       }
       return [];
     }

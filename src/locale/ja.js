@@ -33,7 +33,7 @@ const FRAME = {
 
 const pages = {
   home: "ホーム",
-  meta: "メタデータ管理",
+  meta: "ファイル管理",
   demo: "ライブデモ",
   setting: "設定",
   about: "このアプリについて",
@@ -216,15 +216,7 @@ export default {
   pages: pages,
   home: home,
   meta: {
-    disc: `
-    このページでは登録された ${VIDEO} ファイルのメタ情報を管理します.
-    </br>
-    メタ情報として付与する内容は自身で設定することが可能です.
-    </br>
-    メタ情報は ${VIDEO} の発話者, 撮影日, 発話内容等が想定されます.
-    </br>
-    メタ情報は ${VIDEO} ファイル検索時に使用されます.
-    `
+    disc: `このページでは登録された ${VIDEO} ファイルの横断検索, 一括操作が実施可能です.`
   },
   demo: {
     disc: `

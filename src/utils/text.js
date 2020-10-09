@@ -19,10 +19,8 @@ const trim = str => clean(str).replace(/^\s+|\s+$/g, "");
 const toParam = str => {
   const reg = /\s*[||,|+]\s*/g;
   return trim(str)
-    .replace(/\s=\s/g, "=")
-    .replace(" !=", "!=")
-    .replace("!= ", "!=")
-    .replace(" != ", "!=")
+    .replace(/\s*[=|:]\s*/g, "=")
+    .replace(/\s*!=\s*/g, "!=")
     .replace(reg, "+")
     .replace(/\s/g, "&");
 };
