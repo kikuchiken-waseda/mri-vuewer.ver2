@@ -9,6 +9,7 @@
     @click-tier-delete="onClickTierDelete"
     @click-upload="onUploadClick"
     @click-download="onDownloadClick"
+    @click-noise-reduction="onClickNoiseReduction"
     @click-complate="onClickComplate"
     @click-record="onClickRecordContextMenu"
   >
@@ -83,27 +84,17 @@
           @tier-update="onTextGridUpdate"
         >
           <template v-slot:textform>
-            <v-text-field
-              dense
-              hide-details
-              outlined
-              append-icon="mdi-microphone"
-              autocomplete="on"
-              label="text"
-              list="complates"
+            <m-record-text-field
               ref="input"
               v-if="showTextField"
               v-model="current.tier.record.text"
+              :complate-key="current.key"
               :disabled="current.tier.key == null"
-              @click:append="onVoiceUpdateRecordText"
-              @keydown.enter="onUpdateRecordText"
-              @keydown.tab="onUpdateRecordText('next')"
-              @keydown.ctrl.219="onEscTextField"
-              @keydown.27.prevent="onEscTextField"
+              @click:prepend-inner-icon="onVoiceUpdateRecordText"
+              @enter="onUpdateRecordText"
+              @next="onUpdateRecordText('next')"
+              @esc="onEscTextField"
             />
-            <datalist id="complates">
-              <option v-for="x in complates" :key="x"> {{ x }} </option>
-            </datalist>
           </template>
 
           <div class="text-center" v-if="isLoading">
@@ -189,6 +180,7 @@ import MVuwerLayout from "@/components/layouts/MVuwerLayout";
 import MVideoArray from "@/components/video/MVideoArray";
 import MTextGrid from "@/components/MTextGrid";
 import MVuwerActions from "@/components/actions/MVuewerActions";
+import MRecordTextField from "@/components/form/MRecordTextField";
 import MWContextMenu from "@/components/contextmenus/MWContextMenu";
 import MDetailDialog from "@/components/dialogs/MDetailDialog";
 import MTierDialog from "@/components/dialogs/MTierDialog";
@@ -201,7 +193,6 @@ import MTextgridDialog from "@/components/dialogs/MTextgridDialog";
 import MComplatesDialog from "@/components/dialogs/MComplatesDialog";
 import MSpeedDial from "@/components/MSpeedDial";
 import MSettingMixin from "@/mixins/MSettingMixin";
-import io from "@/io";
 
 export default {
   name: "WVuwer",
@@ -222,6 +213,7 @@ export default {
     MTierDeleteDialog,
     MTierDialog,
     MTierEditDialog,
+    MRecordTextField,
     MVuwerActions
   },
   props: {
@@ -298,6 +290,13 @@ export default {
       setting: { show: false },
       complates: { show: false }
     },
+    keybuffer: {
+      time: null,
+      keycode: null,
+      key: null,
+      xKey: null,
+      from: null
+    },
     current: {
       // 現在フォーカスが当たっている TIER 情報
       tier: {
@@ -320,8 +319,7 @@ export default {
         texts: []
       }
     },
-    tiers: [],
-    complates: []
+    tiers: []
   }),
   computed: {
     wavesurfer: {
@@ -338,6 +336,7 @@ export default {
       },
       set(val) {
         this.$store.commit("current/textGrid", val);
+        this.$store.dispatch("current/cache/setTextgrid", val);
       }
     },
     $frameIdx() {
@@ -364,7 +363,7 @@ export default {
       if (this.videoElm) {
         if (this.$textgrid) {
           if (!this.isLoading) {
-            return Object.keys(this.$textgrid).length > -1;
+            return Object.keys(this.$textgrid).length > 0;
           }
         }
       }
@@ -384,26 +383,11 @@ export default {
       deep: true
     },
     $minPxPerSec: function(val) {
-      if ((val > 100) & (val < 500)) {
+      if ((val > 100) & (val < 700)) {
         if (val % 50 == 0) {
           this.wavesurfer.zoom(val);
         }
       }
-    },
-    current: {
-      handler: function(val) {
-        if (val && val.key) {
-          if (this.$textgrid[val.key]) {
-            // 補完の候補を決定
-            const texts = this.$textgrid[val.key].values.map(x => x.text);
-            const complates = texts.concat(
-              this.$store.state.current.complates.complates[val.key] || []
-            );
-            this.complates = [...new Set(complates)];
-          }
-        }
-      },
-      deep: true
     },
     "dialog.imageEdit.show": function(val) {
       if (val == false) {
@@ -412,6 +396,12 @@ export default {
     }
   },
   methods: {
+    rebaseTextgrid: function(n = 1) {
+      const textgrid = this.$store.getters["current/cache/textgrids"](n);
+      if (textgrid !== null) {
+        this.wavesurfer.setTextGrid(textgrid);
+      }
+    },
     playPause: function() {
       const key = this.current.tier.key || null;
       const idx = this.current.tier.record.idx || null;
@@ -436,13 +426,33 @@ export default {
     },
     deleteRecord: function(key, idx) {
       if (idx > -1) {
-        this.wavesurfer.deleteTierValue(key, idx);
-        if (!this.isSyncing) {
-          this.$vuewer.console.log(
-            this.tag,
-            `delete a record (key: ${key} idx: ${idx})`
-          );
+        const type = this.$textgrid[key].type;
+        const len = this.$textgrid[key].values.length;
+        if (type != "interval" || len > 1) {
+          this.wavesurfer.deleteTierValue(key, idx);
+          if (!this.isSyncing) {
+            this.$vuewer.console.log(
+              this.tag,
+              `delete a record (key: ${key} idx: ${idx})`
+            );
+          }
         }
+      }
+    },
+    updateRecordText(key, idx, text = "") {
+      const time = this.$textgrid[key].values[idx].time;
+      const item = { time, text };
+      this.wavesurfer.setTierValue(key, idx, item);
+    },
+    deleteRecordText(key, idx) {
+      const item = this.$textgrid[key].values[idx];
+      if (item.text) {
+        this.copyRecord(key, idx);
+        item.text = "";
+        this.wavesurfer.setTierValue(key, idx, item);
+        this.current.tier.record.text = null;
+      } else {
+        this.deleteRecord(key, idx);
       }
     },
     playRecord: function(key, idx) {
@@ -476,24 +486,70 @@ export default {
         this.showBrowserError();
       }
     },
-    pasteRecord(key, idx) {
-      const target = this.$textgrid[key].values[idx];
-      const vm = this;
+    copyRecords(key) {
       if (navigator.clipboard) {
-        navigator.clipboard.readText().then(function(text) {
-          const item = {
-            time: target.time,
-            text: text
-          };
-          vm.wavesurfer.setTierValue(key, idx, item);
-          vm.current.tier.record.text = text;
-          if (!this.isSyncing) {
-            this.$vuewer.console.log(
-              this.tag,
-              `update text a record (key: ${key} idx: ${idx})`
-            );
+        const tier = this.$textgrid[key];
+        const values = tier.values;
+        const item = {
+          "x-special": "vuewer:tier",
+          type: tier.type,
+          parent: null,
+          key,
+          values
+        };
+        const text = JSON.stringify(item);
+        navigator.clipboard.writeText(text);
+      } else {
+        this.showBrowserError();
+      }
+    },
+    async paste() {
+      if (navigator.clipboard) {
+        const text = await navigator.clipboard.readText();
+        try {
+          const obj = JSON.parse(text);
+          if (obj["x-special"] == "vuewer:tier") {
+            const textgrid = this.$textgrid;
+            textgrid[`${obj.key}-copy`] = {
+              type: obj.type,
+              parent: obj.parent,
+              values: obj.values
+            };
+            this.wavesurfer.setTextGrid(textgrid);
+            const keys = Object.keys(this.$textgrid);
+            this.focusRecord(keys[keys.length - 1]);
           }
-        });
+        } catch {
+          this.pasteRecord(this.current.key, this.current.tier.record.idx);
+        }
+      }
+    },
+    async pasteRecord(key, idx) {
+      const target = this.$textgrid[key].values[idx];
+      const time = target.time;
+      const text = await navigator.clipboard.readText();
+      const item = { time, text };
+      this.wavesurfer.setTierValue(key, idx, item);
+      this.current.tier.record.text = text;
+      if (!this.isSyncing) {
+        const msg = `update text a record (key: ${key} idx: ${idx})`;
+        this.$vuewer.console.log(this.tag, msg);
+      }
+    },
+    focusRecord(key = null) {
+      const tg = this.wavesurfer.wavesurfer.textgrid;
+      const time = this.wavesurfer.getCurrentTime();
+      const $key =
+        key !== null ? key : this.current.key || Object.keys(this.$textgrid)[0];
+      if ($key) {
+        const values = this.$textgrid[$key].values;
+        if (values) {
+          const current = values
+            .sort((a, b) => a.time > b.time)
+            .find(x => x.time > time);
+          tg.setCurrent(key, current);
+          tg.tiers[key].canvas.focus();
+        }
       }
     },
     nextRecord(key, idx, focus) {
@@ -655,6 +711,10 @@ export default {
         tg.tiers[key].canvas.focus();
       });
     },
+    deleteTier(key) {
+      this.copyRecords(key);
+      this.wavesurfer.deleteTier(key);
+    },
     seekTo: function(time, center) {
       const d = this.wavesurfer.getDuration();
       const p = time / d;
@@ -693,8 +753,8 @@ export default {
           points: this.$store.getters["current/pointTable"],
           rects: this.$store.getters["current/rectTable"]
         };
-        const blob = io.xlsx.dump(obj);
-        io.file.download(blob, `${bname}.xlsx`);
+        const blob = this.$vuewer.io.xlsx.dump(obj);
+        this.$vuewer.io.file.download(blob, `${bname}.xlsx`);
       } else if (payload == "JSON") {
         this.$emit("download-json");
       } else if (payload == "PNG") {
@@ -719,38 +779,38 @@ export default {
           }
           const bname = this.$store.state.current.video.filename.split(".")[0];
           const name = `${bname}.mp4`;
-          const buff = io.file.toBuff(this.src);
-          const result = io.video.trim(buff, start, end);
+          const buff = this.$vuewer.io.file.toBuff(this.src);
+          const result = this.$vuewer.io.video.trim(buff, start, end);
           const out = result.MEMFS[0];
-          const blob = io.video.toBlob(Buffer(out.data));
-          io.file.download(blob, name);
+          const blob = this.$vuewer.io.video.toBlob(Buffer(out.data));
+          this.$vuewer.io.file.download(blob, name);
         }
       } else if (payload == "TEXTGRID/JSON") {
         const blob = new Blob([JSON.stringify(this.$textgrid, null, "  ")], {
           type: "application/json"
         });
-        io.file.download(blob, `${bname}-records.json`);
+        this.$vuewer.io.file.download(blob, `${bname}-records.json`);
       } else if (payload == "TEXTGRID/TEXTGRID") {
         this.wavesurfer.downloadTextGrid(`${bname}.TextGrid`);
       } else if (payload == "TEXTGRID/XLSX") {
         const obj = {
           records: this.$store.getters["current/tgTable"]
         };
-        const blob = io.xlsx.dump(obj);
-        io.file.download(blob, `${bname}-records.xlsx`);
+        const blob = this.$vuewer.io.xlsx.dump(obj);
+        this.$vuewer.io.file.download(blob, `${bname}-records.xlsx`);
       } else if (payload == "FRAME/JSON") {
         const blob = new Blob([JSON.stringify(this.$frames, null, "  ")], {
           type: "application/json"
         });
-        io.file.download(blob, `${bname}-frame.json`);
+        this.$vuewer.io.file.download(blob, `${bname}-frame.json`);
       } else if (payload == "FRAME/XLSX") {
         const obj = {
           frames: this.$store.getters["current/frameTable"],
           points: this.$store.getters["current/pointTable"],
           rects: this.$store.getters["current/rectTable"]
         };
-        const blob = io.xlsx.dump(obj);
-        io.file.download(blob, `${bname}.xlsx`);
+        const blob = this.$vuewer.io.xlsx.dump(obj);
+        this.$vuewer.io.file.download(blob, `${bname}.xlsx`);
       } else {
         this.$vuewer.snackbar.warning("$vuetify.yet");
       }
@@ -760,37 +820,43 @@ export default {
       const file = payload.files[0];
       if (file) {
         if (payload.click == "TEXTGRID/JSON") {
-          io.json.read(file).then(obj => {
+          this.$vuewer.io.json.read(file).then(obj => {
             this.wavesurfer.setTextGrid({});
-            const textgrid = io.obj.ver2.loadTextGrid(obj);
+            const textgrid = this.$vuewer.io.obj.ver2.loadTextGrid(obj);
             this.wavesurfer.setTextGrid(textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
         } else if (payload.click == "TEXTGRID/JSON/VER1") {
-          io.json.read(file).then(obj => {
+          this.$vuewer.io.json.read(file).then(obj => {
             this.wavesurfer.setTextGrid({});
-            const textgrid = io.obj.ver1.loadTextGrid(obj, "both");
+            const textgrid = this.$vuewer.io.obj.ver1.loadTextGrid(obj, "both");
             this.wavesurfer.setTextGrid(textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
         } else if (payload.click == "TEXTGRID/JSON/VER1/LEFT") {
-          io.json.read(file).then(obj => {
+          this.$vuewer.io.json.read(file).then(obj => {
             this.wavesurfer.setTextGrid({});
-            const textgrid = io.obj.ver1.loadTextGrid(obj, "left");
+            const textgrid = this.$vuewer.io.obj.ver1.loadTextGrid(obj, "left");
             this.wavesurfer.setTextGrid(textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
         } else if (payload.click == "TEXTGRID/JSON/VER1/RIGHT") {
-          io.json.read(file).then(obj => {
+          this.$vuewer.io.json.read(file).then(obj => {
             this.wavesurfer.setTextGrid({});
-            const textgrid = io.obj.ver1.loadTextGrid(obj, "right");
+            const textgrid = this.$vuewer.io.obj.ver1.loadTextGrid(
+              obj,
+              "right"
+            );
             this.wavesurfer.setTextGrid(textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
         } else if (payload.click == "TEXTGRID/JSON/VER1/UP-DOWN") {
-          io.json.read(file).then(obj => {
+          this.$vuewer.io.json.read(file).then(obj => {
             this.wavesurfer.setTextGrid({});
-            const textgrid = io.obj.ver1.loadTextGrid(obj, "up-down");
+            const textgrid = this.$vuewer.io.obj.ver1.loadTextGrid(
+              obj,
+              "up-down"
+            );
             this.wavesurfer.setTextGrid(textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
@@ -875,195 +941,150 @@ export default {
     },
     // key 操作系
     onTextGridKeydown: function(payload) {
+      const time = Number(Date.now() - this.keybuffer.time);
+      const check = (this.keybuffer.from == "textgrid") & (time < 150);
+      const preKey = check ? this.keybuffer.keycode : null;
+      const { key, xKey } = this.$vuewer.key.summary(payload);
+
       const item = payload.current;
+
       // DELETE 系の動作
-      if (payload.keycode == 8 || payload.keycode == 46) {
-        if (this.$deleteRecordKey == "alt") {
-          if (payload.alt) {
-            if (payload.shift) {
-              this.onClickTierDelete();
-            } else {
-              this.deleteRecord(item.key, item.index);
-            }
-          } else {
-            const record = this.$textgrid[item.key].values[item.index];
-            if (record.text.length) {
-              const text = record.text.slice(0, record.text.length - 1);
-              this.current.tier.record.text = record.text = text;
-              this.wavesurfer.setTierValue(item.key, item.index, record);
-            }
-          }
-        } else if (this.$deleteRecordKey == "ctrl") {
-          if (payload.ctrl) {
-            if (payload.shift) {
-              this.onClickTierDelete();
-            } else {
-              this.deleteRecord(item.key, item.index);
-            }
-          } else {
-            const record = this.$textgrid[item.key].values[item.index];
-            if (record.text.length) {
-              const text = record.text.slice(0, record.text.length - 1);
-              this.current.tier.record.text = record.text = text;
-              this.wavesurfer.setTierValue(item.key, item.index, record);
-            }
-          }
-        } else {
-          if (payload.shift) {
-            this.onClickTierDelete();
-          } else if (payload.ctrl) {
-            const record = this.$textgrid[item.key].values[item.index];
-            if (record.text.length) {
-              const text = record.text.slice(0, record.text.length - 1);
-              this.current.tier.record.text = record.text = text;
-              this.wavesurfer.setTierValue(item.key, item.index, record);
-            }
-          } else {
-            this.deleteRecord(item.key, item.index);
-          }
+      if (~[8, 46].indexOf(key)) {
+        if (this.$deleteRecordKey == xKey) {
+          this.deleteRecord(item.key, item.index);
+        }
+        if (this.$deleteRecordKey + "+shift" == xKey) {
+          this.onClickTierDelete();
+        }
+      } else if (key == 68) {
+        if (preKey == null && xKey == "default") {
+          // d で現在 Tier のテキストを削除
+          this.deleteRecordText(item.key, item.index);
+        } else if (preKey == 68 && xKey == "default") {
+          // dd で現在 Tier の削除
+          this.deleteTier(item.key);
         }
       }
 
       // Ctrl + SPACE で現在時刻にティアーを挿入
-      if (payload.keycode == 32 && payload.ctrl) {
+      if (key == 32 && xKey == "ctrl") {
         this.addRecord(item.key, this.wavesurfer.getCurrentTime(), "");
       }
 
       // タブキー時に現在時刻の再生
-      if (payload.keycode == 9) {
+      if (key == 9 && xKey == "default") {
         this.playRecord(item.key, item.index);
       }
 
-      // ctrl + で拡大
-      if (payload.keycode == 187 && payload.shift) {
-        if (payload.ctrl == true) {
-          if (this.$minPxPerSec < 500) {
-            this.$minPxPerSec = this.$minPxPerSec + 50;
-          }
-        }
+      if (key == 187 && xKey == "ctrl+shift") {
+        // ctrl + で拡大
+        this.$minPxPerSec = this.$minPxPerSec + 50;
       }
-      if (payload.keycode == 189 && payload.shift) {
-        if (payload.ctrl == true) {
-          if (this.$minPxPerSec > 100) {
-            this.$minPxPerSec = this.$minPxPerSec - 50;
-          }
-        }
+      if (key == 189 && xKey == "ctrl") {
+        // ctrl - で拡大
+        if (this.$minPxPerSec > 100) this.$minPxPerSec = this.$minPxPerSec - 50;
       }
 
-      // ← で1フレーム戻す
-      if (payload.keycode == 37) {
-        if (payload.ctrl) {
-          if (payload.shift) {
-            // ctrl + shift + ← で現在レコードを縮小
-            this.shrinkRecord(item.key, item.index);
-          } else if (payload.alt) {
-            // ctrl + alt + ← で現在レコードの始端に移動
-            this.toStartRecord(item.key, item.index);
-          } else {
-            // ctrl + ← で前レコードに移動
-            this.prevRecord(item.key, item.index, false);
-          }
-        } else {
+      // 移動系操作
+      if (~[37, 74].indexOf(key)) {
+        if (xKey == "default") {
+          // ← | j で 1 フレーム戻す
           this.wavesurfer.skipBackward();
+        } else if (xKey == "ctrl") {
+          // ctrl + ← | j で前のレコードに移動
+          this.prevRecord(item.key, item.index, false);
+        } else if (xKey == "ctrl+shift") {
+          // ctrl + shift + ← | j で終端時刻を短くする
+          this.shrinkRecord(item.key, item.index);
+        } else if (xKey == "ctrl+alt") {
+          // ctrl + alt + ← | j で現在レコードの先頭に移動
+          this.toStartRecord(item.key, item.index);
         }
-      }
-      // ↑ で上の Tier に移動
-      if (payload.keycode == 38) {
+      } else if (~[38, 72].indexOf(key) && xKey == "default") {
+        // ↑|h で上の Tier を選択
         this.prevTier();
-      }
-      // → で1フレーム進める
-      if (payload.keycode == 39) {
-        if (payload.ctrl) {
-          if (payload.shift) {
-            // → + ctrl + shift で現在レコードを延長
-            this.extendRecord(item.key, item.index);
-          } else if (payload.alt) {
-            // → + ctrl + alt で現在レコードの終端に移動
-            this.toEndRecord(item.key, item.index);
-          } else {
-            // → + ctrl で次のレコードに移動
-            this.nextRecord(item.key, item.index, false);
-          }
-        } else {
+      } else if (~[39, 75].indexOf(key)) {
+        if (xKey == "default") {
+          // →|k で 1 フレーム進める
           this.wavesurfer.skipForward();
+        } else if (xKey == "ctrl") {
+          // ctrl + →|k で次のレコードに移動
+          this.nextRecord(item.key, item.index, false);
+        } else if (xKey == "ctrl+shift") {
+          // ctrl + shift + →|k で現在レコードを延長
+          this.extendRecord(item.key, item.index);
+        } else if (xKey == "ctrl+alt") {
+          // ctrl + alt + →|k  で現在レコードの終端に移動
+          this.toEndRecord(item.key, item.index);
         }
-      }
-      // ↓ で上の Tier に移動
-      if (payload.keycode == 40) {
+      } else if (~[40, 76].indexOf(key) && xKey == "default") {
+        // ↓|l で下の TIER に移動
         this.nextTier();
+      }
+      if (key == 54 && xKey == "shift") {
+        this.toStartRecord(item.key, item.index);
+      } else if (key == 52 && xKey == "shift") {
+        this.toEndRecord(item.key, item.index);
       }
 
       // ctrl + c でクリップボードにコピー
-      if (payload.keycode == 67 && payload.ctrl == true) {
-        if (payload.shift) {
-          this.onClickTierAdd();
-        } else {
-          this.copyRecord(item.key, item.index);
-        }
+      if (key == 67 && xKey == "ctrl") {
+        this.copyRecord(item.key, item.index);
+      } else if (key == 67 && xKey == "ctrl+shift") {
+        this.onClickTierAdd();
       }
 
       // ctrl + v でクリップボードにペースト
-      if (payload.keycode == 86 && payload.ctrl == true) {
+      if (key == 86 && xKey == "ctrl") {
         this.pasteRecord(item.key, item.index);
       }
 
+      // ヤンク操作
+      if (key == 89 && xKey == "default") {
+        if (preKey == null) {
+          // y のみで現在 Record のテキストをコピー
+          this.copyRecord(item.key, item.index);
+        } else if (preKey == 89) {
+          // yy で現在 tier を全てコピー
+          this.copyRecords(item.key);
+        }
+      } else if (key == 80 && xKey == "default") {
+        this.paste();
+      }
       // ctrl + s で明示的に保存
-      if (payload.keycode == 83 && payload.ctrl == true) {
+      if (key == 83 && xKey == "ctrl") {
         this.fireUpdateData();
       }
-      if (payload.keycode == 82 && payload.ctrl == true) {
+      // ctrl + z または u で Textgrid の状態を一つ戻す
+      if ((key == 90 && xKey == "ctrl") || (key == 85 && xKey == "default")) {
+        this.rebaseTextgrid();
+      }
+
+      // ctrl + r でドロップボックスからデータをリロード
+      if (key == 82 && xKey == "ctrl") {
         this.onClickLoadDropbox();
       }
-      // VIM モード
-      if (payload.keycode == 74) {
-        if (payload.ctrl) {
-          if (payload.shift) {
-            // ctrl + shift + j で現在レコードを縮小
-            this.shrinkRecord(item.key, item.index);
-          } else if (payload.alt) {
-            // ctrl + alt + j で現在レコードの始端に移動
-            this.toStartRecord(item.key, item.index);
-          } else {
-            // ctrl + j で前レコードに移動
-            this.prevRecord(item.key, item.index, false);
-          }
-        } else {
-          // j で前フレームに移動
-          this.wavesurfer.skipBackward();
-        }
-      }
-      if (payload.keycode == 75) {
-        if (payload.ctrl) {
-          if (payload.shift) {
-            // k + ctrl + shift で現在レコードを延長
-            this.extendRecord(item.key, item.index);
-          } else if (payload.alt) {
-            // k + ctrl + alt で現在レコードの終端に移動
-            this.toEndRecord(item.key, item.index);
-          } else {
-            // k + ctrl で次のレコードに移動
-            this.nextRecord(item.key, item.index, false);
-          }
-        } else {
-          // k で次フレームに移動
-          this.wavesurfer.skipForward();
-        }
-      }
-      if (payload.keycode == 76) {
-        // l で下の Tier をフォーカス
-        this.nextTier();
-      }
-      if (payload.keycode == 72) {
-        // h で上の Tier をフォーカス
-        this.prevTier();
-      }
-      if (payload.keycode == 73) {
-        if (payload.ctrl && payload.shift) {
+
+      if (key == 73 && xKey == "default") {
+        if (preKey == 73) {
+          // i i で画像編集
           this.onClickImageEdit();
         } else {
-          setTimeout(() => this.$refs.input.focus());
+          // i でインサート
+          this.$refs.input.focus();
         }
       }
+
+      // o d で補完設定を開く
+      if (preKey == 79 && key == 68 && xKey == "default") {
+        this.onClickComplate();
+      }
+
+      // キーバッファを更新
+      this.keybuffer.time = Date.now();
+      this.keybuffer.from = "textgrid";
+      this.keybuffer.keycode = payload.keycode;
+      this.keybuffer.xKey = xKey;
     },
     onWaveSurferKeyup: function(event) {
       const { key, xKey } = this.$vuewer.key.summary(event);
@@ -1091,10 +1112,23 @@ export default {
         this.toEndRecord(item.key, item.idx);
       } else if (key == "s" && xKey == "ctrl") {
         this.fireUpdateData();
+      } else if (
+        (key == "z" && xKey == "ctrl") ||
+        (key == "u" && xKey == "default")
+      ) {
+        // ctrl + z または u で Textgrid の状態を一つ戻す
+        this.rebaseTextgrid();
       } else if (key == "r" && xKey == "ctrl") {
         this.onClickLoadDropbox();
+      } else if (key == "i" && xKey == "default") {
+        this.focusRecord();
+        setTimeout(() => {
+          this.$refs.input.focus();
+        });
       } else if (key == "i" && xKey == "ctrl+shift") {
         this.onClickImageEdit();
+      } else if (key == "c" && xKey == "ctrl+shift") {
+        this.onClickTierAdd();
       } else {
         console.log("onWaveSurferKeyup", key, xKey, event);
       }
@@ -1167,6 +1201,8 @@ export default {
         }
         if (opt == "next") {
           this.nextRecord(key, idx, true);
+        } else {
+          this.onEscTextField();
         }
       }
     },
@@ -1199,8 +1235,17 @@ export default {
     },
     onTextGridUpdate: function(textgrid) {
       if (textgrid) {
+        const oldTierNum = this.$textgrid
+          ? Object.keys(this.$textgrid).length
+          : 0;
         this.$textgrid = Object.assign({}, textgrid);
-        this.fireUpdateTextGrid();
+        const currentTierNum = Object.keys(this.$textgrid).length;
+        if (!this.isSyncing) {
+          if (oldTierNum !== currentTierNum) {
+            this.$store.commit("current/tab", currentTierNum);
+          }
+          this.fireUpdateTextGrid();
+        }
       }
     },
     onRecordUpdated: function(payload) {
@@ -1225,6 +1270,12 @@ export default {
         });
         this.lazyFocusTextField = false;
       }
+    },
+    // ffmpeg を用いたノイズ除去
+    onClickNoiseReduction: function(payload) {
+      setTimeout(() => {
+        this.$emit("run-noise-reduction", payload);
+      }, 100);
     },
     onClickDetail: function() {
       this.$vuewer.console.log(this.tag, `on click detail`);
@@ -1396,9 +1447,7 @@ export default {
     onForwardBtnUp: function(payload) {
       if (payload.ctrl) {
         // ctrl + next で拡大
-        if (this.$minPxPerSec < 500) {
-          this.$minPxPerSec = this.$minPxPerSec + 50;
-        }
+        this.$minPxPerSec = this.$minPxPerSec + 50;
       } else {
         if (this.where == "wave-surfer") {
           const key = this.current.tier.key;
@@ -1471,6 +1520,7 @@ export default {
     }
   },
   mounted: function() {
+    this.$store.dispatch("current/init");
     this.$frames = [];
     this.$frames = this.frames;
     this.minPxPerSec = this.$minPxPerSec;

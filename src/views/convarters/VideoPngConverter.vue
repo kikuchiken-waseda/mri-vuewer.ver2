@@ -59,7 +59,7 @@ export default {
         });
         const crop = this.crop.show ? this.crop : null;
         if (this.frame == -1) {
-          const result = this.$vuewer.io.video.toPngs(
+          const result = await this.$vuewer.io.video.toPngs(
             buff,
             payload.fps,
             payload.duration,

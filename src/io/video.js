@@ -1,8 +1,8 @@
 import ffmpeg from "ffmpeg.js/ffmpeg-mp4.js";
+
 const version = callback => {
   let stdout = "";
   let stderr = "";
-  // Print FFmpeg's version.
   const result = ffmpeg({
     arguments: ["-version"],
     print: function(data) {
@@ -136,15 +136,46 @@ const toPng = (buff, frame, fps, duration, crop = null) => {
 
 // 全てのフレームを個別の png として分割します.
 const toPngs = (buff, fps, duration, crop = null) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(function() {
+      const video = new Uint8Array(buff);
+      const lank = String(Math.round(duration * fps)).length;
+      let args;
+      if (crop) {
+        const { x, y, w, h } = crop;
+        args = `-i data.mp4 -vf crop=${w}:${h}:${x}:${y} %0${lank}d.png -loglevel error`;
+      } else {
+        args = `-i data.mp4 %0${lank}d.png -loglevel error`;
+      }
+      const result = ffmpeg({
+        MEMFS: [{ name: "data.mp4", data: video }],
+        arguments: args.split(" "),
+        print: () => {},
+        printErr: error => reject(error)
+      });
+      resolve(result);
+    });
+  });
+};
+
+const toWav = buff => {
+  return new Promise((resolve, reject) => {
+    const video = new Uint8Array(buff);
+    const args =
+      "-i data.mp4 -vn -ac 2 -ar 48000 -acodec pcm_s16le -f wav output.wav -loglevel error";
+    const result = ffmpeg({
+      MEMFS: [{ name: "data.mp4", data: video }],
+      arguments: args.split(" "),
+      print: () => {},
+      printErr: error => reject(error)
+    });
+    resolve(result);
+  });
+};
+
+const bandpass = (buff, low, high) => {
   const video = new Uint8Array(buff);
-  const lank = String(Math.round(duration * fps)).length;
-  let args;
-  if (crop) {
-    const { x, y, w, h } = crop;
-    args = `-i data.mp4 -vf crop=${w}:${h}:${x}:${y} %0${lank}d.png -loglevel error`;
-  } else {
-    args = `-i data.mp4 %0${lank}d.png -loglevel error`;
-  }
+  const args = `-i data.mp4 -af lowpass=${low},highpass=${high} out.mp4 -loglevel error`;
   const result = ffmpeg({
     MEMFS: [{ name: "data.mp4", data: video }],
     arguments: args.split(" "),
@@ -154,10 +185,21 @@ const toPngs = (buff, fps, duration, crop = null) => {
   return result;
 };
 
-const toWav = buff => {
+const anlmdn = buff => {
   const video = new Uint8Array(buff);
-  const args =
-    "-i data.mp4 -vn -ac 2 -ar 48000 -acodec pcm_s16le -f wav output.wav -loglevel error";
+  const args = `-i data.mp4 -af anlmdn out.mp4 -loglevel error`;
+  const result = ffmpeg({
+    MEMFS: [{ name: "data.mp4", data: video }],
+    arguments: args.split(" "),
+    print: () => {},
+    printErr: error => console.error(error)
+  });
+  return result;
+};
+
+const afftdn = buff => {
+  const video = new Uint8Array(buff);
+  const args = `-i data.mp4 -af afftdn out.mp4 -loglevel error`;
   const result = ffmpeg({
     MEMFS: [{ name: "data.mp4", data: video }],
     arguments: args.split(" "),
@@ -269,6 +311,9 @@ const toBase64 = blob => {
 export default {
   version,
   info,
+  bandpass,
+  anlmdn,
+  afftdn,
   trim,
   concat,
   toWav,

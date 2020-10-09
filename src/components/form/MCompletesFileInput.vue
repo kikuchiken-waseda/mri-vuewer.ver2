@@ -22,13 +22,33 @@ export default {
       for (const f of files) {
         const key = f.name.split(".")[0];
         try {
-          const text = await this.readFile(f);
-          if (text) {
-            const contents = text
+          const _text = await this.readFile(f);
+          if (_text) {
+            const texts = _text
               .replace(/\r\n?/g, "\n")
               .split("\n")
               .filter(x => x !== "");
-            dict[key] = contents;
+            const t = this.$vuewer.text;
+            const isSafe = t.checker.isSafe(texts.join(""));
+            if (isSafe) {
+              const contents = texts.map(x => {
+                const text = t.trim(x);
+                return { name: text, val: text, rubi: text };
+              });
+              dict[key] = contents;
+            } else {
+              const srcs = texts.map(x => t.trim(x));
+              const _yomi = await t.oyomi(srcs.join("&"));
+              const yomi = t
+                .clean(_yomi.join(" "))
+                .replace(/\s/g, "")
+                .split("&");
+              const contents = srcs.map((x, i) => {
+                const rubi = yomi[i] ? t.toHebon(yomi[i]) : t.toHebon(x);
+                return { name: x, val: x, rubi: rubi };
+              });
+              dict[key] = contents;
+            }
           }
         } catch (e) {
           console.log(e);

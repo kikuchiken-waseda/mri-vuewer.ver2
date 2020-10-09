@@ -26,6 +26,33 @@ db.version(4).stores({
   rects:
     "++id, x, y, width, height, rotation, scaleX, scaleY, size, color, label, frameId -> frames.id"
 });
+db.version(5)
+  .stores({
+    files:
+      "++id,name,source,fps,duration,originSize,videoStream,audioStream,metaData,textgrid,lastModifiedAt",
+    frames: "++id, idx, time, fileId -> files.id",
+    points: "++id, x, y, size, color, label, frameId -> frames.id",
+    rects:
+      "++id, x, y, width, height, rotation, scaleX, scaleY, size, color, label, frameId -> frames.id"
+  })
+  .upgrade(trans => {
+    const now = Date.now();
+    return trans.files.toCollection().modify(file => {
+      file.lastModifiedAt = now;
+    });
+  });
+
+db.files.hook("creating", function(primKey, file) {
+  const now = Date.now();
+  file.lastModifiedAt = now;
+  return file;
+});
+
+db.files.hook("updating", function(mods, primKey, file) {
+  const now = Date.now();
+  file.lastModifiedAt = now;
+  return file;
+});
 db.open();
 
 const dump = function() {

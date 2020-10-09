@@ -66,6 +66,17 @@ export default {
     }
   },
   actions: {
+    init: function(context) {
+      context.state.src = null;
+      context.state.id = null;
+      context.state.idx = null;
+      context.state.time = null;
+      context.state.ow = null;
+      context.state.oh = null;
+      context.state.points = [];
+      context.state.rects = [];
+      context.state.texts = [];
+    },
     frame: function(context, payload) {
       context.commit("src", payload.src || context.state.src);
       context.commit("idx", payload.idx || context.state.idx);

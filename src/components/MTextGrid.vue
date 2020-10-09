@@ -1,27 +1,42 @@
 <template>
   <v-container fluid class="pa-0 transparent" @mouseover="$emit('mouseover')">
     <m-key-context @keyup="$emit('keyup', $event)">
-      <m-tab :color="color" v-slot="tab" :tabs="tabs">
-        <m-frame-table
-          v-if="tab.i == 0"
-          :video-height="videoHeight"
-          :frames="frames"
-          @click-image-edit="$emit('click-image-edit', $event)"
-          @click-ruler="$emit('click-ruler', $event)"
-        />
-        <m-text-grid-table
-          v-if="tab.i > 0"
-          :video-height="videoHeight"
-          :title="tab.item"
-          :tier="textgrid[tab.item]"
-          @click-image-edit="$emit('click-image-edit', $event)"
-        />
-      </m-tab>
+      <v-tabs
+        v-model="tab"
+        dark
+        grow
+        show-arrows
+        center-active
+        :background-color="color"
+      >
+        <v-tab v-for="(item, i) in tabs" :key="i">
+          {{ item.text }}
+          <v-icon small v-if="item.icon" class="ml-2">{{ item.icon }}</v-icon>
+        </v-tab>
+        <v-tabs-slider color="yellow" />
+      </v-tabs>
+      <v-tabs-items v-model="tab">
+        <v-tab-item>
+          <m-frame-table
+            :video-height="videoHeight"
+            :frames="frames"
+            @click-image-edit="$emit('click-image-edit', $event)"
+            @click-ruler="$emit('click-ruler', $event)"
+          />
+        </v-tab-item>
+        <v-tab-item v-for="tier in tiers" :key="tier">
+          <m-text-grid-table
+            :video-height="videoHeight"
+            :title="tier"
+            :tier="textgrid[tier]"
+            @click-image-edit="$emit('click-image-edit', $event)"
+          />
+        </v-tab-item>
+      </v-tabs-items>
     </m-key-context>
   </v-container>
 </template>
 <script>
-import MTab from "@/components/base/MTab.vue";
 import MTextGridTable from "@/components/table/MTextGridTable.vue";
 import MFrameTable from "@/components/table/MFrameTable";
 import MWavesurferMixin from "@/mixins/MWavesurferMixin";
@@ -30,7 +45,6 @@ export default {
   name: "WTextGrid",
   mixins: { MWavesurferMixin },
   components: {
-    MTab,
     MKeyContext,
     MTextGridTable,
     MFrameTable
@@ -57,6 +71,14 @@ export default {
     }
   },
   computed: {
+    tab: {
+      get() {
+        return this.$store.state.current.tab;
+      },
+      set(payload) {
+        this.$store.commit("current/tab", payload);
+      }
+    },
     parents: function() {
       let parents = [];
       if (this.textgrid) {
@@ -76,24 +98,16 @@ export default {
       }
       return this.$vuewer.math.uniq(children);
     },
+    tiers: function() {
+      return this.textgrid ? Object.keys(this.textgrid) : [];
+    },
     tabs: function() {
       const tabs = [{ text: "FRAMES" }];
-      if (this.textgrid) {
-        for (const x of Object.keys(this.textgrid)) {
-          if (this.parents.findIndex(p => p == x) != -1) {
-            tabs.push({
-              text: x,
-              icon: "mdi-link-lock"
-            });
-          } else if (this.children.findIndex(p => p == x) != -1) {
-            tabs.push({
-              text: x,
-              icon: "mdi-link"
-            });
-          } else {
-            tabs.push({ text: x });
-          }
-        }
+      for (const text of this.tiers) {
+        const isP = this.parents.findIndex(p => p == text) != -1;
+        const isC = this.children.findIndex(p => p == text) != -1;
+        const icon = isP ? "mdi-link-lock" : isC ? "mdi-link" : "";
+        tabs.push({ text, icon });
       }
       return tabs;
     }

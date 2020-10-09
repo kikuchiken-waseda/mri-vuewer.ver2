@@ -1,7 +1,20 @@
 import kuromoji from "kuromoji";
+import jaconv from "jaconv";
+
 const builder = kuromoji.builder({
   dicPath: process.env.VUE_APP_KUROMOJI_DICT
 });
+
+const clean = str => {
+  const reg = /[\t|\x20\u3000|\s]+/g;
+  return str.replace(reg, " ");
+};
+
+const trim = str => clean(str).replace(/^\s+|\s+$/g, "");
+
+const checker = {
+  isSafe: str => (str.match(/^[0-9a-zA-Z|\s]*$/) ? true : false)
+};
 
 const tokenize = function(text) {
   return new Promise((resolve, reject) => {
@@ -35,7 +48,7 @@ const oyomi = function(text) {
   return new Promise((resolve, reject) => {
     tokenize(text)
       .then(res => {
-        if (res) resolve(res.map(x => x.reading || ""));
+        if (res) resolve(res.map(x => x.reading || x.surface_form));
         resolve([]);
       })
       .catch(error => reject(error));
@@ -83,11 +96,23 @@ const opos = function(text) {
   });
 };
 
+const toHiragana = s => {
+  return jaconv.toHiragana(s);
+};
+const toHebon = s => {
+  const x = jaconv.toHiragana(s);
+  return jaconv.toHebon(x).toLowerCase();
+};
 export default {
+  clean,
+  trim,
+  checker,
   tokenize: tokenize,
   owakati: owakati,
   oyomi: oyomi,
   opronunciation: opronunciation,
   obasic: obasic,
+  toHiragana,
+  toHebon,
   opos: opos
 };

@@ -83,12 +83,11 @@ const Vuewer = {
       },
       key: {
         summary: function(event) {
-          const key = event.key.toLowerCase();
-
-          const ctrl = { text: "ctrl", val: event.ctrlKey };
-          const alt = { text: "alt", val: event.altKey };
-          const shift = { text: "shift", val: event.shiftKey };
-          const meta = { text: "meta", val: event.metaKey };
+          const key = event.key ? event.key.toLowerCase() : event.keycode;
+          const ctrl = { text: "ctrl", val: event.ctrlKey || event.ctrl };
+          const alt = { text: "alt", val: event.altKey || event.alt };
+          const shift = { text: "shift", val: event.shiftKey || event.shift };
+          const meta = { text: "meta", val: event.metaKey || event.meta };
 
           const keys = [ctrl, alt, shift, meta];
           const xkeys = keys.filter(x => x.val == true).map(x => x.text);

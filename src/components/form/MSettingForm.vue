@@ -145,8 +145,8 @@ export default {
       rules.push(
         v =>
           !v ||
-          Number(v) < 500 ||
-          this.$vuetify.lang.t("$vuetify.validations.less", 500)
+          Number(v) < 700 ||
+          this.$vuetify.lang.t("$vuetify.validations.less", 700)
       );
       rules.push(
         v =>

@@ -22,12 +22,19 @@
         <v-list-group v-for="(items, key) in complates" :key="key">
           <template v-slot:activator>
             <v-list-item-content>
-              <v-list-item-title v-text="key" />
+              <v-list-item-title>
+                {{ key }}
+                <v-chip v-if="items.length > 0" small class="ml-2" color="info">
+                  {{ items.length }}
+                </v-chip>
+              </v-list-item-title>
             </v-list-item-content>
           </template>
-          <v-list-item v-for="item in items" :key="item">
+          <v-list-item v-for="item in items" :key="item.name">
             <v-list-item-content>
-              <v-list-item-title v-text="item" />
+              <v-list-item-title>
+                {{ item.name }}: {{ item.rubi }}
+              </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list-group>

@@ -5,7 +5,11 @@ const conf = {
   redirect: process.env.VUE_APP_DROPBOX_REDIRECT,
   token: storages.dropbox.get("token")
 };
-let CLIENT = new Dropbox({ clientId: conf.key, accessToken: conf.token });
+let CLIENT = new Dropbox({
+  fetch: fetch,
+  clientId: conf.key,
+  accessToken: conf.token
+});
 
 const auth = function() {
   const authUrl = CLIENT.getAuthenticationUrl(

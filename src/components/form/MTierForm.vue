@@ -7,6 +7,7 @@
     />
     <v-autocomplete
       :items="typeChoice"
+      :filter="autocomplete"
       v-model="type"
       item-text="name"
       item-value="val"
@@ -67,13 +68,16 @@ export default {
   },
   computed: {
     typeChoice: function() {
+      const locale = this.$vuetify.lang.current;
       return [
         {
           name: this.$vuetify.lang.t("$vuetify.textgrid.tier.interval"),
+          rubi: locale == "ja" ? "kyoukaitenkisou" : "interval tier",
           val: "interval"
         },
         {
           name: this.$vuetify.lang.t("$vuetify.textgrid.tier.point"),
+          rubi: locale == "ja" ? "eventtenkisou" : "point tier",
           val: "point"
         }
       ];
@@ -102,6 +106,12 @@ export default {
     }
   },
   methods: {
+    autocomplete(item, input) {
+      const rubi = item.rubi.toLowerCase();
+      const val = item.val.toLowerCase();
+      const query = input.toLowerCase();
+      return rubi.startsWith(query) || val.startsWith(query);
+    },
     checkName: function(v) {
       if (v) {
         if (this.tiers.indexOf(v) > -1) {
