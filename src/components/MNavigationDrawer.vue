@@ -260,6 +260,28 @@
           </v-list-item-content>
         </v-list-item>
       </v-list-group>
+      <v-divider />
+
+      <v-list-group v-model="open.docs" prepend-icon="mdi-library" sub-group>
+        <template v-slot:activator>
+          <v-list-item-title>Docs</v-list-item-title>
+        </template>
+        <v-divider />
+        <v-list-item
+          v-for="item in docs"
+          :key="item.title"
+          :href="item.link"
+          target="_blank"
+          rel="noopener noreferrer"
+          link
+        >
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ $vuetify.lang.t(item.title) }}
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-group>
     </v-list>
 
     <m-file-upload-dialog v-model="uploadDialog" />
@@ -284,7 +306,8 @@ export default {
       dropboxes: false,
       databases: false,
       convarters: false,
-      depelops: false
+      depelops: false,
+      docs: false
     },
     dropboxDialog: false,
     uploadDialog: false,
@@ -399,6 +422,26 @@ export default {
           return x;
         });
     },
+    docs: function() {
+      return [
+        {
+          title: "$vuetify.docs.fileRegistration",
+          link:
+            "https://github.com/kikuchiken-waseda/mri-vuewer.ver2/wiki/%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E7%99%BB%E9%8C%B2"
+        },
+        {
+          title: "$vuetify.docs.textgrid",
+          link:
+            "https://github.com/kikuchiken-waseda/mri-vuewer.ver2/wiki/%E6%99%82%E7%B3%BB%E5%88%97%E8%BB%A2%E8%A8%98"
+        },
+        {
+          title: "$vuetify.docs.dropbox",
+          link:
+            "https://github.com/kikuchiken-waseda/mri-vuewer.ver2/wiki/Dropbox%E9%80%A3%E6%90%BA"
+        }
+      ];
+    },
+
     hasToken: function() {
       if (this.updateToken) return true;
       return this.$vuewer.dropbox.hasToken();

@@ -22,7 +22,7 @@ const TEXTGRID = {
     interval: "境界転記層",
     point: "イベント転記層",
     record: {
-      name: "時刻記述",
+      name: "レコード",
       no: "レコードが選択されていません"
     }
   }
@@ -392,10 +392,16 @@ export default {
     tier: {
       add: `${TEXTGRID.tier.name} を追加`,
       edit: `${TEXTGRID.tier.name} を編集`,
-      delete: `${TEXTGRID.tier.name} を削除`
+      delete: `${TEXTGRID.tier.name} を削除`,
+      interval: {
+        name: `${TEXTGRID.tier.name}操作`,
+        owakati: `現在${TEXTGRID.tier.interval}を分かち書き`,
+        oyomi: `現在${TEXTGRID.tier.interval}をよみに変換`,
+        opronunciation: `現在${TEXTGRID.tier.interval}を発音系に変換`
+      }
     },
     record: {
-      name: `${TEXTGRID.tier.record.name} 操作`,
+      name: `${TEXTGRID.tier.record.name}操作`,
       play: `現在${TEXTGRID.tier.record.name}を再生`,
       copy: `現在${TEXTGRID.tier.record.name}をコピー`,
       paste: `現在${TEXTGRID.tier.record.name}にペースト`,
@@ -464,6 +470,11 @@ export default {
   notAcceptable: "不正なファイルです",
   browserError: "このブラウザでは, 該当の機能を使用することはできません.",
   annotation: ANNOTATION,
-  ver1: "MRI Vuewer ver.1 系"
+  ver1: "MRI Vuewer ver.1 系",
+  docs: {
+    fileRegistration: "ファイル登録",
+    textgrid: "時系列転記",
+    dropbox: "ドロップボックス連携"
+  }
 };
 //# sourceMappingURL=ja.js.map

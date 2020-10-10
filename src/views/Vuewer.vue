@@ -153,7 +153,6 @@ export default {
             this.$originSize = file.originSize || {};
             this.metaData = file.metaData || {};
             this.textgrid = file.textgrid || {};
-            console.log(this.textgrid, file.textgrid);
             this.frames = await db.frames
               .where({ fileId: file.id })
               .with({ points: "points", rects: "rects" });

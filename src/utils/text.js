@@ -86,7 +86,7 @@ const opronunciation = function(text) {
   return new Promise((resolve, reject) => {
     tokenize(text)
       .then(res => {
-        if (res) resolve(res.map(x => x.pronunciation || ""));
+        if (res) resolve(res.map(x => x.pronunciation || x.surface_form));
         resolve([]);
       })
       .catch(error => reject(error));

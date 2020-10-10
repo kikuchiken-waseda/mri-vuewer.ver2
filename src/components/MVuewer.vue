@@ -12,6 +12,7 @@
     @click-noise-reduction="onClickNoiseReduction"
     @click-complate="onClickComplate"
     @click-record="onClickRecordContextMenu"
+    @click-interval="onClickIntervalContextMenu"
   >
     <m-vuwer-layout ref="layout" @resize="onResize">
       <template v-slot:video>
@@ -715,6 +716,28 @@ export default {
       this.copyRecords(key);
       this.wavesurfer.deleteTier(key);
     },
+    tokenizeTier(key, type) {
+      const records = this.$textgrid[key].values;
+      const tokenize = this.$vuewer.text[type];
+      const texts = records.map(r => r.text).join("&");
+      if (tokenize && texts) {
+        tokenize(texts).then(res => {
+          if (res) {
+            const new_texts = res.join("/").split("&");
+            const new_records = new_texts.map((t, i) => {
+              return {
+                time: records[i].time,
+                text: new_texts[i].replace(/(?:^\/)|(?:\/$)/g, "")
+              };
+            });
+            const textgrid = this.$textgrid;
+            textgrid[key].values = new_records;
+            this.wavesurfer.setTextGrid(textgrid);
+          }
+        });
+      }
+    },
+
     seekTo: function(time, center) {
       const d = this.wavesurfer.getDuration();
       const p = time / d;
@@ -1392,6 +1415,20 @@ export default {
           this.tokenizeRecord(key, record.idx, payload);
         } else if (payload == "opos") {
           this.tokenizeRecord(key, record.idx, payload);
+        }
+      } else {
+        this.$vuewer.snackbar.warning("$vuetify.textgrid.tier.record.no");
+      }
+    },
+    onClickIntervalContextMenu: function(payload) {
+      const key = this.current.tier.key;
+      if (key) {
+        if (payload == "owakati") {
+          this.tokenizeTier(key, payload);
+        } else if (payload == "oyomi") {
+          this.tokenizeTier(key, payload);
+        } else if (payload == "opronunciation") {
+          this.tokenizeTier(key, payload);
         }
       } else {
         this.$vuewer.snackbar.warning("$vuetify.textgrid.tier.record.no");

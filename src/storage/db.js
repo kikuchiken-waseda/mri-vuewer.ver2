@@ -41,12 +41,6 @@ db.version(5)
       file.lastModifiedAt = now;
     });
   });
-
-// db.files.hook("updating", function(mods, primKey, file) {
-//   const now = Date.now();
-//   file.lastModifiedAt = now;
-//   return file;
-// });
 db.open();
 
 const dump = function() {

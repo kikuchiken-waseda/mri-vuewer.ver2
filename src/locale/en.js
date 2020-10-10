@@ -378,7 +378,13 @@ export default {
     tier: {
       add: "Add a Tier",
       edit: "Edit a Tier",
-      delete: "Delete a Tier"
+      delete: "Delete a Tier",
+      interval: {
+        name: "Interval Tier",
+        owakati: "word-separation for the current tier (for Japanese)",
+        oyomi: "Convert current tier to reading (for Japanese)",
+        opronunciation: "Convert current tier to pronunciation (for Japanese)"
+      }
     },
     record: {
       name: "Record",
@@ -394,11 +400,11 @@ export default {
       splitByFrames: "split a current record by frames.",
       splitByChars: "split a current record by chars.",
       splitBySlash: "split a current record by slash.",
-      owakati: "word-separation for the current record",
-      oyomi: "Convert current record to reading",
-      opronunciation: "Convert current record to pronunciation",
-      obasic: "Convert current record to representative type",
-      opos: "Convert current record to part of speech"
+      owakati: "word-separation for the current record (for Japanese)",
+      oyomi: "Convert current record to reading (for Japanese)",
+      opronunciation: "Convert current record to pronunciation (for Japanese)",
+      obasic: "Convert current record to representative type (for Japanese)",
+      opos: "Convert current record to part of speech (for Japanese)"
     },
     frame: {
       name: `Image Annotation`,
@@ -440,5 +446,10 @@ export default {
   annotation: "annotation",
   frame: "frames",
   browserError: "This feature is not available in this browser.",
-  ver1: "MRI Vuewer ver.1"
+  ver1: "MRI Vuewer ver.1",
+  docs: {
+    fileRegistration: "File Registration (Japanese only)",
+    textgrid: "Time Series Annotation (Japanese only)",
+    dropbox: "Works with Dropbox (Japanese only)"
+  }
 };

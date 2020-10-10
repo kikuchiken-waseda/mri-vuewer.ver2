@@ -425,7 +425,7 @@ export default {
         {
           text: "$vuetify.contexts.record.name",
           show: false,
-          icon: "mdi-movie-edit",
+          icon: "mdi-pencil-box",
           items: [
             {
               text: "$vuetify.contexts.record.play",
@@ -589,6 +589,41 @@ export default {
             }
           ]
         },
+        {
+          text: "$vuetify.contexts.tier.interval.name",
+          show: false,
+          icon: "mdi-pencil-box-multiple",
+          items: [
+            {
+              text: "$vuetify.contexts.tier.interval.owakati",
+              icon: "",
+              click: () => {
+                setTimeout(function() {
+                  vm.$emit("click-interval", "owakati");
+                }, 10);
+              }
+            },
+            {
+              text: "$vuetify.contexts.tier.interval.oyomi",
+              icon: "",
+              click: () => {
+                setTimeout(function() {
+                  vm.$emit("click-interval", "oyomi");
+                }, 10);
+              }
+            },
+            {
+              text: "$vuetify.contexts.tier.interval.opronunciation",
+              icon: "",
+              click: () => {
+                setTimeout(function() {
+                  vm.$emit("click-interval", "opronunciation");
+                }, 10);
+              }
+            }
+          ]
+        },
+
         {
           subheader: "$vuetify.contexts.frame.name",
           divider: true

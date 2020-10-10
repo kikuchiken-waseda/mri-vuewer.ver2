@@ -29,7 +29,13 @@
     >
       <v-icon>mdi-home</v-icon>
     </v-btn>
-    <v-btn icon :href="$store.state.github" v-if="$vuetify.breakpoint.smAndUp">
+    <v-btn
+      icon
+      target="_blank"
+      rel="noopener noreferrer"
+      :href="$store.state.github"
+      v-if="$vuetify.breakpoint.smAndUp"
+    >
       <v-icon>mdi-github</v-icon>
     </v-btn>
     <v-menu bottom left v-if="$vuetify.breakpoint.smAndUp">
