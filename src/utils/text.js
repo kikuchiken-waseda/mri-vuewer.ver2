@@ -35,6 +35,10 @@ const toQuery = param => {
   }, {});
 };
 
+const query = str => {
+  return toQuery(toParam(str));
+};
+
 const checker = {
   isSafe: str => (str.match(/^[0-9a-zA-Z|\s]*$/) ? true : false)
 };
@@ -131,6 +135,7 @@ export default {
   trim,
   toParam,
   toQuery,
+  query,
   checker,
   tokenize: tokenize,
   owakati: owakati,

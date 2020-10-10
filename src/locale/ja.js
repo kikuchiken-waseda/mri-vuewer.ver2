@@ -108,7 +108,18 @@ export default {
       lastModifiedAt: "最終更新日",
       duration: `${VIDEO}持続時間 (秒)`,
       size: `${VIDEO}サイズ(pixels)`,
-      actions: `${VIDEO}操作`
+      actions: `${VIDEO}操作`,
+      forms: {
+        setTier: {
+          label:
+            "転記階層一括付与 (name:[interval|point] name2:[interval|point]...)",
+          hint: `
+            選択中の${VIDEO}に${TEXTGRID.tier.name}を付与します.
+            例えば IPU という${TEXTGRID.tier.interval}をつけるには "IPU-interval" と入力します.
+            その後, 右のアイコンをクリックすると${TEXTGRID.tier.name}が付与されます.
+          `
+        }
+      }
     }
   },
   forms: {

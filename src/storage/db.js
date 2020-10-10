@@ -42,17 +42,11 @@ db.version(5)
     });
   });
 
-db.files.hook("creating", function(primKey, file) {
-  const now = Date.now();
-  file.lastModifiedAt = now;
-  return file;
-});
-
-db.files.hook("updating", function(mods, primKey, file) {
-  const now = Date.now();
-  file.lastModifiedAt = now;
-  return file;
-});
+// db.files.hook("updating", function(mods, primKey, file) {
+//   const now = Date.now();
+//   file.lastModifiedAt = now;
+//   return file;
+// });
 db.open();
 
 const dump = function() {
@@ -178,6 +172,7 @@ const add_frames = async function(fileId, obj) {
 };
 
 const add = async function(obj) {
+  obj.lastModifiedAt = Date.now();
   let fileId;
   const keys = Object.keys(obj);
   if (obj.name && obj.source) {

@@ -25,28 +25,27 @@
       </v-row>
     </template>
     <template v-slot:item.actions="{ item }">
-      <m-video-meta-data-dialog
-        v-if="dialog"
-        v-model="dialog"
-        @validated="onValidated($event)"
-        :current-item="metaData"
-      />
       <v-row>
-        <v-col cols="4" class="px-0">
+        <v-col cols="3" class="px-0">
+          <v-btn fab dark x-small @click="playVideo(item)">
+            <v-icon>mdi-play</v-icon>
+          </v-btn>
+        </v-col>
+        <v-col cols="3" class="px-0">
           <v-btn fab dark x-small @click="openItem(item)">
             <v-icon>
               mdi-import
             </v-icon>
           </v-btn>
         </v-col>
-        <v-col cols="4" class="px-0">
+        <v-col cols="3" class="px-0">
           <v-btn color="green" fab dark x-small @click="editItem(item)">
             <v-icon>
               mdi-pencil
             </v-icon>
           </v-btn>
         </v-col>
-        <v-col cols="4" class="px-0">
+        <v-col cols="3" class="px-0">
           <v-btn color="error" fab dark x-small @click="deleteItem(item)">
             <v-icon>
               mdi-delete
@@ -62,19 +61,27 @@
         <m-audio-stream-list :audio-stream="item.audioStream" />
       </td>
     </template>
-    <template v-slot:footer v-if="isSelected">
+    <template v-slot:footer>
       <v-card flat>
-        <v-card-text>
+        <m-video-dialog v-model="dialogs.video" :src="src" />
+        <m-video-meta-data-dialog
+          v-model="dialogs.meta"
+          @validated="onValidated($event)"
+          :current-item="metaData"
+        />
+        <v-card-text v-if="isSelected">
           <v-text-field
             filled
             v-model="tierTemplate"
             type="text"
             append-icon="mdi-send"
-            label="Set Tiers (name:[interval|point]-name2:[interval|point]...)"
+            :label="$vuetify.lang.t('$vuetify.table.file.forms.setTier.label')"
+            :hint="$vuetify.lang.t('$vuetify.table.file.forms.setTier.hint')"
+            @keydown.enter="onClickAddTiers"
             @click:append="onClickAddTiers"
           />
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions v-if="isSelected">
           <v-spacer />
         </v-card-actions>
       </v-card>
@@ -85,19 +92,25 @@
 import moment from "moment";
 import db from "@/storage/db";
 import MVideoMetaDataDialog from "@/components/dialogs/MVideoMetaDataDialog";
+import MVideoDialog from "@/components/dialogs/MVideoDialog";
 import MAudioStreamList from "@/components/list/MAudioStreamList";
 import MVideoStreamList from "@/components/list/MVideoStreamList";
 export default {
   name: "m-file-table",
   components: {
+    MVideoDialog,
     MVideoMetaDataDialog,
     MVideoStreamList,
     MAudioStreamList
   },
   data: () => ({
     tierTemplate: "",
-    dialog: false,
+    dialogs: {
+      video: false,
+      meta: false
+    },
     id: null,
+    src: "",
     metaData: {},
     selected: [],
     expanded: []
@@ -187,7 +200,7 @@ export default {
       headers.push({
         text: this.$vuetify.lang.t(`${locale}.actions`),
         value: "actions",
-        width: "120px",
+        width: "150px",
         sortable: false,
         align: "end"
       });
@@ -248,31 +261,48 @@ export default {
     },
     // 選択された全てのファイルに指定の Tier を付与します.
     onClickAddTiers: async function() {
-      this.$vuewer.loading.start("set tiers ...");
-      const fields = this.tierTemplate.split("-");
-      for (const file of this.selected) {
-        const textgrid = {};
-        for (const field of fields) {
-          if (~field.indexOf(":")) {
-            const [tName, tType] = field.split(":");
-            if (~["interval", "point"].indexOf(tType)) {
-              textgrid[tName] = {
-                type: tType,
+      const query = this.$vuewer.text.query(this.tierTemplate);
+      const tiers = Object.keys(query)
+        .filter(
+          key =>
+            String(query[key]).toLowerCase() == "interval" ||
+            String(query[key]).toLowerCase() == "point"
+        )
+        .map(key => ({ key, type: query[key] }));
+      if (tiers.length) {
+        this.$vuewer.loading.start("set tiers ...");
+        for (const file of this.selected) {
+          const textgrid = file.textgrid || {};
+          for (const tier of tiers) {
+            if (Object.keys(textgrid).findIndex(x => x == tier.key) == -1) {
+              textgrid[tier.key] = {
+                type: tier.type,
                 parent: null,
                 values: []
               };
             }
           }
+          try {
+            const item = await db.files.get(file.id);
+            item.lastModifiedAt = Date.now();
+            item.textgrid = textgrid;
+            const id = await db.files.put(item);
+
+            const msg = `update the textgrid of a file (id=${id})`;
+            this.$vuewer.db.log("textgrid", "PUT", msg);
+            this.$vuewer.console.log("textgrid", msg);
+          } catch (error) {
+            this.$vuewer.console.error("meta:textgrid:put", error);
+            this.$vuewer.snackbar.error(error);
+          }
         }
-        try {
-          const origin = await db.files.get(file.id);
-          origin.textgrid = textgrid;
-          await db.files.put(origin);
-        } catch (error) {
-          this.$vuewer.snackbar.error(error);
-        }
+        this.$vuewer.loading.end();
       }
-      this.$vuewer.loading.end();
+    },
+    // 選択された動画を再生します
+    playVideo: function(item) {
+      this.src = item.source;
+      this.dialogs.video = true;
     },
     // 選択されたファイルの詳細情報を取得します.
     openItem: function(item) {
@@ -282,7 +312,7 @@ export default {
     editItem: function(payload) {
       this.metaData = payload.metaData;
       this.id = payload.id;
-      this.dialog = true;
+      this.dialogs.meta = true;
     },
     // 選択されたファイルを削除します.
     deleteItem: function(item) {

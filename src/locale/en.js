@@ -63,7 +63,14 @@ export default {
       lastModifiedAt: "Last modified at",
       duration: "Video duration (sec)",
       size: "Video size (pixels)",
-      actions: "File Actions"
+      actions: "File Actions",
+      forms: {
+        setTier: {
+          label: "Set Tiers (name:[interval|point] name2:[interval|point]...)",
+          hint: `Gives some textgrid tiers to the selected files. To add a interval tier called IPU, enter "IPU-interval" in input form. And then, click the icon on the right of input form.
+          `
+        }
+      }
     }
   },
   validations: {

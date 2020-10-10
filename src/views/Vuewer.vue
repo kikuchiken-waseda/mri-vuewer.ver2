@@ -153,6 +153,7 @@ export default {
             this.$originSize = file.originSize || {};
             this.metaData = file.metaData || {};
             this.textgrid = file.textgrid || {};
+            console.log(this.textgrid, file.textgrid);
             this.frames = await db.frames
               .where({ fileId: file.id })
               .with({ points: "points", rects: "rects" });
@@ -224,6 +225,7 @@ export default {
             parent: this.item.textgrid[key].parent
           };
         }
+        this.item.lastModifiedAt = Date.now();
         db.files
           .put(this.item)
           .then(id => {
@@ -333,6 +335,7 @@ export default {
           parent: this.item.textgrid[key].parent
         };
       }
+      this.item.lastModifiedAt = Date.now();
       await db.files.put(this.item);
       for (const frame of payload.frames) {
         if (frame.points && frame.points.length) {
