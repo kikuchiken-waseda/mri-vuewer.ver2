@@ -438,6 +438,11 @@ export default {
           title: "$vuetify.docs.dropbox",
           link:
             "https://github.com/kikuchiken-waseda/mri-vuewer.ver2/wiki/Dropbox%E9%80%A3%E6%90%BA"
+        },
+        {
+          title: "Release notes",
+          link:
+            "https://github.com/kikuchiken-waseda/mri-vuewer.ver2/blob/master/release.md"
         }
       ];
     },

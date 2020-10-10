@@ -28,9 +28,12 @@
     </v-toolbar>
 
     <v-toolbar dense>
-      <v-btn text @click="threshold">
-        二値化
-      </v-btn>
+      <v-btn-toggle v-model="imageFilter" dense group color="primary">
+        <v-btn :value="f.func" text v-for="f in imageFilters" :key="f.name">
+          {{ f.name }}
+        </v-btn>
+      </v-btn-toggle>
+
       <v-spacer />
       <v-btn text @click="downloadImage">
         png <v-icon>mdi-download</v-icon>
@@ -251,6 +254,35 @@ export default {
     idx: function() {
       return this.$store.state.current.frame.idx;
     },
+    imageFilters: function() {
+      const cv = this.$vuewer.image;
+      return [
+        {
+          func: async (src, originSize) =>
+            await cv.otsuThreshold(src, originSize),
+          name: "二値化"
+        },
+        {
+          func: async (src, originSize) =>
+            await cv.adaptiveThreshold(src, originSize),
+          name: "適応的閾値"
+        },
+        {
+          func: async (src, originSize) => await cv.canny(src, originSize),
+          name: "キャニー"
+        },
+        {
+          func: async (src, originSize) =>
+            await cv.bilateralFilter(src, originSize),
+          name: "バイラテラル"
+        },
+        {
+          func: async (src, originSize) =>
+            await cv.laplacianFilter(src, originSize),
+          name: "ラプラシアン"
+        }
+      ];
+    },
     modes: function() {
       return [
         { val: "circ", icon: "mdi-shape-circle-plus" },
@@ -261,11 +293,12 @@ export default {
     }
   },
   data: () => ({
+    imageFilter: null,
     color: "#F44336",
     size: 5,
     mode: "circ",
     scale: 0,
-    eHeight: 0,
+    eHeight: 500,
     background: {
       image: null
     },
@@ -323,16 +356,17 @@ export default {
       this.skipBackward();
       this.$emit("skip");
     },
-    loadImage: function(val) {
-      const img = new Image();
-      img.src = val;
-      img.onload = () => {
-        this.onResize();
-        this.background.image = img;
-        this.syncPoints();
-        this.syncRects();
-        this.focus();
-      };
+    loadImage: async function(src) {
+      let $src = src;
+      if (this.imageFilter) {
+        $src = await this.imageFilter(src, this.originSize);
+      }
+      const img = await this.$vuewer.io.image.load($src);
+      this.onResize();
+      this.background.image = img;
+      this.syncPoints();
+      this.syncRects();
+      this.focus();
     },
     copyImage: async function() {
       const stage = this.$refs.stage.getStage();
@@ -352,10 +386,9 @@ export default {
       link.download = name;
       link.click();
     },
-    threshold: function() {
-      this.$vuewer.image
-        .adaptiveThreshold(this.src, this.originSize)
-        .then(dst => (this.src = dst));
+    // 画像フィルター
+    adaptiveThreshold: async function(src, originSize) {
+      return await this.$vuewer.image.adaptiveThreshold(src, originSize);
     },
     syncPoints: function() {
       this.points = [];
@@ -516,8 +549,8 @@ export default {
       this.background.height = $cw;
       this.background.width = $ch;
 
-      const eHeight = this.$refs.card.$el.clientHeight || 600;
-      this.eHeight = eHeight - 100;
+      // const eHeight = this.$refs.card.$el.clientHeight || 600;
+      // this.eHeight = eHeight - 100;
     },
     // キー操作
     onKeyup: function(payload) {
@@ -730,6 +763,11 @@ export default {
     }
   },
   watch: {
+    imageFilter: function(val, old) {
+      if (val != old) {
+        this.loadImage(this.src);
+      }
+    },
     mode: function(val) {
       if (val == undefined) this.mode = 0;
     },

@@ -20,7 +20,7 @@
     <m-frame-editor
       ref="editor"
       class="mx-auto overflow-y-auto"
-      :height="contentsHeight"
+      :height="contentHeight"
       :origin-size="originSize"
       @skip="onSkip"
       @update-max-width="onUpdateMaxWidth"
@@ -42,8 +42,7 @@ export default {
     originSize: { type: Object, required: true }
   },
   data: () => ({
-    maxWidth: "700",
-    contentsHeight: "80vh"
+    maxWidth: "700"
   }),
   methods: {
     onUpdateMaxWidth: function(maxWidth) {
@@ -61,6 +60,10 @@ export default {
     }
   },
   computed: {
+    contentHeight: function() {
+      if (this.$store.state.current.layout.mini) return "90vh";
+      return "80vh";
+    },
     title: function() {
       return "$vuetify.forms.imageEdit.title";
     },
