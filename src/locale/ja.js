@@ -101,6 +101,16 @@ export default {
     alreadyExists: "この値は既に存在しています.",
     notExist: "この値は存在しません"
   },
+  table: {
+    file: {
+      name: `${VIDEO}名`,
+      fps: "フレームレート (fps)",
+      lastModifiedAt: "最終更新日",
+      duration: `${VIDEO}持続時間 (秒)`,
+      size: `${VIDEO}サイズ(pixels)`,
+      actions: `${VIDEO}操作`
+    }
+  },
   forms: {
     db: {
       title: `データベース取り込み${FORM}`,

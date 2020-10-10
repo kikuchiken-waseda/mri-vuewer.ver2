@@ -10,6 +10,20 @@
     :expanded.sync="expanded"
     item-key="name"
   >
+    <template v-slot:item.name="{ item }">
+      <v-row align-content="center">
+        <span class="d-inline-block text-truncate" style="max-width: 100px;">
+          {{ item.name }}
+        </span>
+        <v-chip
+          small
+          v-if="Object.keys(item.textgrid).length > 0"
+          color="success"
+        >
+          {{ Object.keys(item.textgrid).length }} Tiers
+        </v-chip>
+      </v-row>
+    </template>
     <template v-slot:item.actions="{ item }">
       <m-video-meta-data-dialog
         v-if="dialog"
@@ -68,6 +82,7 @@
   </v-data-table>
 </template>
 <script>
+import moment from "moment";
 import db from "@/storage/db";
 import MVideoMetaDataDialog from "@/components/dialogs/MVideoMetaDataDialog";
 import MAudioStreamList from "@/components/list/MAudioStreamList";
@@ -98,65 +113,36 @@ export default {
         norargs: this.$store.getters["search/norargs"]
       };
     },
+    dformat: function() {
+      let f = "dddd, MMMM Do YYYY, h:mm:ss a";
+      if (this.$vuetify.lang.current == "ja") {
+        moment.locale("ja");
+        f = "YYYY/MM/DD h:mm:ss";
+      }
+      return f;
+    },
     files: function() {
       let files = this.$store.state.files.files || [];
-      const args = this.query.args;
-      const kwargs = this.query.kwargs;
-      const norargs = this.query.norargs;
-      if (args.length) {
-        files = files.filter(x => {
-          const search = [
-            x.name,
-            String(x.fps),
-            String(x.duration),
-            String(x.originSize.width),
-            String(x.originSize.height),
-            ...Object.keys(x.metaData).map(m => x.metaData[m])
-          ];
-          return args
-            .map(x => search.join(" ").indexOf(x) !== -1)
-            .every(val => val === true);
-        });
-      }
-      if (Object.keys(kwargs).length) {
-        files = files.filter(x => {
-          const search = {
-            name: x.name,
-            duration: String(x.duration),
-            width: String(x.originSize.width),
-            height: String(x.originSize.height),
-            ...x.metaData
-          };
-          return Object.keys(kwargs)
-            .map(key => {
-              if (key in search) {
-                return search[key].indexOf(kwargs[key]) !== -1;
-              }
-              return false;
-            })
-            .every(val => val === true);
-        });
-      }
-      if (Object.keys(norargs).length) {
-        files = files.filter(x => {
-          const search = {
-            name: x.name,
-            duration: String(x.duration),
-            width: String(x.originSize.width),
-            height: String(x.originSize.height),
-            ...x.metaData
-          };
-          return Object.keys(norargs)
-            .map(key => {
-              if (key in search) {
-                return search[key].indexOf(norargs[key]) == -1;
-              }
-              return false;
-            })
-            .every(val => val === true);
-        });
-      }
 
+      // 検索フィールドおよび表示フィールドを作成
+      files = files.map(x => {
+        x.size = `${x.originSize.width} * ${x.originSize.height}`;
+        x.lastModifiedText = moment(x.lastModifiedAt).format(this.dformat);
+        x.search = {
+          name: x.name,
+          fps: String(x.fps),
+          duration: String(x.duration),
+          size: x.size,
+          lastModifiedAt: x.lastModifiedText,
+          ...x.metaData
+        };
+        return x;
+      });
+
+      // 検索クエリに応じたファイル検索
+      files = this.argFilter(this.query.args, files);
+      files = this.kwargFilter(this.query.kwargs, files);
+      files = this.norFilter(this.query.norargs, files);
       return files;
     },
     isLoading: function() {
@@ -166,31 +152,27 @@ export default {
       return this.$store.getters["files/fields"];
     },
     headers: function() {
+      const locale = "$vuetify.table.file";
       const headers = [
         {
-          text: "Name",
-          class: "text-truncate",
+          text: this.$vuetify.lang.t(`${locale}.name`),
           value: "name"
         },
         {
-          text: "FPS",
-          class: "text-truncate",
+          text: this.$vuetify.lang.t(`${locale}.lastModifiedAt`),
+          value: "lastModifiedText"
+        },
+        {
+          text: this.$vuetify.lang.t(`${locale}.fps`),
           value: "fps"
         },
         {
-          text: "Duration",
-          class: "text-truncate",
+          text: this.$vuetify.lang.t(`${locale}.duration`),
           value: "duration"
         },
         {
-          text: "Width",
-          class: "text-truncate",
-          value: "originSize.width"
-        },
-        {
-          text: "Height",
-          class: "text-truncate",
-          value: "originSize.height"
+          text: this.$vuetify.lang.t(`${locale}.size`),
+          value: "size"
         }
       ];
       if (this.fields) {
@@ -203,7 +185,7 @@ export default {
         }
       }
       headers.push({
-        text: "Actions",
+        text: this.$vuetify.lang.t(`${locale}.actions`),
         value: "actions",
         width: "120px",
         sortable: false,
@@ -213,6 +195,57 @@ export default {
     }
   },
   methods: {
+    // ヘッダ付き否定系検索
+    norFilter(norargs, files) {
+      let $files = files;
+      if (Object.keys(norargs).length) {
+        // 全ての検索クエリが検索フィールドの何れかに部分一致しない
+        $files = files.filter(f => {
+          return Object.keys(norargs)
+            .map(key =>
+              key in f.search
+                ? f.search[key].indexOf(norargs[key]) == -1
+                : false
+            )
+            .every(val => val === true);
+        });
+      }
+      if ($files.length) return $files;
+      return files;
+    },
+    // ヘッダ付き検索
+    kwargFilter(kwargs, files) {
+      let $files = files;
+      if (Object.keys(kwargs).length) {
+        // 全ての検索クエリが検索フィールドの何れかに前方一致
+        $files = files.filter(f => {
+          return Object.keys(kwargs)
+            .map(key =>
+              key in f.search
+                ? String(f.search[key]).startsWith(kwargs[key])
+                : false
+            )
+            .every(val => val === true);
+        });
+      }
+      if ($files.length) return $files;
+      return files;
+    },
+    // ヘッダ無し検索
+    argFilter(args, files) {
+      let $files = files;
+      if (args.length) {
+        $files = files.filter(f => {
+          // 全ての検索語が検索リストの内容のいずれかに前方一致する
+          const values = Object.values(f.search);
+          return args
+            .map(arg => values.some(v => String(v).startsWith(arg)))
+            .every(val => val === true);
+        });
+      }
+      if ($files.length) return $files;
+      return files;
+    },
     // 選択された全てのファイルに指定の Tier を付与します.
     onClickAddTiers: async function() {
       this.$vuewer.loading.start("set tiers ...");

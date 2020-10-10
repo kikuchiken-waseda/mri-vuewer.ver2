@@ -56,6 +56,16 @@ const home = {
 export default {
   ...en,
   prev: "Previous",
+  table: {
+    file: {
+      name: "Name",
+      fps: "Frame Rate (fps)",
+      lastModifiedAt: "Last modified at",
+      duration: "Video duration (sec)",
+      size: "Video size (pixels)",
+      actions: "File Actions"
+    }
+  },
   validations: {
     required: "This field is required!",
     positiveInteger: "This is a positive integer field!",
