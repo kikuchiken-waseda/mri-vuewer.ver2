@@ -1,5 +1,6 @@
 <template>
   <m-card-dialog
+    ref="dialog"
     persistent
     titleColor="warning darken-1"
     :fullscreen="$store.state.current.layout.mini"
@@ -18,6 +19,8 @@
     </template>
     <m-frame-editor
       ref="editor"
+      class="mx-auto overflow-y-auto"
+      :height="contentsHeight"
       :origin-size="originSize"
       @skip="onSkip"
       @update-max-width="onUpdateMaxWidth"
@@ -39,7 +42,8 @@ export default {
     originSize: { type: Object, required: true }
   },
   data: () => ({
-    maxWidth: "700"
+    maxWidth: "700",
+    contentsHeight: "80vh"
   }),
   methods: {
     onUpdateMaxWidth: function(maxWidth) {

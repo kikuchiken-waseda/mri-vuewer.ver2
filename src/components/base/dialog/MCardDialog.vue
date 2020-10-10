@@ -5,6 +5,7 @@
     :hide-overlay="hideOverlay"
     :transition="transition"
     :persistent="persistent"
+    :scrollable="scrollable"
     :max-width="maxWidth"
   >
     <template v-slot:activator="{ on, attrs }">
@@ -41,6 +42,10 @@ export default {
       type: String
     },
     fullscreen: {
+      type: Boolean,
+      default: false
+    },
+    scrollable: {
       type: Boolean,
       default: false
     },

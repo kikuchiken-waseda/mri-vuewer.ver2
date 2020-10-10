@@ -1,5 +1,5 @@
 <template>
-  <v-card ref="card" class="mx-auto" color="grey">
+  <v-card :style="`max-height: ${height}`" flat tile ref="card" color="grey">
     <v-toolbar dense>
       <v-btn-toggle v-model="mode" dense group color="primary">
         <v-btn :value="m.val" text v-for="m in modes" :key="m.val">
@@ -7,10 +7,8 @@
         </v-btn>
       </v-btn-toggle>
       <div class="mx-1"></div>
-
       <m-color-menu icon v-model="color" />
       <v-spacer />
-
       <v-btn-toggle dense group color="primary">
         <v-btn icon @click="skipPrev">
           <v-icon>mdi-skip-previous</v-icon>
@@ -19,7 +17,6 @@
           <v-icon>mdi-skip-next</v-icon>
         </v-btn>
       </v-btn-toggle>
-
       <v-btn-toggle dense group color="primary">
         <v-btn text @click="zoomOut">
           <v-icon>mdi-magnify-minus</v-icon>
@@ -28,11 +25,13 @@
           <v-icon>mdi-magnify-plus</v-icon>
         </v-btn>
       </v-btn-toggle>
+    </v-toolbar>
 
+    <v-toolbar dense>
       <v-btn text @click="threshold">
         二値化
       </v-btn>
-
+      <v-spacer />
       <v-btn text @click="downloadImage">
         png <v-icon>mdi-download</v-icon>
       </v-btn>
@@ -40,166 +39,170 @@
 
     <v-card
       flat
+      tile
       class="overflow-y-auto"
-      :style="`max-height: ${canvasMaxHeight}px`"
+      :style="`max-height: ${eHeight}px`"
     >
-      <m-key-context ref="context" @keyup="onKeyup">
-        <v-stage
-          ref="stage"
-          :config="canvas"
-          @mousemove="onStageMouseMove"
-          @mousedown="onStageMouseDown"
-          @touchstart="onStageMouseDown"
-        >
-          <v-layer ref="layer">
-            <v-image
-              ref="background"
-              @dblclick="onDblClick"
-              :config="background"
-            />
-          </v-layer>
+      <v-card flat tile class="overflow-y-auto">
+        <m-key-context ref="context" @keyup="onKeyup">
+          <v-stage
+            ref="stage"
+            :config="canvas"
+            @mousemove="onStageMouseMove"
+            @mousedown="onStageMouseDown"
+            @touchstart="onStageMouseDown"
+          >
+            <v-layer ref="layer">
+              <v-image
+                ref="background"
+                @dblclick="onDblClick"
+                :config="background"
+              />
+            </v-layer>
 
-          <v-layer ref="layer">
-            <v-circle
-              v-for="(x, i) in ruler.points"
-              :key="i"
-              :config="{
-                x: x.x,
-                y: x.y,
-                stroke: 'white',
-                strokeWidth: 1,
-                radius: ruler.conf.size,
-                fill: ruler.conf.color
-              }"
-            />
-          </v-layer>
+            <v-layer ref="layer">
+              <v-circle
+                v-for="(x, i) in ruler.points"
+                :key="i"
+                :config="{
+                  x: x.x,
+                  y: x.y,
+                  stroke: 'white',
+                  strokeWidth: 1,
+                  radius: ruler.conf.size,
+                  fill: ruler.conf.color
+                }"
+              />
+            </v-layer>
 
-          <v-layer ref="layer">
-            <v-line
-              v-for="(x, i) in ruler.lines"
-              :key="i"
-              :config="{
-                points: x.points,
-                stroke:
-                  ruler.active == x.id
-                    ? ruler.conf.activeColor
-                    : ruler.conf.color,
-                strokeWidth:
-                  ruler.active == x.id
-                    ? ruler.conf.activeSize
-                    : ruler.conf.size,
-                lineCap: 'round',
-                lineJoin: 'round',
-                dash: [5, 10]
-              }"
-              @mouseenter="onRulerMouseEnter"
-              @mouseleave="onRulerMouseLeave"
-              @click="onRulerClick"
-            />
-          </v-layer>
+            <v-layer ref="layer">
+              <v-line
+                v-for="(x, i) in ruler.lines"
+                :key="i"
+                :config="{
+                  points: x.points,
+                  stroke:
+                    ruler.active == x.id
+                      ? ruler.conf.activeColor
+                      : ruler.conf.color,
+                  strokeWidth:
+                    ruler.active == x.id
+                      ? ruler.conf.activeSize
+                      : ruler.conf.size,
+                  lineCap: 'round',
+                  lineJoin: 'round',
+                  dash: [5, 10]
+                }"
+                @mouseenter="onRulerMouseEnter"
+                @mouseleave="onRulerMouseLeave"
+                @click="onRulerClick"
+              />
+            </v-layer>
 
-          <v-layer ref="layer">
-            <v-rect
-              v-for="x in rects"
-              :key="x.name"
-              :config="{
-                name: x.name,
-                x: x.x,
-                y: x.y,
-                width: x.width,
-                height: x.height,
-                rotation: x.rotation || 1,
-                scaleX: x.scaleX || 1,
-                scaleY: x.scaleY || 1,
-                stroke: x.color,
-                strokeWidth: x.size || 1,
-                opacity: x.opacity || 1,
-                draggable: mode == 'rect'
-              }"
-              @click="onRectClick"
-              @dragstart="onRectDragStart"
-              @dragend="onRectDragEnd"
-              @transformend="onTransformEnd"
-            />
-            <v-circle
-              v-for="(x, i) in points"
-              :key="i"
-              :config="{
-                x: x.x,
-                y: x.y,
-                stroke: 'white',
-                strokeWidth: 1,
-                opacity: x.opacity || 1,
-                radius: x.size,
-                fill: x.color,
-                draggable: mode == 'circ'
-              }"
-              @click="onPointClick"
-              @mouseenter="onPointMouseEnter"
-              @mouseleave="onPointMouseLeave"
-              @dragstart="onPointDragStart"
-              @dragend="onPointDragEnd"
-            />
-            <v-transformer v-if="mode == 'rect'" ref="transformer" />
-          </v-layer>
+            <v-layer ref="layer">
+              <v-rect
+                v-for="x in rects"
+                :key="x.name"
+                :config="{
+                  name: x.name,
+                  x: x.x,
+                  y: x.y,
+                  width: x.width,
+                  height: x.height,
+                  rotation: x.rotation || 1,
+                  scaleX: x.scaleX || 1,
+                  scaleY: x.scaleY || 1,
+                  stroke: x.color,
+                  strokeWidth: x.size || 1,
+                  opacity: x.opacity || 1,
+                  draggable: mode == 'rect'
+                }"
+                @click="onRectClick"
+                @dragstart="onRectDragStart"
+                @dragend="onRectDragEnd"
+                @transformend="onTransformEnd"
+              />
+              <v-circle
+                v-for="(x, i) in points"
+                :key="i"
+                :config="{
+                  x: x.x,
+                  y: x.y,
+                  stroke: 'white',
+                  strokeWidth: 1,
+                  opacity: x.opacity || 1,
+                  radius: x.size,
+                  fill: x.color,
+                  draggable: mode == 'circ'
+                }"
+                @click="onPointClick"
+                @mouseenter="onPointMouseEnter"
+                @mouseleave="onPointMouseLeave"
+                @dragstart="onPointDragStart"
+                @dragend="onPointDragEnd"
+              />
+              <v-transformer v-if="mode == 'rect'" ref="transformer" />
+            </v-layer>
 
-          <v-layer v-if="cursor.show" ref="layer">
-            <v-line
-              :config="{
-                points: [
-                  this.cursor.x || 0,
-                  0,
-                  this.cursor.x || 0,
-                  this.canvas.height
-                ],
-                stroke: cursor.color,
-                strokeWidth: 1,
-                lineCap: 'round',
-                lineJoin: 'round',
-                dash: [2, 5]
-              }"
-            />
-            <v-line
-              :config="{
-                points: [
-                  0,
-                  this.cursor.y || 0,
-                  this.canvas.width,
-                  this.cursor.y || 0
-                ],
-                stroke: cursor.color,
-                strokeWidth: 1,
-                lineCap: 'round',
-                lineJoin: 'round',
-                dash: [2, 5]
-              }"
-            />
-          </v-layer>
-        </v-stage>
-      </m-key-context>
+            <v-layer v-if="cursor.show" ref="layer">
+              <v-line
+                :config="{
+                  points: [
+                    this.cursor.x || 0,
+                    0,
+                    this.cursor.x || 0,
+                    this.canvas.height
+                  ],
+                  stroke: cursor.color,
+                  strokeWidth: 1,
+                  lineCap: 'round',
+                  lineJoin: 'round',
+                  dash: [2, 5]
+                }"
+              />
+              <v-line
+                :config="{
+                  points: [
+                    0,
+                    this.cursor.y || 0,
+                    this.canvas.width,
+                    this.cursor.y || 0
+                  ],
+                  stroke: cursor.color,
+                  strokeWidth: 1,
+                  lineCap: 'round',
+                  lineJoin: 'round',
+                  dash: [2, 5]
+                }"
+              />
+            </v-layer>
+          </v-stage>
+        </m-key-context>
+      </v-card>
+
+      <v-tabs v-model="tab" fixed-tabs background-color="primary" dark>
+        <v-tab> Points </v-tab>
+        <v-tab> Rects </v-tab>
+      </v-tabs>
+      <v-tabs-items v-model="tab">
+        <v-tab-item>
+          <m-point-table
+            :points="points"
+            :origin-size="originSize"
+            :canvas-size="canvas"
+            @update-point="onUpdatePoint"
+          />
+        </v-tab-item>
+        <v-tab-item>
+          <m-rect-table
+            :rects="rects"
+            :origin-size="originSize"
+            :canvas-size="canvas"
+            @update-rect="onUpdateRect"
+          />
+        </v-tab-item>
+      </v-tabs-items>
     </v-card>
-    <v-tabs v-model="tab" fixed-tabs background-color="primary" dark>
-      <v-tab> Points </v-tab>
-      <v-tab> Rects </v-tab>
-    </v-tabs>
-    <v-tabs-items v-model="tab">
-      <v-tab-item>
-        <m-point-table
-          :points="points"
-          :origin-size="originSize"
-          :canvas-size="canvas"
-          @update-point="onUpdatePoint"
-        />
-      </v-tab-item>
-      <v-tab-item>
-        <m-rect-table
-          :rects="rects"
-          :origin-size="originSize"
-          :canvas-size="canvas"
-          @update-rect="onUpdateRect"
-        />
-      </v-tab-item>
-    </v-tabs-items>
   </v-card>
 </template>
 <script>
@@ -219,11 +222,21 @@ export default {
     MRectTable
   },
   props: {
+    height: {
+      type: String,
+      default: "100%"
+    },
     originSize: {
       type: Object
     }
   },
   computed: {
+    cardHeight: function() {
+      if (this.$store.state.current.layout.mini) {
+        return "100%";
+      }
+      return "80vh";
+    },
     src: {
       get() {
         return this.$store.state.current.frame.src;
@@ -252,7 +265,7 @@ export default {
     size: 5,
     mode: "circ",
     scale: 0,
-    canvasMaxHeight: 600,
+    eHeight: 0,
     background: {
       image: null
     },
@@ -271,8 +284,8 @@ export default {
     rects: [],
     selectedShapeName: "",
     canvas: {
-      width: 600,
-      height: 600
+      width: 700,
+      height: 700
     },
     cursor: { x: null, y: null, show: false, color: "#00B8D4" },
     tab: null
@@ -502,7 +515,9 @@ export default {
       this.canvas.height = $ch;
       this.background.height = $cw;
       this.background.width = $ch;
-      this.canvasMaxHeight = ch - (64 + 64);
+
+      const eHeight = this.$refs.card.$el.clientHeight || 600;
+      this.eHeight = eHeight - 100;
     },
     // キー操作
     onKeyup: function(payload) {
@@ -579,7 +594,6 @@ export default {
         const x = e.evt.offsetX;
         const y = e.evt.offsetY;
         const r = (line.t * 180) / Math.PI;
-        console.log(r * 180, Math.PI);
         this.addRect(x, y, width, height, r, this.color, this.size);
       } else {
         this.addPoint(e.evt.offsetX, e.evt.offsetY, this.color, this.size);
@@ -687,7 +701,6 @@ export default {
       const idx = this.rects.findIndex(r => r.name == this.selectedShapeName);
       if (idx !== -1) {
         this.rects[idx].rotation = e.target.rotation();
-        console.log(e.target.rotation());
         this.rects[idx].width = e.target.width();
         this.rects[idx].scaleX = e.target.scaleX();
         this.rects[idx].height = e.target.height();
