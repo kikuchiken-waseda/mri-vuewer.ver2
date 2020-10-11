@@ -64,6 +64,22 @@ export default {
       if (this.$store.state.current.layout.mini) return "90vh";
       return "80vh";
     },
+    refKey: function() {
+      return this.$store.state.current.frameConf.refTier;
+    },
+    refValues: function() {
+      const ref = this.refKey;
+      if (ref) {
+        return this.$store.state.current.textgrid[ref].values;
+      }
+      return [];
+    },
+    refText: function() {
+      const time = this.$store.state.current.frame.time;
+      const record = this.refValues.filter(r => r.time >= time)[0];
+      if (record) return record.text;
+      return null;
+    },
     title: function() {
       return "$vuetify.forms.imageEdit.title";
     },
@@ -71,6 +87,11 @@ export default {
       const time = this.$store.state.current.frame.time;
       const id = this.$store.state.current.frame.id;
       if (id) {
+        if (this.refKey) {
+          const sec = this.$vuewer.math.round(time, 3);
+          const ref = `${this.refKey}: ${this.refText || "null"}`;
+          return `${ref}: FRAME: ${id}: ${sec} sec`;
+        }
         return `FRAME: ${id}: ${this.$vuewer.math.round(time, 3)} sec`;
       } else {
         return `${this.$vuewer.math.round(time, 3)} sec`;

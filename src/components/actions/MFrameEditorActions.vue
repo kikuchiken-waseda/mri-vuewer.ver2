@@ -8,6 +8,17 @@
       </v-btn-toggle>
       <div class="mx-1"></div>
       <m-color-menu icon v-model="color" />
+      <v-text-field
+        solo
+        hide-details
+        v-model="sendText"
+        v-if="targetTier"
+        label="転記テキスト"
+      >
+        <template v-slot:append>
+          <v-btn icon @click="addEvent"><v-icon>mdi-send</v-icon></v-btn>
+        </template>
+      </v-text-field>
       <v-spacer />
       <v-btn-toggle dense group color="primary">
         <v-btn icon @click="$emit('skip', 'prev')">
@@ -51,7 +62,34 @@ export default {
       if (val == undefined) this.mode = 0;
     }
   },
+  methods: {
+    addEvent() {
+      if (this.targetTier) {
+        if (this.sendText) {
+          const item = {
+            time: this.$store.state.current.frame.time,
+            text: this.sendText
+          };
+          if (this.$ws) this.$ws.addTierValue(this.targetTier, item);
+        }
+      }
+    }
+  },
   computed: {
+    $ws: function() {
+      return this.$store.state.current.wavesurfer || null;
+    },
+    targetTier: function() {
+      return this.$store.state.current.frameConf.targetTier;
+    },
+    sendText: {
+      get() {
+        return this.$store.state.current.frameConf.text;
+      },
+      set(str) {
+        this.$store.commit("current/frameConf/text", str);
+      }
+    },
     color: {
       get() {
         return this.$store.state.current.frame.color;
@@ -76,7 +114,6 @@ export default {
         this.$store.commit("current/frame/filter", filter);
       }
     },
-
     modes: function() {
       return [
         { val: "circ", icon: "mdi-shape-circle-plus" },
@@ -117,5 +154,4 @@ export default {
   }
 };
 </script>
-
 <style scoped></style>

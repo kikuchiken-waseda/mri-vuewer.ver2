@@ -173,6 +173,14 @@ export default {
     }
   },
   computed: {
+    isPointReserved: function() {
+      // 入力予定の点群が存在するか
+      return this.$store.state.current.frameConf.points.length > 0;
+    },
+    isRectReserved: function() {
+      // 入力予定の矩形が存在するか
+      return this.$store.state.current.frameConf.rects.length > 0;
+    },
     src: {
       get() {
         return this.$store.state.current.frame.src;
@@ -221,6 +229,8 @@ export default {
       points: [],
       lines: []
     },
+    reservedPoints: [],
+    reservedRects: [],
     points: [],
     rects: [],
     selectedShapeName: "",
@@ -373,43 +383,72 @@ export default {
       this.ruler.lines.push({ id, points, t, i });
     },
     addPoint: async function(x, y, color, size) {
-      const item = {
-        id: this.points.length + 1,
-        label: `point-${this.points.length + 1}`,
-        x: x,
-        y: y,
-        size: size,
-        color: color
-      };
-      if (this.id) {
+      if (this.isPointReserved) {
+        const item = this.reservedPoints.shift();
+        if (item) {
+          const count = await db.points.count();
+          item.id = count + 1;
+          item.x = x;
+          item.y = y;
+          item.size = size;
+          this.points.push(item);
+          this.emitUpdatePoints();
+        }
+      } else {
         const count = await db.points.count();
-        item.id = count + 1;
-        item.label = `points-${count + 1}`;
+        const item = {
+          id: count + 1,
+          label: `points-${count + 1}`,
+          x: x,
+          y: y,
+          size: size,
+          color: color
+        };
+        this.points.push(item);
+        this.emitUpdatePoints();
       }
-      this.points.push(item);
-      this.emitUpdatePoints();
     },
     addRect: async function(x, y, width, height, rotation, color, size) {
-      const item = {
-        id: this.rects.length + 1,
-        name: `rect-${this.rects.length + 1}`,
-        label: `rect-${this.rects.length + 1}`,
-        x: x,
-        y: y,
-        width: width,
-        height: height,
-        rotation: rotation,
-        size: size,
-        color: color
-      };
-      if (this.id) {
-        const count = await db.rects.count();
-        item.id = count + 1;
-        item.name = `rect-${count + 1}`;
-        item.label = `rect-${count + 1}`;
+      if (this.isRectReserved) {
+        const item = this.reservedRects.shift();
+        if (item) {
+          item.id = this.rects.length + 1;
+          item.name = item.label;
+          item.x = x;
+          item.y = y;
+          item.width = width;
+          item.height = height;
+          item.rotation = rotation;
+          item.size = size;
+          if (this.id) {
+            const count = await db.rects.count();
+            item.id = count + 1;
+          }
+          this.rects.push(item);
+          this.emitUpdateRects();
+        }
+      } else {
+        const item = {
+          id: this.rects.length + 1,
+          name: `rect-${this.rects.length + 1}`,
+          label: `rect-${this.rects.length + 1}`,
+          x: x,
+          y: y,
+          width: width,
+          height: height,
+          rotation: rotation,
+          size: size,
+          color: color
+        };
+        if (this.id) {
+          const count = await db.rects.count();
+          item.id = count + 1;
+          item.name = `rect-${count + 1}`;
+          item.label = `rect-${count + 1}`;
+        }
+        this.rects.push(item);
+        this.emitUpdateRects();
       }
-      this.rects.push(item);
-      this.emitUpdateRects();
     },
     onSkip: function(payload) {
       if (payload == "next") {
@@ -678,13 +717,31 @@ export default {
     },
     src: function(val) {
       if (val) {
+        // 元画像が変更されたタイミングで拡大比を戻す
         this.scale = 0;
+
+        // 元画像が変更されたタイミングで予約ポイントが存在するかを確認
+        this.reservedPoints = JSON.parse(
+          JSON.stringify(this.$store.state.current.frameConf.points)
+        );
+        this.reservedRects = JSON.parse(
+          JSON.stringify(this.$store.state.current.frameConf.rects)
+        );
+
+        // 動画をキャンバスに読み込み
         this.loadImage(val);
       }
     }
   },
   mounted: function() {
     this.scale = 0;
+    this.reservedPoints = JSON.parse(
+      JSON.stringify(this.$store.state.current.frameConf.points)
+    );
+    this.reservedRects = JSON.parse(
+      JSON.stringify(this.$store.state.current.frameConf.rects)
+    );
+
     this.loadImage(this.src);
   }
 };

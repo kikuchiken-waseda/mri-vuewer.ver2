@@ -175,19 +175,21 @@ export default {
           time: f.time,
           // 表示対象の点群データ
           circles: f.points
-            ? f.points.map(x => {
-                return {
-                  stroke: "white",
-                  strokeWidth: 1,
-                  x: ow ? (x.x * cw) / ow : x.x,
-                  y: oh ? (x.y * ch) / oh : x.y,
-                  radius: 3,
-                  fill: utils.color.toCss(
-                    x.color || this.defaultPointColor,
-                    this.$vuetify
-                  )
-                };
-              })
+            ? f.points
+                .filter(p => p.x && p.y)
+                .map(x => {
+                  return {
+                    stroke: "white",
+                    strokeWidth: 1,
+                    x: ow ? (x.x * cw) / ow : x.x,
+                    y: oh ? (x.y * ch) / oh : x.y,
+                    radius: 3,
+                    fill: utils.color.toCss(
+                      x.color || this.defaultPointColor,
+                      this.$vuetify
+                    )
+                  };
+                })
             : [],
           // 表示対象の矩形群データ
           rects: f.rects

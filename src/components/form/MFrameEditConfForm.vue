@@ -2,13 +2,18 @@
   <v-form ref="form">
     <div>
       <label>時系列転記連携</label>
-      <v-autocomplete :items="refTiers" label="参照境界転記層" />
       <v-autocomplete
+        v-model="refTier"
+        :items="refTiers"
+        label="参照境界転記層"
+      />
+      <v-autocomplete
+        v-model="targetTier"
         v-if="targetTiers.length"
         :items="targetTiers"
         label="対象イベント転記層"
       />
-      <v-text-field v-if="targetTier" label="転記テキスト" />
+      <v-text-field v-model="text" v-if="targetTier" label="転記テキスト" />
     </div>
 
     <div class="my-5">
@@ -140,14 +145,18 @@ export default {
       return this.$store.state.current.textgrid;
     },
     refTiers: function() {
-      return Object.keys(this.textgrid).filter(
+      const choices = [null];
+      const tiers = Object.keys(this.textgrid).filter(
         key => this.textgrid[key].type == "interval"
       );
+      return choices.concat(tiers);
     },
     targetTiers: function() {
-      return Object.keys(this.textgrid).filter(
+      const choices = [null];
+      const tiers = Object.keys(this.textgrid).filter(
         key => this.textgrid[key].type == "point"
       );
+      return choices.concat(tiers);
     }
   },
   methods: {
