@@ -1,0 +1,121 @@
+<template>
+  <v-card>
+    <v-toolbar dense>
+      <v-btn-toggle v-model="mode" dense group color="primary">
+        <v-btn :value="m.val" text v-for="m in modes" :key="m.val">
+          <v-icon>{{ m.icon }}</v-icon>
+        </v-btn>
+      </v-btn-toggle>
+      <div class="mx-1"></div>
+      <m-color-menu icon v-model="color" />
+      <v-spacer />
+      <v-btn-toggle dense group color="primary">
+        <v-btn icon @click="$emit('skip', 'prev')">
+          <v-icon>mdi-skip-previous</v-icon>
+        </v-btn>
+        <v-btn icon @click="$emit('skip', 'next')">
+          <v-icon>mdi-skip-next</v-icon>
+        </v-btn>
+      </v-btn-toggle>
+      <v-btn-toggle dense group color="primary">
+        <v-btn icon @click="$emit('zoom', 'out')">
+          <v-icon>mdi-magnify-minus</v-icon>
+        </v-btn>
+        <v-btn icon @click="$emit('zoom', 'in')">
+          <v-icon>mdi-magnify-plus</v-icon>
+        </v-btn>
+      </v-btn-toggle>
+    </v-toolbar>
+    <v-toolbar dense>
+      <v-btn-toggle v-model="filter" dense group color="primary">
+        <v-btn :value="f.func" text v-for="f in filters" :key="f.name">
+          {{ f.name }}
+        </v-btn>
+      </v-btn-toggle>
+      <v-spacer />
+      <v-btn text @click="$emit('download', 'image')">
+        png <v-icon>mdi-download</v-icon>
+      </v-btn>
+    </v-toolbar>
+  </v-card>
+</template>
+<script>
+import MColorMenu from "@/components/menus/MColorMenu";
+export default {
+  name: "m-frame-editor-actions",
+  components: {
+    MColorMenu
+  },
+  watch: {
+    mode: function(val) {
+      if (val == undefined) this.mode = 0;
+    }
+  },
+  computed: {
+    color: {
+      get() {
+        return this.$store.state.current.frame.color;
+      },
+      set(color) {
+        this.$store.commit("current/frame/mode", color);
+      }
+    },
+    mode: {
+      get() {
+        return this.$store.state.current.frame.mode;
+      },
+      set(mode) {
+        this.$store.commit("current/frame/mode", mode);
+      }
+    },
+    filter: {
+      get() {
+        return this.$store.state.current.frame.filter;
+      },
+      set(filter) {
+        this.$store.commit("current/frame/filter", filter);
+      }
+    },
+
+    modes: function() {
+      return [
+        { val: "circ", icon: "mdi-shape-circle-plus" },
+        { val: "rect", icon: "mdi-shape-rectangle-plus" },
+        { val: "ruler", icon: "mdi-ruler-square" },
+        { val: "eras", icon: "mdi-eraser" }
+      ];
+    },
+    filters: function() {
+      const cv = this.$vuewer.image;
+      return [
+        {
+          func: async (src, originSize) =>
+            await cv.otsuThreshold(src, originSize),
+          name: "二値化"
+        },
+        {
+          func: async (src, originSize) =>
+            await cv.adaptiveThreshold(src, originSize),
+          name: "適応的閾値"
+        },
+        {
+          func: async (src, originSize) => await cv.canny(src, originSize),
+          name: "キャニー"
+        },
+        {
+          func: async (src, originSize) =>
+            await cv.bilateralFilter(src, originSize),
+          name: "バイラテラル"
+        },
+        {
+          func: async (src, originSize) =>
+            await cv.laplacianFilter(src, originSize),
+          name: "ラプラシアン"
+        }
+      ];
+    }
+  }
+};
+</script>
+
+<style scoped></style>

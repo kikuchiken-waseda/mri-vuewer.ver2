@@ -4,6 +4,7 @@ import frame from "./frame.js";
 import layout from "./layout.js";
 import cache from "./cache.js";
 import complates from "./complates.js";
+import frameConf from "./frameConf.js";
 export default {
   namespaced: true,
   state: () => ({
@@ -37,6 +38,7 @@ export default {
     init: function({ dispatch, state }) {
       dispatch("layout/init", { root: true });
       dispatch("frame/init", { root: true });
+      dispatch("frameConf/init", { root: true });
       dispatch("complates/init", { root: true });
       dispatch("cache/init", { root: true });
       state.tab = 0;
@@ -146,6 +148,7 @@ export default {
     video,
     frame,
     layout,
+    frameConf,
     complates,
     cache
   }

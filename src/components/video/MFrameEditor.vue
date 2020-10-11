@@ -1,218 +1,157 @@
 <template>
-  <v-card :style="`max-height: ${height}`" flat tile ref="card" color="grey">
-    <v-toolbar dense>
-      <v-btn-toggle v-model="mode" dense group color="primary">
-        <v-btn :value="m.val" text v-for="m in modes" :key="m.val">
-          <v-icon>{{ m.icon }}</v-icon>
-        </v-btn>
-      </v-btn-toggle>
-      <div class="mx-1"></div>
-      <m-color-menu icon v-model="color" />
-      <v-spacer />
-      <v-btn-toggle dense group color="primary">
-        <v-btn icon @click="skipPrev">
-          <v-icon>mdi-skip-previous</v-icon>
-        </v-btn>
-        <v-btn icon @click="skipNext">
-          <v-icon>mdi-skip-next</v-icon>
-        </v-btn>
-      </v-btn-toggle>
-      <v-btn-toggle dense group color="primary">
-        <v-btn text @click="zoomOut">
-          <v-icon>mdi-magnify-minus</v-icon>
-        </v-btn>
-        <v-btn text @click="zoomIn">
-          <v-icon>mdi-magnify-plus</v-icon>
-        </v-btn>
-      </v-btn-toggle>
-    </v-toolbar>
-
-    <v-toolbar dense>
-      <v-btn-toggle v-model="imageFilter" dense group color="primary">
-        <v-btn :value="f.func" text v-for="f in imageFilters" :key="f.name">
-          {{ f.name }}
-        </v-btn>
-      </v-btn-toggle>
-
-      <v-spacer />
-      <v-btn text @click="downloadImage">
-        png <v-icon>mdi-download</v-icon>
-      </v-btn>
-    </v-toolbar>
-
-    <v-card
-      flat
-      tile
-      class="overflow-y-auto"
-      :style="`max-height: ${eHeight}px`"
-    >
-      <v-card flat tile class="overflow-y-auto">
-        <m-key-context ref="context" @keyup="onKeyup">
-          <v-stage
-            ref="stage"
-            :config="canvas"
-            @mousemove="onStageMouseMove"
-            @mousedown="onStageMouseDown"
-            @touchstart="onStageMouseDown"
-          >
-            <v-layer ref="layer">
-              <v-image
-                ref="background"
-                @dblclick="onDblClick"
-                :config="background"
-              />
-            </v-layer>
-
-            <v-layer ref="layer">
-              <v-circle
-                v-for="(x, i) in ruler.points"
-                :key="i"
-                :config="{
-                  x: x.x,
-                  y: x.y,
-                  stroke: 'white',
-                  strokeWidth: 1,
-                  radius: ruler.conf.size,
-                  fill: ruler.conf.color
-                }"
-              />
-            </v-layer>
-
-            <v-layer ref="layer">
-              <v-line
-                v-for="(x, i) in ruler.lines"
-                :key="i"
-                :config="{
-                  points: x.points,
-                  stroke:
-                    ruler.active == x.id
-                      ? ruler.conf.activeColor
-                      : ruler.conf.color,
-                  strokeWidth:
-                    ruler.active == x.id
-                      ? ruler.conf.activeSize
-                      : ruler.conf.size,
-                  lineCap: 'round',
-                  lineJoin: 'round',
-                  dash: [5, 10]
-                }"
-                @mouseenter="onRulerMouseEnter"
-                @mouseleave="onRulerMouseLeave"
-                @click="onRulerClick"
-              />
-            </v-layer>
-
-            <v-layer ref="layer">
-              <v-rect
-                v-for="x in rects"
-                :key="x.name"
-                :config="{
-                  name: x.name,
-                  x: x.x,
-                  y: x.y,
-                  width: x.width,
-                  height: x.height,
-                  rotation: x.rotation || 1,
-                  scaleX: x.scaleX || 1,
-                  scaleY: x.scaleY || 1,
-                  stroke: x.color,
-                  strokeWidth: x.size || 1,
-                  opacity: x.opacity || 1,
-                  draggable: mode == 'rect'
-                }"
-                @click="onRectClick"
-                @dragstart="onRectDragStart"
-                @dragend="onRectDragEnd"
-                @transformend="onTransformEnd"
-              />
-              <v-circle
-                v-for="(x, i) in points"
-                :key="i"
-                :config="{
-                  x: x.x,
-                  y: x.y,
-                  stroke: 'white',
-                  strokeWidth: 1,
-                  opacity: x.opacity || 1,
-                  radius: x.size,
-                  fill: x.color,
-                  draggable: mode == 'circ'
-                }"
-                @click="onPointClick"
-                @mouseenter="onPointMouseEnter"
-                @mouseleave="onPointMouseLeave"
-                @dragstart="onPointDragStart"
-                @dragend="onPointDragEnd"
-              />
-              <v-transformer v-if="mode == 'rect'" ref="transformer" />
-            </v-layer>
-
-            <v-layer v-if="cursor.show" ref="layer">
-              <v-line
-                :config="{
-                  points: [
-                    this.cursor.x || 0,
-                    0,
-                    this.cursor.x || 0,
-                    this.canvas.height
-                  ],
-                  stroke: cursor.color,
-                  strokeWidth: 1,
-                  lineCap: 'round',
-                  lineJoin: 'round',
-                  dash: [2, 5]
-                }"
-              />
-              <v-line
-                :config="{
-                  points: [
-                    0,
-                    this.cursor.y || 0,
-                    this.canvas.width,
-                    this.cursor.y || 0
-                  ],
-                  stroke: cursor.color,
-                  strokeWidth: 1,
-                  lineCap: 'round',
-                  lineJoin: 'round',
-                  dash: [2, 5]
-                }"
-              />
-            </v-layer>
-          </v-stage>
-        </m-key-context>
-      </v-card>
-
-      <v-tabs v-model="tab" fixed-tabs background-color="primary" dark>
-        <v-tab> Points </v-tab>
-        <v-tab> Rects </v-tab>
-      </v-tabs>
-      <v-tabs-items v-model="tab">
-        <v-tab-item>
-          <m-point-table
-            :points="points"
-            :origin-size="originSize"
-            :canvas-size="canvas"
-            @update-point="onUpdatePoint"
+  <m-frame-editor-layout ref="layout">
+    <template v-slot:toolbar>
+      <m-frame-editor-actions
+        @skip="onSkip"
+        @zoom="onZoom"
+        @download="onDownload"
+      />
+    </template>
+    <m-key-context ref="context" @keyup="onKeyup">
+      <v-stage
+        ref="stage"
+        :config="canvas"
+        @mousemove="onStageMouseMove"
+        @mousedown="onStageMouseDown"
+        @touchstart="onStageMouseDown"
+      >
+        <v-layer ref="layer">
+          <v-image
+            ref="background"
+            @dblclick="onDblClick"
+            :config="background"
           />
-        </v-tab-item>
-        <v-tab-item>
-          <m-rect-table
-            :rects="rects"
-            :origin-size="originSize"
-            :canvas-size="canvas"
-            @update-rect="onUpdateRect"
+        </v-layer>
+        <v-layer ref="layer">
+          <v-circle
+            v-for="(x, i) in ruler.points"
+            :key="i"
+            :config="{
+              x: x.x,
+              y: x.y,
+              stroke: 'white',
+              strokeWidth: 1,
+              radius: ruler.conf.size,
+              fill: ruler.conf.color
+            }"
           />
-        </v-tab-item>
-      </v-tabs-items>
-    </v-card>
-  </v-card>
+        </v-layer>
+        <v-layer ref="layer">
+          <v-line
+            v-for="(x, i) in ruler.lines"
+            :key="i"
+            :config="{
+              points: x.points,
+              stroke:
+                ruler.active == x.id
+                  ? ruler.conf.activeColor
+                  : ruler.conf.color,
+              strokeWidth:
+                ruler.active == x.id ? ruler.conf.activeSize : ruler.conf.size,
+              lineCap: 'round',
+              lineJoin: 'round',
+              dash: [5, 10]
+            }"
+            @mouseenter="onRulerMouseEnter"
+            @mouseleave="onRulerMouseLeave"
+            @click="onRulerClick"
+          />
+        </v-layer>
+        <v-layer ref="layer">
+          <v-rect
+            v-for="x in rects"
+            :key="x.name"
+            :config="{
+              name: x.name,
+              x: x.x,
+              y: x.y,
+              width: x.width,
+              height: x.height,
+              rotation: x.rotation || 1,
+              scaleX: x.scaleX || 1,
+              scaleY: x.scaleY || 1,
+              stroke: x.color,
+              strokeWidth: x.size || 1,
+              opacity: x.opacity || 1,
+              draggable: mode == 'rect'
+            }"
+            @click="onRectClick"
+            @dragstart="onRectDragStart"
+            @dragend="onRectDragEnd"
+            @transformend="onTransformEnd"
+          />
+          <v-circle
+            v-for="(x, i) in points"
+            :key="i"
+            :config="{
+              x: x.x,
+              y: x.y,
+              stroke: 'white',
+              strokeWidth: 1,
+              opacity: x.opacity || 1,
+              radius: x.size,
+              fill: x.color,
+              draggable: mode == 'circ'
+            }"
+            @click="onPointClick"
+            @mouseenter="onPointMouseEnter"
+            @mouseleave="onPointMouseLeave"
+            @dragstart="onPointDragStart"
+            @dragend="onPointDragEnd"
+          />
+          <v-transformer v-if="mode == 'rect'" ref="transformer" />
+        </v-layer>
+        <v-layer v-if="cursor.show" ref="layer">
+          <v-line
+            :config="{
+              points: [
+                this.cursor.x || 0,
+                0,
+                this.cursor.x || 0,
+                this.canvas.height
+              ],
+              stroke: cursor.color,
+              strokeWidth: 1,
+              lineCap: 'round',
+              lineJoin: 'round',
+              dash: [2, 5]
+            }"
+          />
+          <v-line
+            :config="{
+              points: [
+                0,
+                this.cursor.y || 0,
+                this.canvas.width,
+                this.cursor.y || 0
+              ],
+              stroke: cursor.color,
+              strokeWidth: 1,
+              lineCap: 'round',
+              lineJoin: 'round',
+              dash: [2, 5]
+            }"
+          />
+        </v-layer>
+      </v-stage>
+    </m-key-context>
+    <template v-slot:table>
+      <m-frame-editor-tab
+        :rects="rects"
+        :points="points"
+        :origin-size="originSize"
+        :canvas-size="canvas"
+        @update-point="onUpdatePoint"
+        @update-rect="onUpdateRect"
+      />
+    </template>
+  </m-frame-editor-layout>
 </template>
 <script>
 import MWavesurferMixin from "@/mixins/MWavesurferMixin";
-import MColorMenu from "@/components/menus/MColorMenu";
-import MPointTable from "@/components/table/MPointTable";
-import MRectTable from "@/components/table/MRectTable";
+import MFrameEditorTab from "@/components/tab/MFrameEditorTab";
+import MFrameEditorLayout from "@/components/layouts/MFrameEditorLayout";
+import MFrameEditorActions from "@/components/actions/MFrameEditorActions";
 import MKeyContext from "@/components/contextmenus/MKeyContext";
 import db from "@/storage/db";
 export default {
@@ -220,9 +159,9 @@ export default {
   mixins: [MWavesurferMixin],
   components: {
     MKeyContext,
-    MColorMenu,
-    MPointTable,
-    MRectTable
+    MFrameEditorLayout,
+    MFrameEditorActions,
+    MFrameEditorTab
   },
   props: {
     height: {
@@ -234,12 +173,6 @@ export default {
     }
   },
   computed: {
-    cardHeight: function() {
-      if (this.$store.state.current.layout.mini) {
-        return "100%";
-      }
-      return "80vh";
-    },
     src: {
       get() {
         return this.$store.state.current.frame.src;
@@ -254,49 +187,24 @@ export default {
     idx: function() {
       return this.$store.state.current.frame.idx;
     },
-    imageFilters: function() {
-      const cv = this.$vuewer.image;
-      return [
-        {
-          func: async (src, originSize) =>
-            await cv.otsuThreshold(src, originSize),
-          name: "二値化"
-        },
-        {
-          func: async (src, originSize) =>
-            await cv.adaptiveThreshold(src, originSize),
-          name: "適応的閾値"
-        },
-        {
-          func: async (src, originSize) => await cv.canny(src, originSize),
-          name: "キャニー"
-        },
-        {
-          func: async (src, originSize) =>
-            await cv.bilateralFilter(src, originSize),
-          name: "バイラテラル"
-        },
-        {
-          func: async (src, originSize) =>
-            await cv.laplacianFilter(src, originSize),
-          name: "ラプラシアン"
-        }
-      ];
+    mode: function() {
+      return this.$store.state.current.frame.mode;
     },
-    modes: function() {
-      return [
-        { val: "circ", icon: "mdi-shape-circle-plus" },
-        { val: "rect", icon: "mdi-shape-rectangle-plus" },
-        { val: "ruler", icon: "mdi-ruler-square" },
-        { val: "eras", icon: "mdi-eraser" }
-      ];
+    filter: function() {
+      return this.$store.state.current.frame.filter;
+    },
+    color: function() {
+      return this.$store.state.current.frame.color;
+    },
+    cardHeight: function() {
+      if (this.$store.state.current.layout.mini) {
+        return "100%";
+      }
+      return "80vh";
     }
   },
   data: () => ({
-    imageFilter: null,
-    color: "#F44336",
     size: 5,
-    mode: "circ",
     scale: 0,
     eHeight: 500,
     background: {
@@ -330,36 +238,10 @@ export default {
     blur: function() {
       this.$refs.context.blur();
     },
-    zoomIn: function() {
-      if (this.scale < 0) this.scale = 0;
-      const cw = this.$refs.card.$el.clientWidth || 500;
-      const $cw = cw + 100 * this.scale;
-      if ($cw < 1000) {
-        this.scale = this.scale + 0.5;
-        this.loadImage(this.src);
-      }
-    },
-    zoomOut: function() {
-      if (this.scale > 0) this.scale = 0;
-      const cw = this.$refs.card.$el.clientWidth || 500;
-      const $cw = cw + 100 * this.scale;
-      if ($cw > 300) {
-        this.scale = this.scale - 0.5;
-        this.loadImage(this.src);
-      }
-    },
-    skipNext: function() {
-      this.skipForward();
-      this.$emit("skip");
-    },
-    skipPrev: function() {
-      this.skipBackward();
-      this.$emit("skip");
-    },
     loadImage: async function(src) {
       let $src = src;
-      if (this.imageFilter) {
-        $src = await this.imageFilter(src, this.originSize);
+      if (this.filter) {
+        $src = await this.filter(src, this.originSize);
       }
       const img = await this.$vuewer.io.image.load($src);
       this.onResize();
@@ -375,16 +257,6 @@ export default {
       await navigator.clipboard.write([
         new ClipboardItem({ "image/png": blob })
       ]);
-    },
-    downloadImage: function() {
-      const bname = this.$store.state.current.video.filename.split(".")[0];
-      const name = `${bname}-f${this.idx}.png`;
-      const stage = this.$refs.stage.getStage();
-      const dataURL = stage.toDataURL();
-      const link = document.createElement("a");
-      link.href = dataURL;
-      link.download = name;
-      link.click();
     },
     // 画像フィルター
     adaptiveThreshold: async function(src, originSize) {
@@ -539,8 +411,47 @@ export default {
       this.rects.push(item);
       this.emitUpdateRects();
     },
+    onSkip: function(payload) {
+      if (payload == "next") {
+        this.skipForward();
+      } else {
+        this.skipBackward();
+      }
+      this.$emit("skip");
+    },
+    onZoom: function(payload) {
+      if (payload == "out") {
+        if (this.scale > 0) this.scale = 0;
+        const cw = this.$refs.layout.getWidth();
+        const $cw = cw + 100 * this.scale;
+        if ($cw > 300) {
+          this.scale = this.scale - 0.5;
+          this.loadImage(this.src);
+        }
+      } else {
+        if (this.scale < 0) this.scale = 0;
+        const cw = this.$refs.layout.getWidth();
+        const $cw = cw + 100 * this.scale;
+        if ($cw < 1000) {
+          this.scale = this.scale + 0.5;
+          this.loadImage(this.src);
+        }
+      }
+    },
+    onDownload: function(payload) {
+      if (payload == "image") {
+        const bname = this.$store.state.current.video.filename.split(".")[0];
+        const name = `${bname}-f${this.idx}.png`;
+        const stage = this.$refs.stage.getStage();
+        const dataURL = stage.toDataURL();
+        const link = document.createElement("a");
+        link.href = dataURL;
+        link.download = name;
+        link.click();
+      }
+    },
     onResize: function() {
-      const cw = this.$refs.card.$el.clientWidth || 500;
+      const cw = this.$refs.layout.getWidth();
       const ch = (this.originSize.height * cw) / this.originSize.width;
       const $cw = cw + 100 * this.scale;
       const $ch = ch + 100 * this.scale;
@@ -548,9 +459,6 @@ export default {
       this.canvas.height = $ch;
       this.background.height = $cw;
       this.background.width = $ch;
-
-      // const eHeight = this.$refs.card.$el.clientHeight || 600;
-      // this.eHeight = eHeight - 100;
     },
     // キー操作
     onKeyup: function(payload) {
@@ -558,12 +466,12 @@ export default {
       const { key, xKey } = this.$vuewer.key.summary(payload);
       if (key == "tab" && xKey == "default") {
         // TAB でモード変更
-        const idx = this.modes.findIndex(x => x.val == this.mode);
-        if (idx + 1 == this.modes.length) {
-          this.mode = this.modes[0].val;
-        } else {
-          this.mode = this.modes[idx + 1].val;
-        }
+        // const idx = this.modes.findIndex(x => x.val == this.mode);
+        // if (idx + 1 == this.modes.length) {
+        //   this.mode = this.modes[0].val;
+        // } else {
+        //   this.mode = this.modes[idx + 1].val;
+        // }
       } else if (key == "c" && xKey == "ctrl") {
         // ctrl + c で現在画像をクリップボードに挿入
         this.copyImage();
@@ -763,13 +671,10 @@ export default {
     }
   },
   watch: {
-    imageFilter: function(val, old) {
+    filter: function(val, old) {
       if (val != old) {
         this.loadImage(this.src);
       }
-    },
-    mode: function(val) {
-      if (val == undefined) this.mode = 0;
     },
     src: function(val) {
       if (val) {

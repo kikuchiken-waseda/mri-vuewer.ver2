@@ -1,6 +1,12 @@
+const color = "#F44336";
+const mode = "circ";
 export default {
   namespaced: true,
   state: () => ({
+    mode: mode,
+    filter: null,
+    color: color,
+    tab: null,
     src: null,
     id: null,
     idx: null,
@@ -12,9 +18,11 @@ export default {
     texts: []
   }),
   mutations: {
-    src(state, payload) {
-      state.src = payload;
-    },
+    tab: (state, int) => (state.tab = int),
+    mode: (state, str) => (state.mode = str),
+    filter: (state, func) => (state.filter = func),
+    color: (state, str) => (state.color = str),
+    src: (state, str) => (state.src = str),
     id(state, payload) {
       const id = Number(payload);
       state.id = Math.round(id);
@@ -67,6 +75,10 @@ export default {
   },
   actions: {
     init: function(context) {
+      context.state.tab = null;
+      context.state.mode = mode;
+      context.state.filter = null;
+      context.state.color = color;
       context.state.src = null;
       context.state.id = null;
       context.state.idx = null;
