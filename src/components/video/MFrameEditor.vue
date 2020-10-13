@@ -10,7 +10,10 @@
     <m-key-context ref="context" @keyup="onKeyup">
       <v-stage
         ref="stage"
-        :config="canvas"
+        :config="{
+          width: cw,
+          height: ch
+        }"
         @mousemove="onStageMouseMove"
         @mousedown="onStageMouseDown"
         @touchstart="onStageMouseDown"
@@ -104,12 +107,7 @@
         <v-layer v-if="cursor.show" ref="layer">
           <v-line
             :config="{
-              points: [
-                this.cursor.x || 0,
-                0,
-                this.cursor.x || 0,
-                this.canvas.height
-              ],
+              points: [this.cursor.x || 0, 0, this.cursor.x || 0, this.ch],
               stroke: cursor.color,
               strokeWidth: 1,
               lineCap: 'round',
@@ -119,12 +117,7 @@
           />
           <v-line
             :config="{
-              points: [
-                0,
-                this.cursor.y || 0,
-                this.canvas.width,
-                this.cursor.y || 0
-              ],
+              points: [0, this.cursor.y || 0, this.cw, this.cursor.y || 0],
               stroke: cursor.color,
               strokeWidth: 1,
               lineCap: 'round',
@@ -139,8 +132,8 @@
       <m-frame-editor-tab
         :rects="rects"
         :points="points"
-        :origin-size="originSize"
-        :canvas-size="canvas"
+        :origin-size="{ width: ow, height: oh }"
+        :canvas-size="{ width: cw, height: ch }"
         @update-point="onUpdatePoint"
         @update-rect="onUpdateRect"
       />
@@ -167,20 +160,9 @@ export default {
     height: {
       type: String,
       default: "100%"
-    },
-    originSize: {
-      type: Object
     }
   },
   computed: {
-    isPointReserved: function() {
-      // 入力予定の点群が存在するか
-      return this.$store.state.current.frameConf.points.length > 0;
-    },
-    isRectReserved: function() {
-      // 入力予定の矩形が存在するか
-      return this.$store.state.current.frameConf.rects.length > 0;
-    },
     src: {
       get() {
         return this.$store.state.current.frame.src;
@@ -195,6 +177,24 @@ export default {
     idx: function() {
       return this.$store.state.current.frame.idx;
     },
+    cw: function() {
+      return this.$store.state.current.frame.cw;
+    },
+    ch: function() {
+      return this.$store.state.current.frame.ch;
+    },
+    ow: function() {
+      return this.$store.state.current.frame.ow;
+    },
+    oh: function() {
+      return this.$store.state.current.frame.oh;
+    },
+    points: function() {
+      return this.$store.getters["current/frame/points"];
+    },
+    rects: function() {
+      return this.$store.getters["current/frame/rects"];
+    },
     mode: function() {
       return this.$store.state.current.frame.mode;
     },
@@ -203,6 +203,14 @@ export default {
     },
     color: function() {
       return this.$store.state.current.frame.color;
+    },
+    isPointReserved: function() {
+      // 入力予定の点群が存在するか
+      return this.$store.state.current.frameConf.points.length > 0;
+    },
+    isRectReserved: function() {
+      // 入力予定の矩形が存在するか
+      return this.$store.state.current.frameConf.rects.length > 0;
     },
     cardHeight: function() {
       if (this.$store.state.current.layout.mini) {
@@ -218,6 +226,8 @@ export default {
     background: {
       image: null
     },
+    reservedPoints: [],
+    reservedRects: [],
     ruler: {
       active: null,
       conf: {
@@ -229,15 +239,7 @@ export default {
       points: [],
       lines: []
     },
-    reservedPoints: [],
-    reservedRects: [],
-    points: [],
-    rects: [],
     selectedShapeName: "",
-    canvas: {
-      width: 700,
-      height: 700
-    },
     cursor: { x: null, y: null, show: false, color: "#00B8D4" },
     tab: null
   }),
@@ -251,13 +253,11 @@ export default {
     loadImage: async function(src) {
       let $src = src;
       if (this.filter) {
-        $src = await this.filter(src, this.originSize);
+        $src = await this.filter(src, { width: this.ow, height: this.oh });
       }
       const img = await this.$vuewer.io.image.load($src);
       this.onResize();
       this.background.image = img;
-      this.syncPoints();
-      this.syncRects();
       this.focus();
     },
     copyImage: async function() {
@@ -268,61 +268,12 @@ export default {
         new ClipboardItem({ "image/png": blob })
       ]);
     },
-    // 画像フィルター
-    adaptiveThreshold: async function(src, originSize) {
-      return await this.$vuewer.image.adaptiveThreshold(src, originSize);
-    },
-    syncPoints: function() {
-      this.points = [];
-      const points = this.$store.state.current.frame.points;
-      if (points.length) {
-        const cw = this.canvas.width;
-        const ow = this.originSize.width;
-        const ch = this.canvas.height;
-        const oh = this.originSize.height;
-        for (const p of points || []) {
-          this.points.push({
-            id: p.id || points.length + 1,
-            label: p.label || `point-${p.id}`,
-            x: (p.x * cw) / ow,
-            y: (p.y * ch) / oh,
-            size: p.size,
-            color: p.color
-          });
-        }
-      }
-    },
-    syncRects: function() {
-      this.rects = [];
-      const rects = this.$store.state.current.frame.rects;
-      if (rects.length) {
-        const cw = this.canvas.width;
-        const ow = this.originSize.width;
-        const ch = this.canvas.height;
-        const oh = this.originSize.height;
-        for (const r of rects || []) {
-          this.rects.push({
-            id: r.id || rects.length,
-            name: `rect-${r.id || rects.length}`,
-            label: r.label || `rect-${r.id}`,
-            x: (r.x * cw) / ow,
-            y: (r.y * ch) / oh,
-            width: (r.width * cw) / ow,
-            height: (r.height * ch) / oh,
-            rotation: r.rotation || 1,
-            scaleX: r.scaleX || 1,
-            scaleY: r.scaleY || 1,
-            size: r.size,
-            color: r.color
-          });
-        }
-      }
-    },
     emitUpdatePoints: function() {
-      const ow = this.originSize.width;
-      const oh = this.originSize.width;
-      const cw = this.canvas.width;
-      const ch = this.canvas.height;
+      const ow = this.ow;
+      const oh = this.oh;
+      const cw = this.cw;
+      const ch = this.ch;
+
       setTimeout(() => {
         const points = this.points.map(item => {
           return {
@@ -338,10 +289,11 @@ export default {
       }, 1);
     },
     emitUpdateRects: function() {
-      const ow = this.originSize.width;
-      const oh = this.originSize.width;
-      const cw = this.canvas.width;
-      const ch = this.canvas.height;
+      const ow = this.ow;
+      const oh = this.oh;
+      const cw = this.cw;
+      const ch = this.ch;
+
       setTimeout(() => {
         const rects = this.rects.map(item => {
           return {
@@ -376,37 +328,22 @@ export default {
       const i = a.y - t * a.x;
 
       const f1 = { x: 0, y: i };
-      const f2 = { x: this.canvas.width, y: this.canvas.width * t + i };
+      const f2 = { x: this.cw, y: this.cw * t + i };
 
       const points = [f1.x, f1.y, f2.x, f2.y];
       const id = this.ruler.lines.length;
       this.ruler.lines.push({ id, points, t, i });
     },
     addPoint: async function(x, y, color, size) {
+      const item = { x, y, size, color };
       if (this.isPointReserved) {
-        const item = this.reservedPoints.shift();
-        if (item) {
-          const count = await db.points.count();
-          item.id = count + 1;
-          item.x = x;
-          item.y = y;
-          item.size = size;
-          this.points.push(item);
-          this.emitUpdatePoints();
-        }
+        const tmp = this.reservedPoints.shift();
+        item.label = tmp.label;
+        item.color = tmp.color;
       } else {
-        const count = await db.points.count();
-        const item = {
-          id: count + 1,
-          label: `points-${count + 1}`,
-          x: x,
-          y: y,
-          size: size,
-          color: color
-        };
-        this.points.push(item);
-        this.emitUpdatePoints();
+        item.lapel = `points-${this.points.length}`;
       }
+      this.$store.dispatch("current/frame/addPoint", item);
     },
     addRect: async function(x, y, width, height, rotation, color, size) {
       if (this.isRectReserved) {
@@ -491,11 +428,13 @@ export default {
     },
     onResize: function() {
       const cw = this.$refs.layout.getWidth();
-      const ch = (this.originSize.height * cw) / this.originSize.width;
+      const ch = (this.oh * cw) / this.ow;
       const $cw = cw + 100 * this.scale;
       const $ch = ch + 100 * this.scale;
-      this.canvas.width = $cw;
-      this.canvas.height = $ch;
+
+      this.$store.commit("current/frame/cw", $cw);
+      this.$store.commit("current/frame/ch", $ch);
+
       this.background.height = $cw;
       this.background.width = $ch;
     },
@@ -527,17 +466,13 @@ export default {
         // ect でキーボード操作を抜ける
         this.cursor.show = false;
       } else if (key == "j" && xKey == "default") {
-        if (this.cursor.show)
-          this.cursor.x = this.cursor.x - this.canvas.width / 100;
+        if (this.cursor.show) this.cursor.x = this.cursor.x - this.cw / 100;
       } else if (key == "j" && xKey == "ctrl") {
-        if (this.cursor.show)
-          this.cursor.y = this.cursor.y - this.canvas.height / 100;
+        if (this.cursor.show) this.cursor.y = this.cursor.y - this.ch / 100;
       } else if (key == "k" && xKey == "default") {
-        if (this.cursor.show)
-          this.cursor.x = this.cursor.x + this.canvas.width / 100;
+        if (this.cursor.show) this.cursor.x = this.cursor.x + this.cw / 100;
       } else if (key == "k" && xKey == "ctrl") {
-        if (this.cursor.show)
-          this.cursor.y = this.cursor.y + this.canvas.height / 100;
+        if (this.cursor.show) this.cursor.y = this.cursor.y + this.ch / 100;
       } else if (key == " " && xKey == "default") {
         if (this.cursor.show) this.onDblClick();
       } else {
@@ -549,8 +484,8 @@ export default {
       if (this.mode == "circ") {
         this.addPoint(this.cursor.x, this.cursor.y, this.color, this.size);
       } else if (this.mode == "rect") {
-        const width = this.canvas.width / 5;
-        const height = this.canvas.height / 5;
+        const width = this.cw / 5;
+        const height = this.ch / 5;
         const x = this.cursor.x - width / 2;
         const y = this.cursor.y - height / 2;
         this.addRect(x, y, width, height, 0, this.color, this.size);
@@ -569,8 +504,8 @@ export default {
         this.ruler.points.splice(b, 1);
         this.ruler.lines.splice(i, 1);
       } else if (this.mode == "rect") {
-        const width = this.canvas.width / 5;
-        const height = this.canvas.height / 5;
+        const width = this.cw / 5;
+        const height = this.ch / 5;
         const x = e.evt.offsetX;
         const y = e.evt.offsetY;
         const r = (line.t * 180) / Math.PI;

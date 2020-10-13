@@ -14,7 +14,11 @@
     @click-record="onClickRecordContextMenu"
     @click-interval="onClickIntervalContextMenu"
   >
-    <m-vuwer-layout ref="layout" @resize="onResize">
+    <m-vuwer-layout
+      v-if="!$store.state.loading.show"
+      ref="layout"
+      @resize="onResize"
+    >
       <template v-slot:video>
         <m-video-array
           ref="videoArray"

@@ -38,7 +38,7 @@ export default {
     autocompletes: (state, payload) => (state.autocompletes = payload)
   },
   actions: {
-    async init({ dispatch, state }, id = null) {
+    async init({ dispatch, commit, state }, id = null) {
       state.wavesurfer = null;
       state.source = null;
       state.textgrid = {};
@@ -59,8 +59,8 @@ export default {
       dispatch("frameConf/init", { root: true });
       dispatch("complates/init", { root: true });
       dispatch("cache/init", { root: true });
-
       if (id) {
+        dispatch("loading/start", "$vuetify.loading", { root: true });
         state.item = await db.files.get(Number(id));
         state.source = state.item.source;
         state.fps = state.item.fps;
@@ -70,13 +70,30 @@ export default {
         state.videoStream = state.item.videoStream;
         state.audioStream = state.item.audioStream;
         state.originSize = state.item.originSize;
+        commit("frame/ow", state.item.originSize.width);
+        commit("frame/oh", state.item.originSize.height);
         state.metaData = state.item.metaData;
         state.textgrid = state.item.textgrid || {};
         state.frames = await db.frames
           .where({ fileId: state.item.id })
           .with({ points: "points", rects: "rects" });
+        dispatch("loading/finish", {}, { root: true });
       }
     },
+    updateFrames: function({ state, commit }, payload) {
+      const i = state.frames.findIndex(x => x.id == payload.id);
+      if (i !== -1) {
+        const frame = state.frames[i];
+        frame.points = payload.points || frame.points;
+        frame.rects = payload.rects || frame.rects;
+        Vue.set(state.frames, i, frame);
+
+        state.item.lastModifiedAt = Date.now();
+        state.item.frames = state.frames;
+        commit("files/update", state.item, { root: true });
+      }
+    },
+
     textgrid: function({ state, commit }, payload) {
       commit("textgrid", payload);
       const textgrid = Object.assign({}, payload);
@@ -87,11 +104,9 @@ export default {
           parent: textgrid[key].parent
         };
       }
-
       state.item.textgrid = textgrid;
       state.item.lastModifiedAt = Date.now();
       commit("files/update", state.item, { root: true });
-
       return new Promise((resolve, reject) => {
         db.files
           .put(state.item)
@@ -112,11 +127,11 @@ export default {
     zoom({ state }, val) {
       if (state.wavesurfer) this.wavesurfer.zoom(val);
     },
-    seekTo({ state }, { time, center }) {
-      const isCenter = center ? true : false;
+    seekTo({ state }, payload) {
+      const isCenter = payload.center ? true : false;
+      const time = payload.time || 0;
       if (state.wavesurfer) {
-        const d = state.$duration;
-        const p = time / d;
+        const p = time / state.duration;
         const progress = p >= 1 ? 1 : p <= 0 ? 0 : p;
         if (isCenter) {
           state.wavesurfer.seekAndCenter(progress);
@@ -133,14 +148,6 @@ export default {
       }
       if (payload.textgrid) {
         context.dispatch("setTextGrid", payload.textgrid);
-      }
-    },
-    // frames の内の特定のデータを更新します
-    updateFrame: function(context, payload) {
-      const i = context.state.frames.findIndex(x => x.id == payload.id);
-      if (i !== -1) {
-        console.log(payload);
-        Vue.set(context.state.frames, i, payload);
       }
     }
   },
