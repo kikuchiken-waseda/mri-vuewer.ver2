@@ -102,6 +102,19 @@ export default {
     notExist: "この値は存在しません"
   },
   table: {
+    frame: {
+      label: "ラベル",
+      frame: "フレーム ID",
+      time: "時刻",
+      color: "色",
+      x: "x 座標",
+      y: "y 座標",
+      width: "幅",
+      height: "高さ",
+      rotation: "回転",
+      scaleX: "拡大比 (x)",
+      scaleY: "拡大比 (y)"
+    },
     file: {
       name: `${VIDEO}名`,
       fps: "フレームレート (fps)",
@@ -472,6 +485,7 @@ export default {
   browserError: "このブラウザでは, 該当の機能を使用することはできません.",
   annotation: ANNOTATION,
   ver1: "MRI Vuewer ver.1 系",
+  actions: "操作",
   docs: {
     fileRegistration: "ファイル登録",
     textgrid: "時系列転記",

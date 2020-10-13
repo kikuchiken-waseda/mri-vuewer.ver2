@@ -18,13 +18,29 @@ export default {
     oh: null, // オリジナル画像サイズ
     cw: 700, // フレームダイアログのキャンバスサイズ (width)
     ch: 700, // フレームダイアログのキャンバスサイズ (height)
+    activeStyle: { size: 7 },
+    style: { size: 5 },
     points: [],
     rects: [],
     texts: []
   }),
   mutations: {
-    tab: (state, int) => (state.tab = int),
-    mode: (state, str) => (state.mode = str),
+    tab: (state, idx) => {
+      state.tab = Math.round(Number(idx));
+      if (idx == 0) {
+        state.mode = "circ";
+      } else if (idx == 1) {
+        state.mode = "rect";
+      }
+    },
+    mode: (state, str) => {
+      state.mode = str;
+      if (str == "circ") {
+        state.tab = 0;
+      } else if (str == "rect") {
+        state.tab = 1;
+      }
+    },
     filter: (state, func) => (state.filter = func),
     color: (state, str) => (state.color = str),
     src: (state, str) => (state.src = str),
@@ -62,17 +78,20 @@ export default {
       context.state.texts = [];
     },
     frame: function(context, payload) {
-      context.commit("src", payload.src || context.state.src);
-      context.commit("idx", payload.idx || context.state.idx);
-      context.commit("id", payload.id || context.state.id);
-      context.commit("time", payload.time || context.state.time);
-      context.commit("points", payload.points || context.state.points);
-      context.commit("rects", payload.rects || context.state.rects);
-      context.commit("texts", payload.texts || context.state.texts);
+      if (payload.idx && payload.src) {
+        context.commit("src", payload.src || context.state.src);
+        context.commit("idx", payload.idx || context.state.idx);
+        context.commit("id", payload.id || context.state.id);
+        context.commit("time", payload.time || context.state.time);
+        context.commit("points", payload.points || context.state.points);
+        context.commit("rects", payload.rects || context.state.rects);
+        context.commit("texts", payload.texts || context.state.texts);
+      }
     },
     addPoint({ state, dispatch }, item) {
       item.x = (item.x / state.cw) * state.ow;
       item.y = (item.y / state.ch) * state.oh;
+      item.size = state.style.size;
       item.frameId = state.id;
       db.points
         .put(item)
@@ -90,8 +109,12 @@ export default {
       if (item.id) {
         const i = state.points.findIndex(p => p.id == item.id);
         if (i !== -1) {
-          item.x = (item.x / state.cw) * state.ow;
-          item.y = (item.y / state.ch) * state.oh;
+          const origin = state.points[i];
+          item.x = (item.x / state.cw) * state.ow || origin.x;
+          item.y = (item.y / state.ch) * state.oh || origin.y;
+          item.color = item.color || origin.color;
+          item.label = item.label || origin.label;
+          item.size = state.style.size;
           item.frameId = state.id;
           Vue.set(state.points, i, item);
           db.points
@@ -121,11 +144,26 @@ export default {
           });
       }
     },
+    activePoint({ state }, pk) {
+      const i = state.points.findIndex(p => p.id == pk);
+      if (i != -1) {
+        const active = Object.assign(state.points[i], state.activeStyle);
+        Vue.set(state.points, i, active);
+      }
+    },
+    inactivePoint({ state }, pk) {
+      const i = state.points.findIndex(p => p.id == pk);
+      if (i != -1) {
+        const active = Object.assign(state.points[i], state.style);
+        Vue.set(state.points, i, active);
+      }
+    },
     addRect({ state, dispatch }, item) {
       item.x = (item.x / state.cw) * state.ow;
       item.y = (item.y / state.ch) * state.oh;
       item.width = (item.width / state.cw) * state.ow;
       item.height = (item.height / state.ch) * state.oh;
+      item.size = state.style.size;
       item.frameId = state.id;
       db.rects
         .put(item)
@@ -147,6 +185,7 @@ export default {
           item.y = (item.y / state.ch) * state.oh;
           item.width = (item.width / state.cw) * state.ow;
           item.height = (item.height / state.ch) * state.oh;
+          item.size = state.style.size;
           item.frameId = state.id;
           Vue.set(state.rects, i, item);
           db.rects
@@ -174,6 +213,20 @@ export default {
           .catch(error => {
             dispatch("snackbar/error", error.message, { root: true });
           });
+      }
+    },
+    activeRect({ state }, pk) {
+      const i = state.rects.findIndex(r => r.id == pk);
+      if (i != -1) {
+        const active = Object.assign(state.rects[i], state.activeStyle);
+        Vue.set(state.rects, i, active);
+      }
+    },
+    inactiveRect({ state }, pk) {
+      const i = state.rects.findIndex(p => p.id == pk);
+      if (i != -1) {
+        const active = Object.assign(state.rects[i], state.style);
+        Vue.set(state.rects, i, active);
       }
     }
   },

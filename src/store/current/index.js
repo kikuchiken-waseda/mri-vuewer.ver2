@@ -62,22 +62,24 @@ export default {
       if (id) {
         dispatch("loading/start", "$vuetify.loading", { root: true });
         state.item = await db.files.get(Number(id));
-        state.source = state.item.source;
-        state.fps = state.item.fps;
-        state.frameRate = 1 / state.item.fps;
-        state.name = state.item.name;
-        state.duration = state.item.duration;
-        state.videoStream = state.item.videoStream;
-        state.audioStream = state.item.audioStream;
-        state.originSize = state.item.originSize;
-        commit("frame/ow", state.item.originSize.width);
-        commit("frame/oh", state.item.originSize.height);
-        state.metaData = state.item.metaData;
-        state.textgrid = state.item.textgrid || {};
-        state.frames = await db.frames
-          .where({ fileId: state.item.id })
-          .with({ points: "points", rects: "rects" });
-        dispatch("loading/finish", {}, { root: true });
+        if (state.item.name) {
+          state.source = state.item.source;
+          state.fps = state.item.fps;
+          state.frameRate = 1 / state.item.fps;
+          state.name = state.item.name;
+          state.duration = state.item.duration;
+          state.videoStream = state.item.videoStream;
+          state.audioStream = state.item.audioStream;
+          state.originSize = state.item.originSize;
+          commit("frame/ow", state.item.originSize.width);
+          commit("frame/oh", state.item.originSize.height);
+          state.metaData = state.item.metaData;
+          state.textgrid = state.item.textgrid || {};
+          state.frames = await db.frames
+            .where({ fileId: state.item.id })
+            .with({ points: "points", rects: "rects" });
+          dispatch("loading/finish", {}, { root: true });
+        }
       }
     },
     updateFrames: function({ state, commit }, payload) {
@@ -108,10 +110,14 @@ export default {
       state.item.lastModifiedAt = Date.now();
       commit("files/update", state.item, { root: true });
       return new Promise((resolve, reject) => {
-        db.files
-          .put(state.item)
-          .then(res => resolve(res))
-          .catch(error => reject(error));
+        if (state.item.name && state.item.id) {
+          db.files
+            .put(state.item)
+            .then(res => resolve(res))
+            .catch(error => reject(error));
+        } else {
+          reject(new Error("no name"));
+        }
       });
     },
     // ===================================================

@@ -57,6 +57,19 @@ export default {
   ...en,
   prev: "Previous",
   table: {
+    frame: {
+      label: "Label",
+      frame: "Frame ID",
+      time: "Time",
+      color: "Color",
+      x: "X",
+      y: "Y",
+      width: "Width",
+      height: "Height",
+      rotation: "Rotation",
+      scaleX: "Scale (x)",
+      scaleY: "Scale (y)"
+    },
     file: {
       name: "Name",
       fps: "Frame Rate (fps)",
@@ -444,6 +457,7 @@ export default {
       xlsx: "Download as xlsx file"
     }
   },
+  actions: "Actions",
   annotation: "annotation",
   frame: "frames",
   browserError: "This feature is not available in this browser.",

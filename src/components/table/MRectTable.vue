@@ -18,19 +18,27 @@
       </v-edit-dialog>
     </template>
     <template v-slot:item.x="props">
-      {{ Math.round((props.item.x / cw) * ow) }}
+      {{ Math.round(props.item.x) }}
     </template>
     <template v-slot:item.y="props">
-      {{ Math.round((props.item.y / ch) * oh) }}
+      {{ Math.round(props.item.y) }}
     </template>
     <template v-slot:item.width="{ item }">
       <span class="d-inline-block text-truncate" style="max-width: 30px;">
-        {{ (item.width / cw) * ow }}
+        {{
+          item.scaleX
+            ? Math.round(item.scaleX * item.width)
+            : Math.round(item.width)
+        }}
       </span>
     </template>
     <template v-slot:item.height="{ item }">
       <span class="d-inline-block text-truncate" style="max-width: 30px;">
-        {{ (item.height / ch) * oh }}
+        {{
+          item.scaleY
+            ? Math.round(item.scaleY * item.height)
+            : Math.round(item.height)
+        }}
       </span>
     </template>
     <template v-slot:item.rotation="{ item }">
@@ -63,45 +71,46 @@ import MColorMenu from "@/components/menus/MColorMenu";
 export default {
   name: "m-rect-table",
   components: { MColorMenu },
-  props: {
-    rects: {
-      type: Array
-    },
-    originSize: {
-      type: Object
-    },
-    canvasSize: {
-      type: Object
-    }
-  },
   computed: {
-    ow: function() {
-      return this.originSize.width ? this.originSize.width : 0;
+    rects: function() {
+      return this.$store.state.current.frame.rects;
     },
-    oh: function() {
-      return this.originSize.height ? this.originSize.height : 0;
-    },
-    cw: function() {
-      return this.canvasSize.width ? this.canvasSize.width : 0;
-    },
-    ch: function() {
-      return this.canvasSize.height ? this.canvasSize.width : 0;
+    headers: function() {
+      return [
+        {
+          text: this.$vuetify.lang.t("$vuetify.table.frame.label"),
+          value: "label"
+        },
+        {
+          text: this.$vuetify.lang.t("$vuetify.table.frame.x"),
+          value: "x"
+        },
+        {
+          text: this.$vuetify.lang.t("$vuetify.table.frame.y"),
+          value: "y"
+        },
+        {
+          text: this.$vuetify.lang.t("$vuetify.table.frame.width"),
+          value: "width"
+        },
+        {
+          text: this.$vuetify.lang.t("$vuetify.table.frame.height"),
+          value: "height"
+        },
+        {
+          text: this.$vuetify.lang.t("$vuetify.table.frame.rotation"),
+          value: "rotation"
+        },
+        {
+          text: this.$vuetify.lang.t("$vuetify.table.frame.color"),
+          value: "color"
+        }
+      ];
     }
   },
   data: () => ({
     max25chars: v => v.length <= 25 || "Input too long!",
-    pagination: {},
-    headers: [
-      { text: "label", value: "label" },
-      { text: "x", value: "x" },
-      { text: "y", value: "y" },
-      { text: "width", value: "width" },
-      { text: "height", value: "height" },
-      { text: "rotation", value: "rotation" },
-      { text: "scale (x)", value: "scaleX" },
-      { text: "scale (y)", value: "scaleY" },
-      { text: "color", value: "color" }
-    ]
+    pagination: {}
   }),
   methods: {
     close(item) {

@@ -75,7 +75,10 @@ export default {
         db.files
           .toArray()
           .then(files => {
-            context.commit("files", files);
+            context.commit(
+              "files",
+              files.filter(f => f.name)
+            );
             context.dispatch("getLog", "init current status");
             context.commit("isLoading", false);
             resolve(true);

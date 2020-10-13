@@ -7,20 +7,10 @@
     </v-tabs>
     <v-tabs-items v-model="tab">
       <v-tab-item>
-        <m-point-table
-          :points="points"
-          :origin-size="originSize"
-          :canvas-size="canvasSize"
-          @update-point="$emit('update-point')"
-        />
+        <m-point-table />
       </v-tab-item>
       <v-tab-item>
-        <m-rect-table
-          :rects="rects"
-          :origin-size="originSize"
-          :canvas-size="canvasSize"
-          @update-rect="$emit('update-rect')"
-        />
+        <m-rect-table />
       </v-tab-item>
       <v-tab-item>
         <v-card>
@@ -42,24 +32,6 @@ export default {
     MFrameEditConfForm,
     MPointTable,
     MRectTable
-  },
-  props: {
-    originSize: {
-      type: Object,
-      required: true
-    },
-    canvasSize: {
-      type: Object,
-      required: true
-    },
-    rects: {
-      type: Array,
-      required: true
-    },
-    points: {
-      type: Array,
-      required: true
-    }
   },
   computed: {
     tab: {

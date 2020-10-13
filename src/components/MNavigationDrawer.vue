@@ -351,7 +351,7 @@ export default {
     },
     diff: function() {
       const cnames = this.chaches.map(x => x.name.split(".")[0]);
-      const fnames = this.files.map(x => x.name.split(".")[0]);
+      const fnames = this.files.map(x => (x.name ? x.name.split(".")[0] : ""));
       return cnames.filter(c => {
         return fnames.indexOf(c) == -1;
       });

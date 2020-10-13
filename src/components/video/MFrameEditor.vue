@@ -218,9 +218,7 @@ export default {
     }
   },
   data: () => ({
-    size: 5,
     scale: 0,
-    eHeight: 500,
     background: {
       image: null
     },
@@ -287,8 +285,8 @@ export default {
       const id = this.ruler.lines.length;
       this.ruler.lines.push({ id, points, t, i });
     },
-    addPoint: function(x, y, color, size) {
-      const item = { x, y, size, color };
+    addPoint: function(x, y, color) {
+      const item = { x, y, color };
       if (this.isPointReserved) {
         const tmp = this.reservedPoints.shift();
         if (tmp) {
@@ -301,8 +299,8 @@ export default {
         this.$store.dispatch("current/frame/addPoint", item);
       }
     },
-    addRect: async function(x, y, width, height, rotation, color, size) {
-      let item = { x, y, width, height, rotation, color, size };
+    addRect: async function(x, y, width, height, rotation, color) {
+      let item = { x, y, width, height, rotation, color };
       if (this.isRectReserved) {
         const tmp = this.reservedRects.shift();
         if (tmp) {
@@ -413,13 +411,13 @@ export default {
     // image 系イベントハンドラ
     onDblClick: function() {
       if (this.mode == "circ") {
-        this.addPoint(this.cursor.x, this.cursor.y, this.color, this.size);
+        this.addPoint(this.cursor.x, this.cursor.y, this.color);
       } else if (this.mode == "rect") {
         const width = this.cw / 5;
         const height = this.ch / 5;
         const x = this.cursor.x - width / 2;
         const y = this.cursor.y - height / 2;
-        this.addRect(x, y, width, height, 0, this.color, this.size);
+        this.addRect(x, y, width, height, 0, this.color);
       } else if (this.mode == "ruler") {
         this.addRulerPoint(this.cursor.x, this.cursor.y);
       }
@@ -440,9 +438,9 @@ export default {
         const x = e.evt.offsetX;
         const y = e.evt.offsetY;
         const r = (line.t * 180) / Math.PI;
-        this.addRect(x, y, width, height, r, this.color, this.size);
+        this.addRect(x, y, width, height, r, this.color);
       } else {
-        this.addPoint(e.evt.offsetX, e.evt.offsetY, this.color, this.size);
+        this.addPoint(e.evt.offsetX, e.evt.offsetY, this.color);
       }
     },
     onRulerMouseEnter: function(e) {
@@ -463,35 +461,33 @@ export default {
     },
     onPointMouseEnter: function(e) {
       if (this.mode == "eras" || this.mode == "circ") {
-        const point = this.points[e.target.index];
-        point.size = this.size + 2;
-        this.$store.dispatch("current/frame/updatePoint", point);
+        this.$store.dispatch(
+          "current/frame/activePoint",
+          this.points[e.target.index].id
+        );
       }
     },
     onPointMouseLeave: function(e) {
       if (this.mode == "eras" || this.mode == "circ") {
         const point = this.points[e.target.index];
-        point.size = this.size + 2;
-        this.$store.dispatch("current/frame/updatePoint", point);
+        this.$store.dispatch("current/frame/inactivePoint", point.id);
       }
     },
     onPointDragStart: function(e) {
       const point = this.points[e.target.index];
-      point.size = this.size + 2;
-      this.$store.dispatch("current/frame/updatePoint", point);
+      this.$store.dispatch("current/frame/activePoint", point.id);
     },
     onPointDragEnd: function(e) {
       const i = e.target.index;
       const point = this.points[i];
       point.x = e.target.x();
       point.y = e.target.y();
-      point.size = this.size;
       this.$store.dispatch("current/frame/updatePoint", point);
     },
     // Rect 系イベントハンドラ
     onRectClick: function(e) {
       if (this.mode == "circ") {
-        this.addPoint(e.evt.offsetX, e.evt.offsetY, this.color, this.size);
+        this.addPoint(e.evt.offsetX, e.evt.offsetY, this.color);
       } else if (this.mode == "eras") {
         this.$store.dispatch(
           "current/frame/deleteRect",
@@ -564,6 +560,12 @@ export default {
     }
   },
   watch: {
+    "$store.state.current.frameConf.points": function(val) {
+      this.reservedPoints = JSON.parse(JSON.stringify(val));
+    },
+    "$store.state.current.frameConf.rects": function(val) {
+      this.reservedRects = JSON.parse(JSON.stringify(val));
+    },
     filter: function(val, old) {
       if (val != old) {
         this.loadImage(this.src);
@@ -573,7 +575,6 @@ export default {
       if (val) {
         // 元画像が変更されたタイミングで拡大比を戻す
         this.scale = 0;
-
         // 元画像が変更されたタイミングで予約ポイントが存在するかを確認
         this.reservedPoints = JSON.parse(
           JSON.stringify(this.$store.state.current.frameConf.points)
@@ -581,7 +582,6 @@ export default {
         this.reservedRects = JSON.parse(
           JSON.stringify(this.$store.state.current.frameConf.rects)
         );
-
         // 動画をキャンバスに読み込み
         this.loadImage(val);
       }

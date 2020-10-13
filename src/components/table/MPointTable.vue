@@ -23,10 +23,10 @@
     </template>
 
     <template v-slot:item.x="props">
-      {{ Math.round((props.item.x / cw) * ow) }}
+      {{ Math.round(props.item.x) }}
     </template>
     <template v-slot:item.y="props">
-      {{ Math.round((props.item.y / ch) * oh) }}
+      {{ Math.round(props.item.y) }}
     </template>
     <template v-slot:item.color="props">
       <m-color-menu
@@ -34,6 +34,17 @@
         v-model="props.item.color"
         @input="close(props.item)"
       />
+    </template>
+    <template v-slot:item.actions="{ item }">
+      <v-btn
+        icon
+        dark
+        x-small
+        color="error"
+        @click="$store.dispatch('current/frame/deletePoint', item.id)"
+      >
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
     </template>
   </v-data-table>
 </template>
@@ -46,50 +57,45 @@ export default {
     showFrame: {
       type: Boolean,
       default: false
-    },
-    points: {
-      type: Array,
-      require: true
-    },
-    originSize: {
-      type: Object,
-      require: true
-    },
-    canvasSize: {
-      type: Object,
-      require: true
     }
   },
   computed: {
-    ow: function() {
-      return this.originSize.width ? this.originSize.width : 0;
-    },
-    oh: function() {
-      return this.originSize.height ? this.originSize.height : 0;
-    },
-    cw: function() {
-      return this.canvasSize.width ? this.canvasSize.width : 0;
-    },
-    ch: function() {
-      return this.canvasSize.height ? this.canvasSize.width : 0;
-    },
     headers: function() {
-      if (this.showFrame) {
-        return [
-          { text: "label", value: "label" },
-          { text: "frame", value: "frame.idx" },
-          { text: "time", value: "time" },
-          { text: "x", value: "x" },
-          { text: "y", value: "y" },
-          { text: "color", value: "color" }
-        ];
-      }
-      return [
-        { text: "label", value: "label" },
-        { text: "x", value: "x" },
-        { text: "y", value: "y" },
-        { text: "color", value: "color" }
+      const headers = [
+        {
+          text: this.$vuetify.lang.t("$vuetify.table.frame.label"),
+          value: "label"
+        }
       ];
+      if (this.showFrame) {
+        headers.push({
+          text: this.$vuetify.lang.t("$vuetify.table.frame.frame"),
+          value: "frame.idx"
+        });
+      }
+      headers.push({
+        text: this.$vuetify.lang.t("$vuetify.table.frame.x"),
+        value: "x"
+      });
+      headers.push({
+        text: this.$vuetify.lang.t("$vuetify.table.frame.y"),
+        value: "y"
+      });
+      headers.push({
+        text: this.$vuetify.lang.t("$vuetify.table.frame.color"),
+        value: "color"
+      });
+      headers.push({
+        text: this.$vuetify.lang.t("$vuetify.actions"),
+        value: "actions",
+        width: "150px",
+        sortable: false,
+        align: "end"
+      });
+      return headers;
+    },
+    points: function() {
+      return this.$store.state.current.frame.points;
     }
   },
   data: () => ({
@@ -98,7 +104,13 @@ export default {
   }),
   methods: {
     close(item) {
-      this.$emit("update-point", item);
+      this.$store.dispatch("current/frame/updatePoint", {
+        id: item.id,
+        label: item.label,
+        color: item.color
+      });
+
+      // this.$emit("update-point", item);
     }
   }
 };
