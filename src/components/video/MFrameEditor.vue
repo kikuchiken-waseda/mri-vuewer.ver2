@@ -79,7 +79,6 @@
               draggable: mode == 'rect'
             }"
             @click="onRectClick"
-            @dragstart="onRectDragStart"
             @dragend="onRectDragEnd"
             @transformend="onTransformEnd"
           />
@@ -134,8 +133,8 @@
         :points="points"
         :origin-size="{ width: ow, height: oh }"
         :canvas-size="{ width: cw, height: ch }"
-        @update-point="onUpdatePoint"
-        @update-rect="onUpdateRect"
+        @update-point="$store.dispatch('current/frame/updatePoint', $event)"
+        @update-rect="$store.dispatch('current/frame/updateRect', $event)"
       />
     </template>
   </m-frame-editor-layout>
@@ -146,7 +145,6 @@ import MFrameEditorTab from "@/components/tab/MFrameEditorTab";
 import MFrameEditorLayout from "@/components/layouts/MFrameEditorLayout";
 import MFrameEditorActions from "@/components/actions/MFrameEditorActions";
 import MKeyContext from "@/components/contextmenus/MKeyContext";
-import db from "@/storage/db";
 export default {
   name: "m-frame-editor",
   mixins: [MWavesurferMixin],
@@ -268,51 +266,6 @@ export default {
         new ClipboardItem({ "image/png": blob })
       ]);
     },
-    emitUpdatePoints: function() {
-      const ow = this.ow;
-      const oh = this.oh;
-      const cw = this.cw;
-      const ch = this.ch;
-
-      setTimeout(() => {
-        const points = this.points.map(item => {
-          return {
-            id: item.id,
-            label: item.label,
-            x: (item.x / cw) * ow,
-            y: (item.y / ch) * oh,
-            size: item.size,
-            color: item.color
-          };
-        });
-        this.$emit("points-updated", points);
-      }, 1);
-    },
-    emitUpdateRects: function() {
-      const ow = this.ow;
-      const oh = this.oh;
-      const cw = this.cw;
-      const ch = this.ch;
-
-      setTimeout(() => {
-        const rects = this.rects.map(item => {
-          return {
-            id: item.id,
-            label: item.label,
-            x: (item.x / cw) * ow,
-            y: (item.y / ch) * oh,
-            width: (item.width / cw) * ow,
-            height: (item.height / ch) * oh,
-            rotation: item.rotation || 1,
-            scaleX: item.scaleX || 1,
-            scaleY: item.scaleY || 1,
-            size: item.size,
-            color: item.color
-          };
-        });
-        this.$emit("rects-updated", rects);
-      }, 1);
-    },
     addRulerPoint: function(x, y) {
       const id = this.ruler.points.length + 1;
       const label = `ruler-point-${id}`;
@@ -334,57 +287,35 @@ export default {
       const id = this.ruler.lines.length;
       this.ruler.lines.push({ id, points, t, i });
     },
-    addPoint: async function(x, y, color, size) {
+    addPoint: function(x, y, color, size) {
       const item = { x, y, size, color };
       if (this.isPointReserved) {
         const tmp = this.reservedPoints.shift();
-        item.label = tmp.label;
-        item.color = tmp.color;
+        if (tmp) {
+          item.label = tmp.label;
+          item.color = tmp.color;
+          this.$store.dispatch("current/frame/addPoint", item);
+        }
       } else {
         item.lapel = `points-${this.points.length}`;
+        this.$store.dispatch("current/frame/addPoint", item);
       }
-      this.$store.dispatch("current/frame/addPoint", item);
     },
     addRect: async function(x, y, width, height, rotation, color, size) {
+      let item = { x, y, width, height, rotation, color, size };
       if (this.isRectReserved) {
-        const item = this.reservedRects.shift();
-        if (item) {
-          item.id = this.rects.length + 1;
-          item.name = item.label;
-          item.x = x;
-          item.y = y;
-          item.width = width;
-          item.height = height;
-          item.rotation = rotation;
-          item.size = size;
-          if (this.id) {
-            const count = await db.rects.count();
-            item.id = count + 1;
-          }
-          this.rects.push(item);
-          this.emitUpdateRects();
+        const tmp = this.reservedRects.shift();
+        if (tmp) {
+          item.name = tmp.label;
+          item.label = tmp.label;
+          item.color = tmp.color;
+          this.$store.dispatch("current/frame/addRect", item);
         }
       } else {
-        const item = {
-          id: this.rects.length + 1,
-          name: `rect-${this.rects.length + 1}`,
-          label: `rect-${this.rects.length + 1}`,
-          x: x,
-          y: y,
-          width: width,
-          height: height,
-          rotation: rotation,
-          size: size,
-          color: color
-        };
-        if (this.id) {
-          const count = await db.rects.count();
-          item.id = count + 1;
-          item.name = `rect-${count + 1}`;
-          item.label = `rect-${count + 1}`;
-        }
-        this.rects.push(item);
-        this.emitUpdateRects();
+        const name = `rect-${this.rects.length + 1}`;
+        item.name = name;
+        item.label = name;
+        this.$store.dispatch("current/frame/addRect", item);
       }
     },
     onSkip: function(payload) {
@@ -524,68 +455,55 @@ export default {
     // Point 系イベントハンドラ
     onPointClick: function(e) {
       if (this.mode == "eras") {
-        const i = e.target.index;
-        this.$emit("point-deleted", this.points[i]);
-        this.points.splice(i, 1);
+        this.$store.dispatch(
+          "current/frame/deletePoint",
+          this.points[e.target.index].id
+        );
       }
     },
     onPointMouseEnter: function(e) {
-      const i = e.target.index;
       if (this.mode == "eras" || this.mode == "circ") {
-        this.points[i].size = this.size + 2;
+        const point = this.points[e.target.index];
+        point.size = this.size + 2;
+        this.$store.dispatch("current/frame/updatePoint", point);
       }
     },
     onPointMouseLeave: function(e) {
-      const i = e.target.index;
       if (this.mode == "eras" || this.mode == "circ") {
-        this.points[i].size = this.size;
+        const point = this.points[e.target.index];
+        point.size = this.size + 2;
+        this.$store.dispatch("current/frame/updatePoint", point);
       }
     },
     onPointDragStart: function(e) {
-      const i = e.target.index;
-      this.points[i].size = this.size + 2;
-      this.points[i].opacity = 0.5;
+      const point = this.points[e.target.index];
+      point.size = this.size + 2;
+      this.$store.dispatch("current/frame/updatePoint", point);
     },
     onPointDragEnd: function(e) {
       const i = e.target.index;
-      this.points[i].x = e.target.x();
-      this.points[i].y = e.target.y();
-      this.points[i].opacity = 1;
-      this.points[i].size = this.size;
-      this.emitUpdatePoints();
-    },
-    onUpdatePoint: function(point) {
-      const i = this.points.findIndex(x => x.id == point.id);
-      this.points[i].label = point.label;
-      this.points[i].color = point.color;
-      this.emitUpdatePoints();
+      const point = this.points[i];
+      point.x = e.target.x();
+      point.y = e.target.y();
+      point.size = this.size;
+      this.$store.dispatch("current/frame/updatePoint", point);
     },
     // Rect 系イベントハンドラ
     onRectClick: function(e) {
       if (this.mode == "circ") {
         this.addPoint(e.evt.offsetX, e.evt.offsetY, this.color, this.size);
       } else if (this.mode == "eras") {
-        const i = e.target.index;
-        this.$emit("rect-deleted", this.rects[i]);
-        this.rects.splice(i, 1);
+        this.$store.dispatch(
+          "current/frame/deleteRect",
+          this.rects[e.target.index].id
+        );
       }
     },
-    onRectDragStart: function(e) {
-      const i = e.target.index;
-      this.rects[i].opacity = 0.5;
-    },
     onRectDragEnd: function(e) {
-      const i = e.target.index;
-      this.rects[i].x = e.target.x();
-      this.rects[i].y = e.target.y();
-      this.rects[i].opacity = 1;
-      this.emitUpdateRects();
-    },
-    onUpdateRect: function(rect) {
-      const i = this.rects.findIndex(x => x.id == rect.id);
-      this.rects[i].label = rect.label;
-      this.rects[i].color = rect.color;
-      this.emitUpdateRects();
+      const rect = this.rects[e.target.index];
+      rect.x = e.target.x();
+      rect.y = e.target.y();
+      this.$store.dispatch("current/frame/updateRect", rect);
     },
     onStageMouseMove() {
       const cursor = this.$refs.stage.getNode().getPointerPosition();
@@ -615,12 +533,13 @@ export default {
     onTransformEnd(e) {
       const idx = this.rects.findIndex(r => r.name == this.selectedShapeName);
       if (idx !== -1) {
-        this.rects[idx].rotation = e.target.rotation();
-        this.rects[idx].width = e.target.width();
-        this.rects[idx].scaleX = e.target.scaleX();
-        this.rects[idx].height = e.target.height();
-        this.rects[idx].scaleY = e.target.scaleY();
-        this.emitUpdateRects();
+        const rect = this.rects[idx];
+        rect.rotation = e.target.rotation();
+        rect.width = e.target.width();
+        rect.scaleX = e.target.scaleX();
+        rect.height = e.target.height();
+        rect.scaleY = e.target.scaleY();
+        this.$store.dispatch("current/frame/updateRect", rect);
       }
     },
     updateTransformer() {

@@ -1,3 +1,4 @@
+import Vue from "vue";
 import db from "@/storage/db";
 
 const color = "#F44336";
@@ -84,6 +85,96 @@ export default {
         .catch(error => {
           dispatch("snackbar/error", error.message, { root: true });
         });
+    },
+    updatePoint({ state, dispatch }, item) {
+      if (item.id) {
+        const i = state.points.findIndex(p => p.id == item.id);
+        if (i !== -1) {
+          item.x = (item.x / state.cw) * state.ow;
+          item.y = (item.y / state.ch) * state.oh;
+          item.frameId = state.id;
+          Vue.set(state.points, i, item);
+          db.points
+            .put(item)
+            .then(() => {
+              const frame = { id: state.id, points: state.points };
+              dispatch("current/updateFrames", frame, { root: true });
+            })
+            .catch(error => {
+              dispatch("snackbar/error", error.message, { root: true });
+            });
+        }
+      }
+    },
+    deletePoint({ state, dispatch }, pk) {
+      const i = state.points.findIndex(p => p.id == pk);
+      if (i != -1) {
+        db.points
+          .delete(pk)
+          .then(() => {
+            state.points.splice(i, 1);
+            const frame = { id: state.id, points: state.points };
+            dispatch("current/updateFrames", frame, { root: true });
+          })
+          .catch(error => {
+            dispatch("snackbar/error", error.message, { root: true });
+          });
+      }
+    },
+    addRect({ state, dispatch }, item) {
+      item.x = (item.x / state.cw) * state.ow;
+      item.y = (item.y / state.ch) * state.oh;
+      item.width = (item.width / state.cw) * state.ow;
+      item.height = (item.height / state.ch) * state.oh;
+      item.frameId = state.id;
+      db.rects
+        .put(item)
+        .then(id => {
+          item.id = id;
+          state.rects.push(item);
+          const frame = { id: state.id, rects: state.rects };
+          dispatch("current/updateFrames", frame, { root: true });
+        })
+        .catch(error => {
+          dispatch("snackbar/error", error.message, { root: true });
+        });
+    },
+    updateRect({ state, dispatch }, item) {
+      if (item.id) {
+        const i = state.rects.findIndex(r => r.id == item.id);
+        if (i !== -1) {
+          item.x = (item.x / state.cw) * state.ow;
+          item.y = (item.y / state.ch) * state.oh;
+          item.width = (item.width / state.cw) * state.ow;
+          item.height = (item.height / state.ch) * state.oh;
+          item.frameId = state.id;
+          Vue.set(state.rects, i, item);
+          db.rects
+            .put(item)
+            .then(() => {
+              const frame = { id: state.id, rects: state.rects };
+              dispatch("current/updateFrames", frame, { root: true });
+            })
+            .catch(error => {
+              dispatch("snackbar/error", error.message, { root: true });
+            });
+        }
+      }
+    },
+    deleteRect({ state, dispatch }, pk) {
+      const i = state.rects.findIndex(r => r.id == pk);
+      if (i != -1) {
+        db.rects
+          .delete(pk)
+          .then(() => {
+            state.rects.splice(i, 1);
+            const frame = { id: state.id, rects: state.rects };
+            dispatch("current/updateFrames", frame, { root: true });
+          })
+          .catch(error => {
+            dispatch("snackbar/error", error.message, { root: true });
+          });
+      }
     }
   },
   getters: {
