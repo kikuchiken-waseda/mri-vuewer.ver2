@@ -330,7 +330,8 @@ export default {
         this.canvas.height = height;
       }
     },
-    // キャンバス同期
+    // 現在時刻からフレームを算出し
+    // 画像を base64 形式にして提示
     syncFrame: function(currentTime) {
       if (this.$frames.length > 0) {
         if (currentTime) {

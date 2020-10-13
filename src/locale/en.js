@@ -381,6 +381,7 @@ export default {
       delete: "Delete a Tier",
       interval: {
         name: "Interval Tier",
+        time2frame: "Match time of records in a current tier to images time",
         owakati: "word-separation for the current tier (for Japanese)",
         oyomi: "Convert current tier to reading (for Japanese)",
         opronunciation: "Convert current tier to pronunciation (for Japanese)"

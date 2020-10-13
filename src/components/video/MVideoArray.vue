@@ -6,9 +6,9 @@
         flat
         ref="prev"
         :style="videoStyle"
-        :origin-size="originSize"
         :src="src"
-        :frames="frames"
+        :frames="$frames"
+        :origin-size="$originSize"
         @keyup="onKeyup('prev', $event)"
         @mouseover="$emit('mouseover')"
       />
@@ -20,10 +20,10 @@
       @loadeddata="onLoadeddata"
       @timeupdate="onTimeupdate"
       @frame-updated="onFrameUpdated"
-      :origin-size="originSize"
+      :origin-size="$originSize"
       :style="videoStyle"
       :src="src"
-      :frames="frames"
+      :frames="$frames"
       @keyup="onKeyup('prev', $event)"
       @mouseover="$emit('mouseover')"
     />
@@ -33,9 +33,9 @@
         muted
         ref="next"
         :src="src"
-        :origin-size="originSize"
+        :origin-size="$originSize"
         :style="videoStyle"
-        :frames="frames"
+        :frames="$frames"
         @keyup="onKeyup('prev', $event)"
         @mouseover="$emit('mouseover')"
       />
@@ -54,20 +54,6 @@ export default {
       type: String,
       required: true
     },
-    frames: {
-      type: Array,
-      default: function() {
-        return [];
-      }
-    },
-    fps: {
-      type: Number,
-      required: true
-    },
-    originSize: {
-      type: Object,
-      required: true
-    },
     // どの程度前後をずらすか?
     frameOffset: {
       type: Number,
@@ -83,8 +69,14 @@ export default {
     }
   }),
   computed: {
-    frameRate: function() {
-      return 1 / this.fps;
+    $originSize: function() {
+      return this.$store.state.current.originSize;
+    },
+    $frameRate: function() {
+      return this.$store.state.current.frameRate;
+    },
+    $frames: function() {
+      return this.$store.state.current.frames;
     }
   },
   methods: {
@@ -99,7 +91,7 @@ export default {
     },
     syncVideos: function(currentTime) {
       if (this.$refs.video) {
-        const offsetTime = this.frameOffset * this.frameRate;
+        const offsetTime = this.frameOffset * this.$frameRate;
         if (currentTime - offsetTime > 0) {
           const time = currentTime - offsetTime;
           this.$refs.prev.setCurrentTime(time);

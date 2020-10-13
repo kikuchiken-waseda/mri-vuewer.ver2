@@ -5,63 +5,134 @@ import layout from "./layout.js";
 import cache from "./cache.js";
 import complates from "./complates.js";
 import frameConf from "./frameConf.js";
+
+import db from "@/storage/db";
+
 export default {
   namespaced: true,
   state: () => ({
-    wavesurfer: null,
-    textgrid: null,
-    tab: 0,
-    metaData: {},
-    frames: []
+    name: "", // 動画名
+    wavesurfer: null, // 動画アノテーション用コンポーネント
+    source: null, // 解析対象の動画 (base64) 形式
+    fps: 0, // 解析対象動画 fps
+    frameRate: 0, // 解析対象動画 1/fps
+    textgrid: {}, // 時系列アノテーション結果
+    metaData: {}, // 解析対象動画メタ情報
+    item: {}, // DB から検索されたファイルデータ
+    frames: [], // フレームアノテーション結果保存用リスト
+    duration: 0,
+    videoStream: {},
+    audioStream: {},
+    originSize: { height: 0, width: 0 },
+    tab: 0 // アノテーション結果表示用テーブルタブ状態
   }),
   mutations: {
-    waveSurfer(state, payload) {
-      state.wavesurfer = payload;
-    },
-    tab(state, payload) {
-      state.tab = payload;
-    },
-    metaData(state, payload) {
-      state.metaData = payload;
-    },
-    textGrid(state, payload) {
-      state.textgrid = payload;
-    },
-    frames(state, payload) {
-      state.frames = payload;
-    },
-    autocompletes(state, payload) {
-      state.autocompletes = payload;
-    }
+    item: (state, payload) => (state.item = payload),
+    waveSurfer: (state, payload) => (state.wavesurfer = payload),
+    source: (state, payload) => (state.source = payload),
+    duration: (state, payload) => (state.duration = Number(payload)),
+    tab: (state, payload) => (state.tab = payload),
+    metaData: (state, payload) => (state.metaData = payload),
+    textgrid: (state, payload) => (state.textgrid = payload),
+    frames: (state, payload) => (state.frames = payload),
+    autocompletes: (state, payload) => (state.autocompletes = payload)
   },
   actions: {
-    init: function({ dispatch, state }) {
+    async init({ dispatch, state }, id = null) {
+      state.wavesurfer = null;
+      state.source = null;
+      state.textgrid = {};
+      state.fps = 0;
+      state.frameRate = 0;
+      state.name = "";
+      state.metaData = {};
+      state.frames = [];
+      state.item = {};
+      state.duration = 0;
+      state.videoStream = {};
+      state.audioStream = {};
+      state.originSize = { height: 0, width: 0 };
+      state.tab = 0;
+
       dispatch("layout/init", { root: true });
       dispatch("frame/init", { root: true });
       dispatch("frameConf/init", { root: true });
       dispatch("complates/init", { root: true });
       dispatch("cache/init", { root: true });
-      state.tab = 0;
-      state.frames = [];
-      state.wavesurfer = null;
-      state.textgrid = null;
+
+      if (id) {
+        state.item = await db.files.get(Number(id));
+        state.source = state.item.source;
+        state.fps = state.item.fps;
+        state.frameRate = 1 / state.item.fps;
+        state.name = state.item.name;
+        state.duration = state.item.duration;
+        state.videoStream = state.item.videoStream;
+        state.audioStream = state.item.audioStream;
+        state.originSize = state.item.originSize;
+        state.metaData = state.item.metaData;
+        state.textgrid = state.item.textgrid || {};
+        state.frames = await db.frames
+          .where({ fileId: state.item.id })
+          .with({ points: "points", rects: "rects" });
+      }
     },
+    textgrid: function({ state, commit }, payload) {
+      commit("textgrid", payload);
+      const textgrid = Object.assign({}, payload);
+      for (const key in textgrid) {
+        textgrid[key] = {
+          values: textgrid[key].values,
+          type: textgrid[key].type,
+          parent: textgrid[key].parent
+        };
+      }
+
+      state.item.textgrid = textgrid;
+      state.item.lastModifiedAt = Date.now();
+      commit("files/update", state.item, { root: true });
+
+      return new Promise((resolve, reject) => {
+        db.files
+          .put(state.item)
+          .then(res => resolve(res))
+          .catch(error => reject(error));
+      });
+    },
+    // ===================================================
+    // WS 操作関連
+    // ===================================================
+    setTextGrid(context, obj) {
+      // 現在表示されている TEXTGRID を更新します
+      const ws = context.state.wavesurfer;
+      if (ws) {
+        ws.setTextGrid(obj);
+      }
+    },
+    zoom({ state }, val) {
+      if (state.wavesurfer) this.wavesurfer.zoom(val);
+    },
+    seekTo({ state }, { time, center }) {
+      const isCenter = center ? true : false;
+      if (state.wavesurfer) {
+        const d = state.$duration;
+        const p = time / d;
+        const progress = p >= 1 ? 1 : p <= 0 ? 0 : p;
+        if (isCenter) {
+          state.wavesurfer.seekAndCenter(progress);
+        } else {
+          state.wavesurfer.seekTo(progress);
+        }
+      }
+    },
+
     // 現在表示されている VUEWER の転記情報を更新します
     loadObj: function(context, payload) {
       if (payload.frames && payload.frames.length) {
         context.commit("frames", payload.frames);
       }
       if (payload.textgrid) {
-        context.dispatch("updateTextGrid", payload.textgrid);
-      }
-    },
-    // 現在表示されている TEXTGRID を更新ます.
-    updateTextGrid: function(context, textgrid) {
-      const ws = context.state.wavesurfer;
-      if (ws) {
-        ws.setTextGrid(textgrid);
-      } else {
-        context.commit("textgrid", textgrid);
+        context.dispatch("setTextGrid", payload.textgrid);
       }
     },
     // frames の内の特定のデータを更新します

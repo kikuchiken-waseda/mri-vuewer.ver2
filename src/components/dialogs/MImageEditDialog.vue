@@ -38,8 +38,7 @@ export default {
   name: "m-image-edit-dialog",
   components: { MCardDialog, MFrameEditor },
   props: {
-    value: { type: Boolean, required: true },
-    originSize: { type: Object, required: true }
+    value: { type: Boolean, required: true }
   },
   data: () => ({
     maxWidth: "700"
@@ -60,6 +59,9 @@ export default {
     }
   },
   computed: {
+    originSize: function() {
+      return this.$store.state.current.originSize;
+    },
     contentHeight: function() {
       if (this.$store.state.current.layout.mini) return "90vh";
       return "80vh";

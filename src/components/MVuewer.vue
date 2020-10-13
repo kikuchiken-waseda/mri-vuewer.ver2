@@ -18,11 +18,10 @@
       <template v-slot:video>
         <m-video-array
           ref="videoArray"
-          :src="src"
-          :fps="fps"
+          v-if="$source"
+          :src="$source"
+          :fps="$fps"
           :frameOffset="frameOffset"
-          :frames="$frames"
-          :origin-size="originSize"
           @loadeddata="onLoadeddata"
           @frame-updated="onFrameUpdated"
           @mouseover="onMouseover('video-array')"
@@ -32,7 +31,7 @@
           @download-click="onDownloadClick"
           @upload-click="onUploadClick"
           @mouseover="onMouseover('actions')"
-          :fps="fps"
+          :fps="$fps"
           v-if="wavesurfer"
         />
       </template>
@@ -58,19 +57,19 @@
           ref="wavesurfer"
           backend="MediaElement"
           textgrid-max-height="100px"
-          :cursorColor="$cursorColor"
-          :drawingContextAttributes="drawingContextAttributes"
-          :freqRate="$freqRate"
-          :minPxPerSec="minPxPerSec"
-          :showFreqLabel="$showFreqLabel"
-          :showSpectrogram="$showSpectrogram"
-          :showTimeLine="$showTimeLine"
-          :skipLength="skipLength"
           :source="videoElm"
-          :spectrogramHeight="$spectrogramHeight"
-          :targetChannel="$targetChannel"
-          :waveColor="$waveColor"
-          :progressColor="$progressColor"
+          :skipLength="skipLength"
+          :minPxPerSec="$minPxPerSec"
+          :drawingContextAttributes="drawingContextAttributes"
+          :cursorColor="$store.state.setting.cursorColor"
+          :freqRate="$store.state.setting.freqRate"
+          :showFreqLabel="$store.state.setting.showFreqLabel"
+          :showSpectrogram="$store.state.setting.showSpectrogram"
+          :showTimeLine="$store.state.setting.showTimeLine"
+          :spectrogramHeight="$store.state.setting.spectrogramHeight"
+          :targetChannel="$store.state.setting.targetChannel"
+          :waveColor="$store.state.setting.waveColor"
+          :progressColor="$store.state.setting.progressColor"
           @spectrogram-render-end="onSpectrogramRenderEnd"
           @spectrogram-render-start="onSpectrogramRenderStart"
           @spectrogram-keyup="onWaveSurferKeyup"
@@ -154,15 +153,8 @@
           :tiers="tiers"
           :current="current.tier.key"
         />
-        <m-ruler-dialog v-model="dialog.ruler.show" :origin-size="originSize" />
-        <m-image-edit-dialog
-          v-model="dialog.imageEdit.show"
-          @rects-updated="onRectsUpdated"
-          @points-updated="onPointsUpdated"
-          @rect-deleted="onRectDeleted"
-          @point-deleted="onPointDeleted"
-          :origin-size="originSize"
-        />
+        <m-ruler-dialog v-model="dialog.ruler.show" />
+        <m-image-edit-dialog v-model="dialog.imageEdit.show" />
         <m-complates-dialog v-model="dialog.complates.show" />
       </template>
     </m-vuwer-layout>
@@ -193,11 +185,9 @@ import MSettingDialog from "@/components/dialogs/MSettingDialog";
 import MTextgridDialog from "@/components/dialogs/MTextgridDialog";
 import MComplatesDialog from "@/components/dialogs/MComplatesDialog";
 import MSpeedDial from "@/components/MSpeedDial";
-import MSettingMixin from "@/mixins/MSettingMixin";
 
 export default {
   name: "WVuwer",
-  mixins: [MSettingMixin],
   components: {
     MVuwerLayout,
     MVideoArray,
@@ -218,48 +208,10 @@ export default {
     MVuwerActions
   },
   props: {
-    /**
-     * 解析対象の動画ソース
-     */
-    src: {
-      type: String,
-      required: true
-    },
-    /**
-     * 解析対象の動画の fps
-     */
-    fps: {
+    id: {
       type: Number,
       required: true
     },
-    /**
-     * 動画オリジナルサイズ
-     */
-    originSize: {
-      type: Object,
-      required: true
-    },
-    /**
-     * 既存アノテーション情報
-     */
-    textgrid: {
-      type: Object,
-      default: function() {
-        return {};
-      }
-    },
-    /**
-     * 画像アノテーション結果
-     */
-    frames: {
-      type: Array,
-      default: function() {
-        return [];
-      }
-    },
-    /**
-     * スキップ時に何フレーム分をスキップするか
-     */
     frameOffset: {
       type: Number,
       default: 1
@@ -274,7 +226,6 @@ export default {
     lazyRular: false, // 時刻変更後にルーラーダイアログを起動
     lazyImageEdit: false, // 時刻変更後に画像編集ダイアログを起動
     lazyFocusTextField: false, // 時刻変更後にText field にフォーカスする
-    minPxPerSec: 100,
     drawingContextAttributes: {
       desynchronized: false
     },
@@ -331,17 +282,33 @@ export default {
         this.$store.commit("current/waveSurfer", val);
       }
     },
+    $minPxPerSec: {
+      get() {
+        return this.$store.state.setting.minPxPerSec;
+      },
+      set(val) {
+        const type = typeof val;
+        const minPxPerSec = type == "number" ? val : Number(val);
+        if (minPxPerSec)
+          this.$store.commit("setting/setMinPxPerSec", minPxPerSec);
+      }
+    },
     $textgrid: {
       get() {
         return this.$store.state.current.textgrid;
       },
-      set(val) {
-        this.$store.commit("current/textGrid", val);
-        this.$store.dispatch("current/cache/setTextgrid", val);
+      set(obj) {
+        this.$store
+          .dispatch("current/textgrid", obj)
+          .then(id => {
+            const msg = `update the textgrid of a file (id=${id})`;
+            this.$vuewer.db.log("textgrid", "PUT", msg);
+            this.$store.dispatch("current/cache/setTextgrid", obj);
+          })
+          .catch(error => {
+            this.$vuewer.console.error("vuewer:textgrid:put", error);
+          });
       }
-    },
-    $frameIdx() {
-      return this.$store.state.current.frame.idx;
     },
     $frames: {
       get() {
@@ -351,13 +318,30 @@ export default {
         this.$store.commit("current/frames", val);
       }
     },
-    // fps の逆数
-    frameRate: function() {
-      return 1 / this.fps;
+    $duration: {
+      get() {
+        return this.$store.state.current.duration;
+      },
+      set(val) {
+        this.$store.commit("current/duration", Number(val));
+      }
+    },
+
+    $source() {
+      return this.$store.state.current.source;
+    },
+    $fps() {
+      return this.$store.state.current.fps;
+    },
+    $frameRate() {
+      return this.$store.state.current.frameRate;
+    },
+    $frameIdx() {
+      return this.$store.state.current.frame.idx;
     },
     // スキップ時の長さ
     skipLength: function() {
-      return this.frameOffset * this.frameRate;
+      return this.frameOffset * this.$frameRate;
     },
     // 転記階層記入欄を表示するか否か
     showTextField: function() {
@@ -372,6 +356,9 @@ export default {
     }
   },
   watch: {
+    id: function(val, old) {
+      if (val != old) this.$store.dispatch("current/init", val);
+    },
     $textgrid: {
       handler: function(val, oldVal) {
         if (val && val != oldVal) {
@@ -386,7 +373,7 @@ export default {
     $minPxPerSec: function(val) {
       if ((val > 100) & (val < 700)) {
         if (val % 50 == 0) {
-          this.wavesurfer.zoom(val);
+          this.$store.dispatch("current/zoom", val);
         }
       }
     },
@@ -400,7 +387,7 @@ export default {
     rebaseTextgrid: function(n = 1) {
       const textgrid = this.$store.getters["current/cache/textgrids"](n);
       if (textgrid !== null) {
-        this.wavesurfer.setTextGrid(textgrid);
+        this.$store.dispatch("current/setTextGrid", textgrid);
       }
     },
     playPause: function() {
@@ -471,8 +458,8 @@ export default {
             this.wavesurfer.play(0, current.time);
           }
         } else {
-          const d = this.wavesurfer.getDuration();
-          const offset = this.$playOffset * this.frameRate;
+          const d = this.$duration;
+          const offset = this.$playOffset * this.$frameRate;
           const start = current.time - offset > 0 ? current.time - offset : 0;
           const end = current.time + offset < d ? current.time + offset : d;
           this.wavesurfer.play(start, end);
@@ -516,7 +503,7 @@ export default {
               parent: obj.parent,
               values: obj.values
             };
-            this.wavesurfer.setTextGrid(textgrid);
+            this.$store.dispatch("current/setTextGrid", textgrid);
             const keys = Object.keys(this.$textgrid);
             this.focusRecord(keys[keys.length - 1]);
           }
@@ -560,7 +547,10 @@ export default {
           if (focus) this.lazyFocusTextField = true;
           const tg = this.wavesurfer.wavesurfer.textgrid;
           tg.setCurrent(key, next);
-          this.seekTo(next.time, true);
+          this.$store.dispatch("current/seekTo", {
+            time: next.time,
+            center: true
+          });
         }
       } else {
         const next = this.$textgrid[key].values[0];
@@ -568,7 +558,10 @@ export default {
           if (focus) this.lazyFocusTextField = true;
           const tg = this.wavesurfer.wavesurfer.textgrid;
           tg.setCurrent(key, next);
-          this.seekTo(next.time, true);
+          this.$store.dispatch("current/seekTo", {
+            time: next.time,
+            center: true
+          });
         }
       }
     },
@@ -579,7 +572,10 @@ export default {
           if (focus) this.lazyFocusTextField = true;
           const tg = this.wavesurfer.wavesurfer.textgrid;
           tg.setCurrent(key, prev);
-          this.seekTo(prev.time, true);
+          this.$store.dispatch("current/seekTo", {
+            time: prev.time,
+            center: true
+          });
         }
       } else {
         const values = this.$textgrid[key].values;
@@ -588,7 +584,10 @@ export default {
           if (focus) this.lazyFocusTextField = true;
           const tg = this.wavesurfer.wavesurfer.textgrid;
           tg.setCurrent(key, prev);
-          this.seekTo(prev.time, true);
+          this.$store.dispatch("current/seekTo", {
+            time: prev.time,
+            center: true
+          });
         }
       }
     },
@@ -597,26 +596,35 @@ export default {
       if (this.$textgrid[key].type == "interval") {
         if (idx - 1 > -1) {
           const prev = this.$textgrid[key].values[idx - 1];
-          this.seekTo(prev.time, true);
+          this.$store.dispatch("current/seekTo", {
+            time: prev.time,
+            center: true
+          });
         }
       } else {
         const target = this.$textgrid[key].values[idx];
-        this.seekTo(target.time, true);
+        this.$store.dispatch("current/seekTo", {
+          time: target.time,
+          center: true
+        });
       }
       this.focusTier(key);
     },
     toEndRecord(key, idx) {
       // 現在レコードの終端に移動
       const target = this.$textgrid[key].values[idx];
-      this.seekTo(target.time, true);
+      this.$store.dispatch("current/seekTo", {
+        time: target.time,
+        center: true
+      });
       this.focusTier(key);
     },
     extendRecord(key, idx) {
       const tier = this.$textgrid[key];
       const target = tier.values[idx];
-      const d = this.wavesurfer.getDuration();
+      const d = this.$duration;
       const lim = idx + 1 == tier.length ? d : tier.values[idx + 1].time;
-      const time = target.time + this.frameRate;
+      const time = target.time + this.$frameRate;
       if (time < lim) {
         const item = { text: target.text, time: time };
         this.wavesurfer.setTierValue(key, idx, item);
@@ -626,14 +634,17 @@ export default {
             `update time a record (key: ${key} idx: ${idx})`
           );
         }
-        this.seekTo(time);
+        this.$store.dispatch("current/seekTo", {
+          time,
+          center: false
+        });
       }
     },
     shrinkRecord(key, idx) {
       const target = this.$textgrid[key].values[idx];
       const lim = idx == 0 ? 0 : this.$textgrid[key].values[idx - 1].time;
       const type = this.$textgrid[key].type;
-      const time = target.time - this.frameRate;
+      const time = target.time - this.$frameRate;
       if (time > lim) {
         const item = { text: target.text, time: time };
         if (
@@ -649,7 +660,7 @@ export default {
               `update time a record (key: ${key} idx: ${idx})`
             );
           }
-          this.seekTo(time);
+          this.$store.dispatch("current/seekTo", { time, center: false });
         }
       }
     },
@@ -660,7 +671,7 @@ export default {
       );
       if (type == "frames") {
         // フレーム分割
-        this.wavesurfer.splitTierValue(key, idx, this.frameRate);
+        this.wavesurfer.splitTierValue(key, idx, this.$frameRate);
       } else if (type == "chars") {
         // 文字別分割
         this.wavesurfer.splitTierValue(key, idx);
@@ -732,28 +743,12 @@ export default {
             });
             const textgrid = this.$textgrid;
             textgrid[key].values = new_records;
-            this.wavesurfer.setTextGrid(textgrid);
+            this.$store.dispatch("current/setTextGrid", textgrid);
           }
         });
       }
     },
-
-    seekTo: function(time, center) {
-      const d = this.wavesurfer.getDuration();
-      const p = time / d;
-      const progress = p > 1 ? 1 : p < 0 ? 0 : p;
-      if (center) {
-        this.wavesurfer.seekAndCenter(progress);
-      } else {
-        this.wavesurfer.seekTo(progress);
-      }
-    },
     // EVENT 発火
-    fireUpdateTextGrid: function() {
-      if (!this.isSyncing) {
-        this.$emit("textgrid-updated", this.$textgrid);
-      }
-    },
     fireUpdateData: function() {
       const payload = {
         textgrid: this.$textgrid,
@@ -788,7 +783,7 @@ export default {
           const tier = this.$textgrid[key];
           const idx = this.current.tier.record.idx || 0;
           const item = tier.values[idx];
-          const d = this.wavesurfer.getDuration();
+          const d = this.$duration;
           let start = 0;
           let end = d;
           if (tier.type == "interval") {
@@ -802,7 +797,7 @@ export default {
           }
           const bname = this.$store.state.current.video.filename.split(".")[0];
           const name = `${bname}.mp4`;
-          const buff = this.$vuewer.io.file.toBuff(this.src);
+          const buff = this.$vuewer.io.file.toBuff(this.$source);
           const result = this.$vuewer.io.video.trim(buff, start, end);
           const out = result.MEMFS[0];
           const blob = this.$vuewer.io.video.toBlob(Buffer(out.data));
@@ -844,47 +839,41 @@ export default {
       if (file) {
         if (payload.click == "TEXTGRID/JSON") {
           this.$vuewer.io.json.read(file).then(obj => {
-            this.wavesurfer.setTextGrid({});
             const textgrid = this.$vuewer.io.obj.ver2.loadTextGrid(obj);
-            this.wavesurfer.setTextGrid(textgrid);
+            this.$store.dispatch("current/setTextGrid", textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
         } else if (payload.click == "TEXTGRID/JSON/VER1") {
           this.$vuewer.io.json.read(file).then(obj => {
-            this.wavesurfer.setTextGrid({});
             const textgrid = this.$vuewer.io.obj.ver1.loadTextGrid(obj, "both");
-            this.wavesurfer.setTextGrid(textgrid);
+            this.$store.dispatch("current/setTextGrid", textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
         } else if (payload.click == "TEXTGRID/JSON/VER1/LEFT") {
           this.$vuewer.io.json.read(file).then(obj => {
-            this.wavesurfer.setTextGrid({});
             const textgrid = this.$vuewer.io.obj.ver1.loadTextGrid(obj, "left");
-            this.wavesurfer.setTextGrid(textgrid);
+            this.$store.dispatch("current/setTextGrid", textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
         } else if (payload.click == "TEXTGRID/JSON/VER1/RIGHT") {
           this.$vuewer.io.json.read(file).then(obj => {
-            this.wavesurfer.setTextGrid({});
             const textgrid = this.$vuewer.io.obj.ver1.loadTextGrid(
               obj,
               "right"
             );
-            this.wavesurfer.setTextGrid(textgrid);
+            this.$store.dispatch("current/setTextGrid", textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
         } else if (payload.click == "TEXTGRID/JSON/VER1/UP-DOWN") {
           this.$vuewer.io.json.read(file).then(obj => {
-            this.wavesurfer.setTextGrid({});
             const textgrid = this.$vuewer.io.obj.ver1.loadTextGrid(
               obj,
               "up-down"
             );
-            this.wavesurfer.setTextGrid(textgrid);
+            this.$store.dispatch("current/setTextGrid", textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
         } else if (payload.click == "TEXTGRID/TEXTGRID") {
-          this.wavesurfer.setTextGrid({});
           this.wavesurfer.loadTextGrid(file);
           this.$vuewer.snackbar.success("$vuetify.loaded");
         } else {
@@ -922,18 +911,22 @@ export default {
     },
     onSpectrogramRenderEnd() {
       this.$vuewer.console.log(this.tag, `on spectrogram render end`);
-      if (this.textgrid) {
+      if (this.$textgrid) {
         this.isSyncing = true;
-        this.wavesurfer.setTextGrid(this.textgrid);
+        this.$store.dispatch("current/setTextGrid", this.$textgrid);
+
         // start が指定されている場合そこに移動
-        const start = Number(this.$route.query.start) || this.$frames[1].time;
-        this.seekTo(start);
+        if (this.$route.query.start) {
+          const time = Number(this.$route.query.start);
+          this.$store.dispatch("current/seekTo", { time, center: false });
+        }
         // current.tier を初期化
         this.current.tier.key = null;
         this.current.tier.values = [];
         this.current.tier.record.idx = 0;
         this.current.tier.record.text = "";
         this.current.tier.record.time = 0;
+        this.$duration = this.wavesurfer ? this.wavesurfer.getDuration() : 0;
         this.isSyncing = false;
       }
       this.isLoading = false;
@@ -1261,13 +1254,12 @@ export default {
         const oldTierNum = this.$textgrid
           ? Object.keys(this.$textgrid).length
           : 0;
-        this.$textgrid = Object.assign({}, textgrid);
         const currentTierNum = Object.keys(this.$textgrid).length;
         if (!this.isSyncing) {
+          this.$textgrid = Object.assign({}, textgrid);
           if (oldTierNum !== currentTierNum) {
             this.$store.commit("current/tab", currentTierNum);
           }
-          this.fireUpdateTextGrid();
         }
       }
     },
@@ -1312,20 +1304,20 @@ export default {
       this.$vuewer.console.log(this.tag, `on click setting`);
       this.dialog.setting.show = true;
     },
-    onClickRuler: function(payload) {
+    onClickRuler: function(time) {
       this.$vuewer.console.log(this.tag, `on click ruler`);
-      if (payload) {
+      if (time) {
         this.lazyRular = true;
-        this.seekTo(payload);
+        this.$store.dispatch("current/seekTo", { time, center: false });
       } else {
         this.dialog.ruler.show = true;
       }
     },
-    onClickImageEdit: function(payload) {
+    onClickImageEdit: function(time) {
       this.$vuewer.console.log(this.tag, `on click image edit`);
-      if (payload) {
+      if (time) {
         this.lazyImageEdit = true;
-        this.seekTo(payload);
+        this.$store.dispatch("current/seekTo", { time, center: false });
       } else {
         this.dialog.imageEdit.show = true;
       }
@@ -1429,53 +1421,35 @@ export default {
           this.tokenizeTier(key, payload);
         } else if (payload == "opronunciation") {
           this.tokenizeTier(key, payload);
+        } else if (payload == "time2frame") {
+          const records = this.$textgrid[this.current.key].values;
+          const rType = this.$textgrid[this.current.key].type;
+          let new_records = records;
+          if (rType == "interval") {
+            records.map((r, i) => {
+              const time = Math.round(r.time * this.$fps) * this.$frameRate;
+              if (i == records.length - 1) {
+                return { text: r.text, time: r.time };
+              }
+              return { text: r.text, time: time };
+            });
+          } else {
+            new_records = records.map(r => {
+              return {
+                text: r.text,
+                time: Math.round(r.time * this.$fps) * this.$frameRate
+              };
+            });
+          }
+          const textgrid = this.$textgrid;
+          textgrid[key].values = new_records;
+          this.$store.dispatch("current/setTextGrid", textgrid);
         }
       } else {
         this.$vuewer.snackbar.warning("$vuetify.textgrid.tier.record.no");
       }
     },
-    onPointsUpdated: function(points) {
-      this.current.frame.points = points;
-      this.$store.dispatch("current/updateFrame", this.current.frame);
-      this.$emit("frame-point-updated", this.current.frame);
-      this.$vuewer.console.log(
-        this.tag,
-        `update points (idx: ${this.$frameIdx})`
-      );
-    },
-    onRectsUpdated: function(rects) {
-      this.current.frame.rects = rects;
-      this.$store.dispatch("current/updateFrame", this.current.frame);
-      this.$emit("frame-rect-updated", this.current.frame);
-      this.$vuewer.console.log(
-        this.tag,
-        `update rects (idx: ${this.$frameIdx})`
-      );
-    },
-    onPointDeleted: function(point) {
-      const i = this.current.frame.points.findIndex(x => x.id == point.id);
-      if (i !== -1) {
-        this.current.frame.points.splice(i, 1);
-        this.$store.dispatch("current/updateFrame", this.current.frame);
-        this.$emit("frame-point-deleted", point);
-        this.$vuewer.console.log(
-          this.tag,
-          `delete point (idx: ${this.$frameIdx}: id ${point.id})`
-        );
-      }
-    },
-    onRectDeleted: function(rect) {
-      const i = this.current.frame.rects.findIndex(x => x.id == rect.id);
-      if (i !== -1) {
-        this.current.frame.rects.splice(i, 1);
-        this.$store.dispatch("current/updateFrame", this.current.frame);
-        this.$emit("frame-rect-deleted", rect);
-        this.$vuewer.console.log(
-          this.tag,
-          `delete rect (idx: ${this.$frameIdx}, id: ${rect.id})`
-        );
-      }
-    },
+
     // 特殊ボタンの操作
     onMouseover: function(where) {
       this.where = where;
@@ -1556,12 +1530,9 @@ export default {
       }
     }
   },
-  mounted: function() {
-    this.$store.dispatch("current/init");
-    this.$frames = [];
-    this.$frames = this.frames;
-    this.minPxPerSec = this.$minPxPerSec;
+  mounted: async function() {
     this.$store.dispatch("search/show");
+    await this.$store.dispatch("current/init", this.id);
     const layout = this.$refs.layout;
     if (layout) {
       const el = layout.$el;

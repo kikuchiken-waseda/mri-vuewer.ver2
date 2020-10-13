@@ -2,20 +2,11 @@
   <m-drag-context>
     <v-container fluid>
       <m-vuewer
-        v-if="!isLoading && $source"
+        v-if="!isLoading && id"
         ref="video"
-        :src="$source"
-        :fps="$fps"
-        :frames="frames"
-        :origin-size="$originSize"
-        :textgrid="textgrid"
+        :id="id"
         @run-noise-reduction="onNoiseReduction"
         @data-updated="onDataUpdated"
-        @textgrid-updated="onTextGridUpdated"
-        @frame-point-updated="onFramePointUpdated"
-        @frame-rect-updated="onFrameRectUpdated"
-        @frame-point-deleted="onFramePointDeleted"
-        @frame-rect-deleted="onFrameRectDeleted"
         @download-json="downloadJson"
       />
     </v-container>
@@ -34,7 +25,6 @@ export default {
   data: () => ({
     id: null,
     item: {}, // DB データ登録用オブジェクト
-    frames: [], // フレーム転記情報
     textgrid: {}, // 時系列転記情報
     isLoading: false, // 読み込み状態
     isChange: false // データ変更の有無
@@ -131,48 +121,7 @@ export default {
      */
     onIdChanged: async function(id) {
       if (id) {
-        this.id = id;
-        this.$vuewer.console.log(this.tag, `change page id ${id}`);
-
-        this.isChange = false;
-        this.isLoading = true;
-        this.$vuewer.loading.start("$vuetify.loading");
-
-        this.$initVideo(); // 画面表示する動画情報を初期化する
-        try {
-          const file = await db.files.get(Number(id));
-          this.$vuewer.db.log("files", "GET", `get file ${id}`);
-          if (file) {
-            this.item = file;
-            this.$source = file.source;
-            this.$fps = file.fps;
-            this.$name = file.name;
-            this.$duration = file.duration;
-            this.$videoStream = file.videoStream || {};
-            this.$audioStream = file.audioStream || {};
-            this.$originSize = file.originSize || {};
-            this.metaData = file.metaData || {};
-            this.textgrid = file.textgrid || {};
-            this.frames = await db.frames
-              .where({ fileId: file.id })
-              .with({ points: "points", rects: "rects" });
-          } else {
-            this.$vuewer.console.error(this.tag, "The file does not exist.");
-            this.$vuewer.snackbar.error("The file does not exist.");
-            this.$router.push({ name: "Home" });
-          }
-        } catch (error) {
-          if (error.name == "DataError") {
-            this.$vuewer.snackbar.error("The file does not exist.");
-            this.$vuewer.console.error(this.tag, error);
-            this.$router.push({ name: "Home" });
-          } else {
-            this.$vuewer.snackbar.error(error);
-            this.$vuewer.console.error(this.tag, error);
-          }
-        }
-        this.isLoading = false;
-        this.$vuewer.loading.end();
+        this.id = Number(id);
       } else {
         this.$vuewer.snackbar.error("There is no id.");
         this.$vuewer.console.error(this.tag, "NO ID ACCESS");
@@ -212,118 +161,95 @@ export default {
         }
       }, 1000);
     },
-    onTextGridUpdated: function(textgrid) {
-      if (textgrid) {
-        this.isChange = true;
-        const vm = this;
-        this.item.textgrid = Object.assign({}, textgrid);
-        for (const key in this.item.textgrid) {
-          this.item.textgrid[key] = {
-            values: this.item.textgrid[key].values,
-            type: this.item.textgrid[key].type,
-            parent: this.item.textgrid[key].parent
-          };
-        }
-        this.item.lastModifiedAt = Date.now();
-        db.files
-          .put(this.item)
-          .then(id => {
-            const msg = `update the textgrid of a file (id=${id})`;
-            vm.$store.commit("files/update", this.item);
-            vm.$vuewer.db.log("textgrid", "PUT", msg);
-            vm.$vuewer.console.log("textgrid", msg);
-          })
-          .catch(error => {
-            vm.$vuewer.console.error("vuewer:textgrid:put", error);
-          });
-      }
-    },
-    onFrameRectUpdated: function(frame) {
-      this.isChange = true;
-      const vm = this;
-      const tag = "vuewer:onFrameRectUpdated";
-      for (const r of frame.rects) {
-        const item = {
-          id: r.id,
-          x: r.x,
-          y: r.y,
-          width: r.width,
-          height: r.height,
-          rotation: r.rotation,
-          scaleX: r.scaleX,
-          scaleY: r.scaleY,
-          size: r.size,
-          color: r.color,
-          label: r.label || `rect-${r.id}`,
-          frameId: frame.id
-        };
-        db.rects
-          .put(item)
-          .then(() => {
-            vm.$store.commit("files/update", this.item);
-            vm.$vuewer.db.log("rects", "PUT", `change rects`);
-          })
-          .catch(error => {
-            vm.$vuewer.snackbar.error(error);
-            vm.$vuewer.console.error(tag, error);
-          });
-      }
-    },
-    onFramePointUpdated: async function(frame) {
-      this.isChange = true;
-      const vm = this;
-      const tag = "vuewer:onFramePointUpdated";
-      for (const i in frame.points) {
-        const p = frame.points[i];
-        const item = {
-          id: p.id,
-          x: p.x,
-          y: p.y,
-          color: p.color,
-          size: p.size,
-          label: p.label || `point-${p.id}`,
-          frameId: frame.id
-        };
-        db.points
-          .put(item)
-          .then(() => {
-            vm.$store.commit("files/update", this.item);
-            vm.$vuewer.db.log("points", "PUT", `change points`);
-          })
-          .catch(error => {
-            vm.$vuewer.snackbar.error(error);
-            vm.$vuewer.console.error(tag, error);
-          });
-      }
-    },
-    onFramePointDeleted: function(point) {
-      this.isChange = true;
-      const vm = this;
-      const tag = "vuewer:onFramePointDeleted";
-      db.points
-        .delete(point.id)
-        .then(() =>
-          vm.$vuewer.db.log("points", "DELETE", `delete point ${point.id}`)
-        )
-        .catch(error => {
-          vm.$vuewer.snackbar.error(error);
-          vm.$vuewer.console.error(tag, error);
-        });
-    },
-    onFrameRectDeleted: function(rect) {
-      this.isChange = true;
-      const vm = this;
-      const tag = "vuewer:onFrameRectDeleted";
-      db.rects
-        .delete(rect.id)
-        .then(() =>
-          vm.$vuewer.db.log("rects", "DELETE", `delete rects ${rect.id}`)
-        )
-        .catch(error => {
-          vm.$vuewer.snackbar.error(error);
-          vm.$vuewer.console.error(tag, error);
-        });
-    },
+    // onFrameRectDeleted: function(rect) {
+    //   this.isChange = true;
+    //   const vm = this;
+    //   const tag = "vuewer:onFrameRectDeleted";
+    //   db.rects
+    //     .delete(rect.id)
+    //     .then(() =>
+    //       vm.$vuewer.db.log("rects", "DELETE", `delete rects ${rect.id}`)
+    //     )
+    //     .catch(error => {
+    //       vm.$vuewer.snackbar.error(error);
+    //       vm.$vuewer.console.error(tag, error);
+    //     });
+    // },
+
+    // onFrameRectUpdated: function(frame) {
+    //   this.isChange = true;
+    //   const vm = this;
+    //   const tag = "vuewer:onFrameRectUpdated";
+    //   for (const r of frame.rects) {
+    //     const item = {
+    //       id: r.id,
+    //       x: r.x,
+    //       y: r.y,
+    //       width: r.width,
+    //       height: r.height,
+    //       rotation: r.rotation,
+    //       scaleX: r.scaleX,
+    //       scaleY: r.scaleY,
+    //       size: r.size,
+    //       color: r.color,
+    //       label: r.label || `rect-${r.id}`,
+    //       frameId: frame.id
+    //     };
+    //     db.rects
+    //       .put(item)
+    //       .then(() => {
+    //         vm.$store.commit("files/update", this.item);
+    //         vm.$vuewer.db.log("rects", "PUT", `change rects`);
+    //       })
+    //       .catch(error => {
+    //         vm.$vuewer.snackbar.error(error);
+    //         vm.$vuewer.console.error(tag, error);
+    //       });
+    //   }
+    // },
+
+    // onFramePointUpdated: async function(frame) {
+    //   this.isChange = true;
+    //   const vm = this;
+    //   const tag = "vuewer:onFramePointUpdated";
+    //   for (const i in frame.points) {
+    //     const p = frame.points[i];
+    //     const item = {
+    //       id: p.id,
+    //       x: p.x,
+    //       y: p.y,
+    //       color: p.color,
+    //       size: p.size,
+    //       label: p.label || `point-${p.id}`,
+    //       frameId: frame.id
+    //     };
+    //     db.points
+    //       .put(item)
+    //       .then(() => {
+    //         vm.$store.commit("files/update", this.item);
+    //         vm.$vuewer.db.log("points", "PUT", `change points`);
+    //       })
+    //       .catch(error => {
+    //         vm.$vuewer.snackbar.error(error);
+    //         vm.$vuewer.console.error(tag, error);
+    //       });
+    //   }
+    // },
+    // onFramePointDeleted: function(point) {
+    //   this.isChange = true;
+    //   const vm = this;
+    //   const tag = "vuewer:onFramePointDeleted";
+    //   db.points
+    //     .delete(point.id)
+    //     .then(() =>
+    //       vm.$vuewer.db.log("points", "DELETE", `delete point ${point.id}`)
+    //     )
+    //     .catch(error => {
+    //       vm.$vuewer.snackbar.error(error);
+    //       vm.$vuewer.console.error(tag, error);
+    //     });
+    // },
+
     onDataUpdated: async function(payload) {
       // DB の保存
       this.item.textgrid = Object.assign({}, payload.textgrid);
@@ -336,14 +262,16 @@ export default {
       }
       this.item.lastModifiedAt = Date.now();
       await db.files.put(this.item);
-      for (const frame of payload.frames) {
-        if (frame.points && frame.points.length) {
-          await db.points.bulkPut(frame.points);
-        }
-        if (frame.rects && frame.rects.length) {
-          await db.rects.bulkPut(frame.rects);
-        }
-      }
+
+      // for (const frame of payload.frames) {
+      //   if (frame.points && frame.points.length) {
+      //     await db.points.bulkPut(frame.points);
+      //   }
+      //   if (frame.rects && frame.rects.length) {
+      //     await db.rects.bulkPut(frame.rects);
+      //   }
+      // }
+
       this.saveDropbox();
     },
     onUnload: function(event) {

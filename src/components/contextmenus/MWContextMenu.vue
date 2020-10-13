@@ -595,6 +595,15 @@ export default {
           icon: "mdi-pencil-box-multiple",
           items: [
             {
+              text: "$vuetify.contexts.tier.interval.time2frame",
+              icon: "",
+              click: () => {
+                setTimeout(function() {
+                  vm.$emit("click-interval", "time2frame");
+                }, 10);
+              }
+            },
+            {
               text: "$vuetify.contexts.tier.interval.owakati",
               icon: "",
               click: () => {

@@ -21,7 +21,7 @@
         ref="editor"
         @update-max-width="onUpdateMaxWidth"
         @skip="onSkip"
-        :origin-size="originSize"
+        :origin-size="$originSize"
       />
     </div>
   </m-card-dialog>
@@ -36,8 +36,7 @@ export default {
     maxWidth: "700"
   }),
   props: {
-    value: { type: Boolean, required: true },
-    originSize: { type: Object, required: true }
+    value: { type: Boolean, required: true }
   },
   methods: {
     onUpdateMaxWidth: function(maxWidth) {
@@ -55,6 +54,9 @@ export default {
     }
   },
   computed: {
+    $originSize: function() {
+      return this.$store.state.current.originSize;
+    },
     title: function() {
       return "$vuetify.forms.ruler.title";
     },

@@ -10541,7 +10541,7 @@ watchpack@^1.7.4:
 
 "wavesurfer.vue@https://github.com/qh73xe/wavesurfer.vue.git":
   version "0.1.0"
-  resolved "https://github.com/qh73xe/wavesurfer.vue.git#c59e9e6c0e3d433db635119353e9fc68106d737e"
+  resolved "https://github.com/qh73xe/wavesurfer.vue.git#81677c94995ade4e62d64470099c7d0ea8193179"
   dependencies:
     core-js "^3.6.5"
     debounce "^1.2.0"

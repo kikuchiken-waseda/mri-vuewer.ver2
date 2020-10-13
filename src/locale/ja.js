@@ -394,7 +394,8 @@ export default {
       edit: `${TEXTGRID.tier.name} を編集`,
       delete: `${TEXTGRID.tier.name} を削除`,
       interval: {
-        name: `${TEXTGRID.tier.name}操作`,
+        name: `${TEXTGRID.tier.name} 操作`,
+        time2frame: `現在${TEXTGRID.tier.name}の時刻をフレーム時刻に合わせる`,
         owakati: `現在${TEXTGRID.tier.interval}を分かち書き`,
         oyomi: `現在${TEXTGRID.tier.interval}をよみに変換`,
         opronunciation: `現在${TEXTGRID.tier.interval}を発音系に変換`

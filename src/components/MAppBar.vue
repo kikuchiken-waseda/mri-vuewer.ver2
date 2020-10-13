@@ -84,11 +84,11 @@ export default {
       }
     },
     fileInfo: function() {
-      const filename = this.$store.state.current.video.filename;
+      const filename = this.$store.state.current.name;
       if (filename) {
         const name = filename.split(".")[0];
-        const fps = this.$store.state.current.video.fps;
-        const duration = this.$store.state.current.video.duration;
+        const fps = this.$store.state.current.fps;
+        const duration = this.$store.state.current.duration;
         return `${name}: ${fps} fps : ${duration} sec`;
       }
       return null;
