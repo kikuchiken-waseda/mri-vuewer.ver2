@@ -987,7 +987,11 @@ export default {
       }
 
       // Ctrl + SPACE で現在時刻にティアーを挿入
-      if (key == 32 && xKey == "ctrl") {
+      if ((key == 32 && xKey == "ctrl") || (key == 32 && xKey == "default")) {
+        this.addRecord(item.key, this.wavesurfer.getCurrentTime(), "");
+      }
+
+      if (key == 13) {
         this.addRecord(item.key, this.wavesurfer.getCurrentTime(), "");
       }
 
