@@ -5,7 +5,6 @@
     hide-details
     outlined
     solo
-    prepend-inner-icon="mdi-microphone"
     ref="text"
     v-model="text"
     :disabled="disabled"
@@ -13,7 +12,6 @@
     :items="choices"
     item-text="name"
     item-value="val"
-    @click:prepend-inner-icon="$emit('click:prepend-inner-icon')"
     @keydown.stop
     @keydown.enter="onEnter"
     @keydown.prevent.tab.exact

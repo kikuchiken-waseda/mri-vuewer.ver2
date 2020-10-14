@@ -93,7 +93,6 @@
               v-model="current.tier.record.text"
               :complate-key="current.key"
               :disabled="current.tier.key == null"
-              @click:prepend-inner-icon="onVoiceUpdateRecordText"
               @enter="onUpdateRecordText"
               @next="onUpdateRecordText('next')"
               @esc="onEscTextField"
@@ -367,13 +366,6 @@ export default {
         }
       },
       deep: true
-    },
-    $minPxPerSec: function(val) {
-      if ((val > 100) & (val < 700)) {
-        if (val % 50 == 0) {
-          this.$store.dispatch("current/zoom", val);
-        }
-      }
     },
     "dialog.imageEdit.show": function(val) {
       if (val == false) {
@@ -1108,6 +1100,10 @@ export default {
       };
       if (key == "tab" && xKey == "default") {
         this.playPause();
+      } else if (key == "+" && (xKey == "ctrl" || xKey == "ctrl+shift")) {
+        this.$minPxPerSec = this.$minPxPerSec + 50;
+      } else if (key == "-" && (xKey == "ctrl" || xKey == "ctrl+shift")) {
+        this.$minPxPerSec = this.$minPxPerSec - 50;
       } else if (key == "j" && xKey == "default") {
         this.wavesurfer.skipBackward();
       } else if (key == "j" && xKey == "ctrl") {
@@ -1226,26 +1222,6 @@ export default {
         this.$refs.input.blur();
         if (key) this.focusTier(key);
       });
-    },
-    // 音声認識
-    onVoiceUpdateRecordText: function() {
-      const recog =
-        window.webkitSpeechRecognition || window.SpeechRecognition || null;
-      if (recog) {
-        const rec = new recog();
-        rec.lang = this.$vuetify.lang.current == "ja" ? "ja-JP" : "en-US";
-        rec.onresult = e => {
-          if (e.results[0].isFinal) {
-            this.current.tier.record.text = e.results[0][0].transcript;
-            this.onUpdateRecordText();
-          }
-        };
-        rec.start();
-      } else {
-        this.$vuewer.snackbar.warn(
-          this.$vuetify.lang.t("$vuetify.contexts.browserError")
-        );
-      }
     },
     onTextGridUpdate: function(textgrid) {
       if (textgrid) {

@@ -77,6 +77,9 @@ export default {
     },
     $frames: function() {
       return this.$store.state.current.frames;
+    },
+    duration: function() {
+      return this.$store.state.current.duration;
     }
   },
   methods: {
@@ -92,11 +95,15 @@ export default {
     syncVideos: function(currentTime) {
       if (this.$refs.video) {
         const offsetTime = this.frameOffset * this.$frameRate;
-        if (currentTime - offsetTime > 0) {
+        if (currentTime - offsetTime < 0) {
+          this.$refs.prev.setCurrentTime(0);
+        } else {
           const time = currentTime - offsetTime;
           this.$refs.prev.setCurrentTime(time);
         }
-        if (offsetTime + currentTime < this.getDuration()) {
+        if (offsetTime + currentTime > this.duration) {
+          this.$refs.next.setCurrentTime(currentTime);
+        } else {
           const time = currentTime + offsetTime;
           this.$refs.next.setCurrentTime(time);
         }

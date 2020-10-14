@@ -291,9 +291,11 @@ export default {
       if (this.isPointReserved) {
         const tmp = this.reservedPoints.shift();
         if (tmp) {
-          item.label = tmp.label;
-          item.color = tmp.color;
-          this.$store.dispatch("current/frame/addPoint", item);
+          if (this.points.findIndex(p => p.label == tmp.label) == -1) {
+            item.label = tmp.label;
+            item.color = tmp.color;
+            this.$store.dispatch("current/frame/addPoint", item);
+          }
         }
       } else {
         item.lapel = `points-${this.points.length}`;
@@ -305,10 +307,12 @@ export default {
       if (this.isRectReserved) {
         const tmp = this.reservedRects.shift();
         if (tmp) {
-          item.name = tmp.label;
-          item.label = tmp.label;
-          item.color = tmp.color;
-          this.$store.dispatch("current/frame/addRect", item);
+          if (this.rects.findIndex(r => r.label == tmp.label) == -1) {
+            item.name = tmp.label;
+            item.label = tmp.label;
+            item.color = tmp.color;
+            this.$store.dispatch("current/frame/addRect", item);
+          }
         }
       } else {
         const name = `rect-${this.rects.length + 1}`;
