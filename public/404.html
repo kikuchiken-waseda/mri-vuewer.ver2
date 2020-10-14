@@ -19,20 +19,11 @@
         const protocol = window.location.protocol;
         const hostname = window.location.hostname;
 
-        const query = window.location.search.split("&");
-        const queries = [];
-        for (const i in query) {
-          if (query[i]) {
-            queries.push(query[i].replace("?", ""));
-          }
-        }
-        const nextquery = queries.join("&");
-
-        let search = `nextpage=${nextpage}`;
-        if (nextquery) {
-          const search = `nextpage=${nextpage}&{nextquery}`;
-        }
-        const url = `${protocol}//${hostname}/mri-vuewer.ver2/?${search}`;
+        const query = window.location.search;
+        const search = query
+          ? `{query}&nextpage=${nextpage}`
+          : `?nextpage=${nextpage}`;
+        const url = `${protocol}//${hostname}/mri-vuewer.ver2/${search}`;
         window.location.replace(url);
       } else {
         window.location.pathname = `/mri-vuewer.ver2/`;
