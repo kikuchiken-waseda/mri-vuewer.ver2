@@ -766,7 +766,7 @@ export default {
       this.videoHeight = payload;
     },
     onDownloadClick: function(payload) {
-      this.$vuewer.console.log(this.tag, `on download`);
+      // 各種ファイルのダウンロード処理
       const bname = this.$store.state.current.video.filename.split(".")[0];
       if (payload == "XLSX") {
         const obj = {

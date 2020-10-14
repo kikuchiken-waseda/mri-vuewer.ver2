@@ -64,6 +64,17 @@ export default {
         state.item = await db.files.get(Number(id));
         if (state.item.name) {
           state.source = state.item.source;
+          commit("video/source", state.item.source);
+          commit("video/fps", state.item.fps);
+          commit("video/fileName", state.item.name);
+          commit("video/duration", state.item.duration);
+          commit("video/videoStream", state.item.videoStream);
+          commit("video/audioStream", state.item.audioStream);
+          commit("video/originSize", state.item.originSize);
+
+          commit("frame/ow", state.item.originSize.width);
+          commit("frame/oh", state.item.originSize.height);
+
           state.fps = state.item.fps;
           state.frameRate = 1 / state.item.fps;
           state.name = state.item.name;
@@ -71,8 +82,6 @@ export default {
           state.videoStream = state.item.videoStream;
           state.audioStream = state.item.audioStream;
           state.originSize = state.item.originSize;
-          commit("frame/ow", state.item.originSize.width);
-          commit("frame/oh", state.item.originSize.height);
           state.metaData = state.item.metaData;
           state.textgrid = state.item.textgrid || {};
           state.frames = await db.frames

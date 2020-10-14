@@ -13,31 +13,15 @@ export default {
     }
   }),
   mutations: {
-    fileName(state, payload) {
-      state.filename = payload;
-    },
-    source(state, payload) {
-      state.source = payload;
-    },
-    fps(state, payload) {
-      state.fps = payload;
-    },
-    duration(state, payload) {
-      state.duration = payload;
-    },
-    videoStream(state, payload) {
-      state.videoStream = payload;
-    },
-    audioStream(state, payload) {
-      state.audioStream = payload;
-    },
+    fileName: (state, payload) => (state.filename = payload),
+    source: (state, payload) => (state.source = payload),
+    fps: (state, payload) => (state.fps = payload),
+    duration: (state, payload) => (state.duration = payload),
+    videoStream: (state, payload) => (state.videoStream = payload),
+    audioStream: (state, payload) => (state.audioStream = payload),
     originSize(state, payload) {
-      if (payload.width) {
-        state.originSize.width = payload.width;
-      }
-      if (payload.height) {
-        state.originSize.height = payload.height;
-      }
+      if (payload.width) state.originSize.width = payload.width;
+      if (payload.height) state.originSize.height = payload.height;
     }
   },
   actions: {
