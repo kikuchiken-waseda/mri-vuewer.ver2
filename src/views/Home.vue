@@ -120,6 +120,7 @@ export default {
   },
   mounted: function() {
     this.$nextTick(() => {
+      console.log("query", window.location.search);
       if (this.$store.state.hash.info["drawer"] || false) {
         this.$store.commit("drawer", true);
       }
