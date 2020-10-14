@@ -47,8 +47,12 @@ export default {
     id: (state, payload) => (state.id = Math.round(Number(payload))),
     idx: (state, payload) => (state.idx = Math.round(Number(payload))),
     time: (state, payload) => (state.time = Number(payload)),
-    cw: (state, payload) => (state.cw = Number(payload)),
-    ch: (state, payload) => (state.ch = Number(payload)),
+    cw: (state, val) => {
+      state.cw = Number(val) > 0 ? Number(val) : 700;
+    },
+    ch: (state, val) => {
+      state.ch = Number(val) > 0 ? Number(val) : 700;
+    },
     ow: (state, payload) => (state.ow = Number(payload)),
     oh: (state, payload) => (state.oh = Number(payload)),
     points(state, payload) {

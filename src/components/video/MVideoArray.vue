@@ -103,6 +103,7 @@ export default {
       }
     },
     onFrameUpdated: function(payload) {
+      console.log("onFrameUpdated");
       const video = this.$refs.video;
       if (video) {
         const dataURL = video.getVideoDataURL();

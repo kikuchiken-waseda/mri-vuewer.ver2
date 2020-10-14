@@ -21,6 +21,8 @@
       ref="editor"
       class="mx-auto overflow-y-auto"
       :height="contentHeight"
+      v-if="src"
+      v-model="src"
       :origin-size="originSize"
       @skip="onSkip"
       @update-max-width="onUpdateMaxWidth"
@@ -49,12 +51,22 @@ export default {
       this.maxWidth = "700";
     },
     close: function() {
-      this.$refs.editor.close();
+      if (this.$refs.editor) {
+        this.$refs.editor.close();
+      }
       this.maxWidth = "700";
       this.dialog = false;
     }
   },
   computed: {
+    src: {
+      get() {
+        return this.$store.state.current.frame.src;
+      },
+      set(val) {
+        this.$store.commit("current/frame/src", val);
+      }
+    },
     originSize: function() {
       return this.$store.state.current.originSize;
     },

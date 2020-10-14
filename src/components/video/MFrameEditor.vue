@@ -158,15 +158,19 @@ export default {
     height: {
       type: String,
       default: "100%"
+    },
+    value: {
+      type: String,
+      required: true
     }
   },
   computed: {
     src: {
       get() {
-        return this.$store.state.current.frame.src;
+        return this.value;
       },
       set(val) {
-        this.$store.commit("current/frame/src", val);
+        this.$emit("input", val);
       }
     },
     id: function() {
@@ -595,7 +599,6 @@ export default {
     this.reservedRects = JSON.parse(
       JSON.stringify(this.$store.state.current.frameConf.rects)
     );
-
     this.loadImage(this.src);
   }
 };

@@ -355,6 +355,9 @@ export default {
       this.setCanvasSize();
       if (this.$frames.length > 0) {
         this.frame = this.$frames[0];
+        setTimeout(() => {
+          this.syncFrame(0);
+        });
       }
       this.$emit("loadeddata", this.$refs.video);
       this.show = false;
