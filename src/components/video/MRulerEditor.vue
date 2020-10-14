@@ -1,142 +1,110 @@
 <template>
-  <v-card ref="card" class="mx-auto" color="grey">
-    <v-toolbar dense>
-      <v-btn-toggle v-model="mode" dense group color="primary">
-        <v-btn text>
-          <v-icon>mdi-map-marker-distance</v-icon>
+  <m-frame-editor-layout ref="layout">
+    <template v-slot:toolbar>
+      <v-toolbar dense>
+        <v-btn-toggle v-model="mode" dense group color="primary">
+          <v-btn text>
+            <v-icon>mdi-map-marker-distance</v-icon>
+          </v-btn>
+          <v-btn text>
+            <v-icon>mdi-map-marker</v-icon>
+          </v-btn>
+          <v-btn text>
+            <v-icon>mdi-eraser</v-icon>
+          </v-btn>
+        </v-btn-toggle>
+        <div class="mx-1"></div>
+        <m-color-menu icon v-model="color" />
+        <v-spacer />
+        <v-btn-toggle dense group color="primary">
+          <v-btn icon @click="skipPrev">
+            <v-icon>mdi-skip-previous</v-icon>
+          </v-btn>
+          <v-btn icon @click="skipNext">
+            <v-icon>mdi-skip-next</v-icon>
+          </v-btn>
+        </v-btn-toggle>
+        <v-btn-toggle dense group color="primary">
+          <v-btn text @click="zoomOut">
+            <v-icon>mdi-magnify-minus</v-icon>
+          </v-btn>
+          <v-btn text @click="zoomIn">
+            <v-icon>mdi-magnify-plus</v-icon>
+          </v-btn>
+        </v-btn-toggle>
+        <v-btn text @click="downloadImage">
+          png <v-icon>mdi-download</v-icon>
         </v-btn>
-        <v-btn text>
-          <v-icon>mdi-map-marker</v-icon>
+        <v-btn text @click="downloadSheet">
+          xlsx <v-icon>mdi-download</v-icon>
         </v-btn>
-        <v-btn text>
-          <v-icon>mdi-eraser</v-icon>
-        </v-btn>
-      </v-btn-toggle>
-      <div class="mx-1"></div>
-      <m-color-menu icon v-model="color" />
-      <v-spacer />
-      <v-btn-toggle dense group color="primary">
-        <v-btn icon @click="skipPrev">
-          <v-icon>mdi-skip-previous</v-icon>
-        </v-btn>
-        <v-btn icon @click="skipNext">
-          <v-icon>mdi-skip-next</v-icon>
-        </v-btn>
-      </v-btn-toggle>
-
-      <v-btn-toggle dense group color="primary">
-        <v-btn text @click="zoomOut">
-          <v-icon>mdi-magnify-minus</v-icon>
-        </v-btn>
-        <v-btn text @click="zoomIn">
-          <v-icon>mdi-magnify-plus</v-icon>
-        </v-btn>
-      </v-btn-toggle>
-
-      <v-btn text @click="downloadImage">
-        png <v-icon>mdi-download</v-icon>
-      </v-btn>
-      <v-btn text @click="downloadSheet">
-        xlsx <v-icon>mdi-download</v-icon>
-      </v-btn>
-    </v-toolbar>
-
-    <v-card
-      flat
-      class="overflow-y-auto"
-      :style="`max-height: ${canvasMaxHeight}px`"
+      </v-toolbar>
+    </template>
+    <v-stage
+      ref="stage"
+      @dblclick="onDblClick"
+      :config="{ width: cw, height: ch }"
     >
-      <v-stage @dblclick="onDblClick" ref="stage" :config="canvas">
-        <v-layer ref="layer">
-          <v-image :config="background" />
-        </v-layer>
-        <v-layer ref="layer">
-          <v-circle
-            v-for="(x, i) in points"
-            :key="i"
-            :config="{
-              x: x.x,
-              y: x.y,
-              stroke: 'white',
-              strokeWidth: 1,
-              opacity: x.opacity || 1,
-              radius: x.size,
-              fill: x.color
-            }"
-            @click="onPointClick"
-            @mouseenter="onPointMouseEnter"
-            @mouseleave="onPointMouseLeave"
-          />
-        </v-layer>
-        <v-layer v-if="mode != 1" ref="layer">
-          <v-line
-            v-for="(x, i) in lines"
-            :key="i"
-            @click="onLineClick"
-            @mouseenter="onLineMouseEnter"
-            @mouseleave="onLineMouseLeave"
-            :config="{
-              points: x.points,
-              stroke: x.color,
-              strokeWidth: x.size,
-              lineCap: 'round',
-              lineJoin: 'round',
-              dash: [5, 10]
-            }"
-          />
-        </v-layer>
-      </v-stage>
-    </v-card>
-
-    <v-tabs v-model="tab" fixed-tabs background-color="primary" dark>
-      <v-tab> Points </v-tab>
-      <v-tab> Distance </v-tab>
-    </v-tabs>
-    <v-tabs-items v-model="tab">
-      <v-tab-item>
-        <m-point-table
-          show-frame
-          :points="points"
-          :origin-size="originSize"
-          :canvas-size="canvas"
-          @update-point="onUpdatePoint"
+      <v-layer ref="layer">
+        <v-image :config="background" />
+        <v-circle
+          v-for="(x, i) in points"
+          :key="i"
+          :config="{
+            x: x.x,
+            y: x.y,
+            stroke: 'white',
+            strokeWidth: 1,
+            opacity: x.opacity || 1,
+            radius: x.size,
+            fill: x.color
+          }"
+          @click="onPointClick"
+          @mouseenter="onPointMouseEnter"
+          @mouseleave="onPointMouseLeave"
         />
-      </v-tab-item>
-      <v-tab-item>
-        <m-line-table
-          show-frame
-          :lines="lines"
-          :origin-size="originSize"
-          :canvas-size="canvas"
-          @update-line="onUpdateLine"
+      </v-layer>
+      <v-layer v-if="mode != 1" ref="layer">
+        <v-line
+          v-for="(x, i) in lines"
+          :key="i"
+          @click="onLineClick"
+          @mouseenter="onLineMouseEnter"
+          @mouseleave="onLineMouseLeave"
+          :config="{
+            points: x.points,
+            stroke: x.color,
+            strokeWidth: x.size,
+            lineCap: 'round',
+            lineJoin: 'round',
+            dash: [5, 10]
+          }"
         />
-      </v-tab-item>
-    </v-tabs-items>
-  </v-card>
+      </v-layer>
+    </v-stage>
+  </m-frame-editor-layout>
 </template>
 <script>
+import MFrameEditorLayout from "@/components/layouts/MFrameEditorLayout";
 import MWavesurferMixin from "@/mixins/MWavesurferMixin";
-import MPointTable from "@/components/table/MPointTable";
-import MLineTable from "@/components/table/MLineTable";
 import MColorMenu from "@/components/menus/MColorMenu";
 export default {
   name: "m-ruler-editor",
   mixins: [MWavesurferMixin],
   components: {
-    MColorMenu,
-    MPointTable,
-    MLineTable
+    MFrameEditorLayout,
+    MColorMenu
   },
   props: {
-    originSize: {
-      type: Object
+    value: {
+      type: String,
+      required: true
     }
   },
   data: () => ({
     mode: 0,
     color: "#F44336",
     oldColors: ["#FF7043", "#FF8A65", "#FFAB91", "#FFCCBC", "#FBE9E7"],
-    canvasMaxHeight: 600,
     size: 5,
     scale: 0,
     widthRate: 0,
@@ -145,21 +113,37 @@ export default {
     points: [],
     lines: [],
     background: { image: null },
-    canvas: { width: 600, height: 600 },
     mouse: { x: null, y: null }
   }),
   computed: {
-    src() {
-      return this.$store.state.current.frame.src;
+    src: {
+      get() {
+        return this.value;
+      },
+      set(val) {
+        this.$emit("input", val);
+      }
     },
-    id() {
+    id: function() {
       return this.$store.state.current.frame.id;
     },
-    idx() {
+    idx: function() {
       return this.$store.state.current.frame.idx;
     },
-    time() {
+    time: function() {
       return this.$store.state.current.frame.time;
+    },
+    cw: function() {
+      return this.$store.state.current.frame.cw;
+    },
+    ch: function() {
+      return this.$store.state.current.frame.ch;
+    },
+    ow: function() {
+      return this.$store.state.current.frame.ow;
+    },
+    oh: function() {
+      return this.$store.state.current.frame.oh;
     }
   },
   methods: {
@@ -177,19 +161,14 @@ export default {
       this.$vuewer.download.url(dataURL, name);
     },
     downloadSheet: function() {
-      const ow = this.originSize.width;
-      const oh = this.originSize.height;
-      const cw = this.canvas.width;
-      const ch = this.canvas.height;
-
       const points = [["label", "frame", "time", "x", "y", "color"]];
       for (const p of this.points || []) {
         const row = [
           p.label,
           p.frame.idx,
           p.frame.time,
-          Math.round((p.x / cw) * ow),
-          Math.round((p.y / ch) * oh),
+          Math.round((p.x / this.cw) * this.ow),
+          Math.round((p.y / this.ch) * this.oh),
           p.color
         ];
         points.push(row);
@@ -199,8 +178,14 @@ export default {
         ["label", "frame", "time", "x1", "y1", "x2", "y2", "distance", "color"]
       ];
       for (const l of this.lines || []) {
-        const p1 = { x: (l.points[0] / cw) * ow, y: (l.points[1] / ch) * oh };
-        const p2 = { x: (l.points[2] / cw) * ow, y: (l.points[3] / ch) * oh };
+        const p1 = {
+          x: (l.points[0] / this.cw) * this.ow,
+          y: (l.points[1] / this.ch) * this.oh
+        };
+        const p2 = {
+          x: (l.points[2] / this.cw) * this.ow,
+          y: (l.points[3] / this.ch) * this.oh
+        };
         const distance = this.$vuewer.math.distance(p1, p2);
         const row = [
           l.label,
@@ -289,11 +274,11 @@ export default {
         this.points[i].size = this.size;
       }
     },
-    resizePoints: function(cw, ch, ow, oh) {
+    resizePoints: function() {
       for (const i in this.points || []) {
         const p = this.points[i];
-        this.points[i].x = (p.x * cw) / ow;
-        this.points[i].y = (p.y * ch) / oh;
+        this.points[i].x = (p.x * this.cw) / this.ow;
+        this.points[i].y = (p.y * this.ch) / this.oh;
       }
     },
     // ライン操作
@@ -313,14 +298,14 @@ export default {
         label: `lines-${count + 1}`
       });
     },
-    resizeLines: function(cw, ch, ow, oh) {
+    resizeLines: function() {
       for (const i in this.lines || []) {
         const l = this.lines[i];
         const points = [
-          (l.points[0] * cw) / ow,
-          (l.points[1] * ch) / oh,
-          (l.points[2] * cw) / ow,
-          (l.points[3] * ch) / oh
+          (l.points[0] * this.cw) / this.ow,
+          (l.points[1] * this.ch) / this.oh,
+          (l.points[2] * this.cw) / this.ow,
+          (l.points[3] * this.ch) / this.oh
         ];
         this.lines[i].points = points;
       }
@@ -349,13 +334,15 @@ export default {
       }
     },
     // 画像操作
-    loadImage: function(val) {
-      const img = new Image();
-      img.src = val;
-      img.onload = () => {
-        this.onResize();
-        this.background.image = img;
-      };
+    loadImage: async function(src) {
+      let $src = src;
+      const filter = this.$store.state.current.frame.filter;
+      if (filter) {
+        $src = await filter(src, { width: this.cw, height: this.ch });
+      }
+      const img = await this.$vuewer.io.image.load($src);
+      this.onResize();
+      this.background.image = img;
     },
     onDblClick: function() {
       if (this.mode != 2) {
@@ -382,24 +369,22 @@ export default {
       this.points[line.ref[1]].color = line.color;
     },
     onResize: function() {
-      const cw = this.$refs.card.$el.clientWidth || 500;
-      const ch = (this.originSize.height * cw) / this.originSize.width;
+      const cw = this.$refs.layout.getWidth();
+      const ch = (this.oh * cw) / this.ow;
       const $cw = cw + 100 * this.scale;
       const $ch = ch + 100 * this.scale;
 
-      this.resizePoints($cw, $ch, this.canvas.width, this.canvas.height);
-      this.resizeLines($cw, $ch, this.canvas.width, this.canvas.height);
+      this.$store.commit("current/frame/cw", $cw);
+      this.$store.commit("current/frame/ch", $ch);
 
-      this.canvas.width = $cw;
-      this.canvas.height = $ch;
       this.background.height = $cw;
       this.background.width = $ch;
 
-      this.widthRate = $cw / this.originSize.width;
-      this.heightRate = $ch / this.originSize.height;
-      this.canvasMaxHeight = ch - (64 + 64);
+      this.resizePoints();
+      this.resizeLines();
 
-      this.$emit("update-max-width", String($cw + 16));
+      this.widthRate = this.cw / this.ow;
+      this.heightRate = this.ch / this.oh;
     }
   },
   watch: {
@@ -410,25 +395,6 @@ export default {
       if (val) {
         this.scale = 0;
         this.loadImage(val);
-        for (const i in this.points) {
-          const depth = this.idx - this.points[i].frame.idx;
-          if (depth == 0) {
-            this.points[i].color = this.color;
-          }
-          if (depth < 6) {
-            this.points[i].color = this.oldColors[depth - 1];
-          } else {
-            this.points[i].color = "#9E9E9E";
-          }
-        }
-        for (const i in this.lines) {
-          const depth = this.idx - this.points[i].frame.idx;
-          if (depth < 6) {
-            this.lines[i].color = this.oldColors[depth - 1];
-          } else {
-            this.lines[i].color = "#9E9E9E";
-          }
-        }
       }
     }
   },

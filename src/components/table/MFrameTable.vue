@@ -51,19 +51,6 @@
       >
         <v-icon>mdi-selection-drag</v-icon>
       </v-btn>
-
-      <v-btn
-        @click="onClickRuler(item)"
-        v-if="$vuetify.breakpoint.lgAndUp"
-        fab
-        dark
-        x-small
-        color="orange"
-      >
-        <v-icon>
-          mdi-ruler
-        </v-icon>
-      </v-btn>
     </template>
     <template v-slot:no-data>
       <v-alert type="warning">

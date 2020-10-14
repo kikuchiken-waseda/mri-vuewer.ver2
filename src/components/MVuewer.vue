@@ -43,7 +43,6 @@
         <m-text-grid
           ref="tables"
           @click-image-edit="onClickImageEdit"
-          @click-ruler="onClickRuler"
           @keyup="onTableKeyup"
           @mouseover="onMouseover('tables')"
           :frames="$frames"
@@ -122,7 +121,6 @@
           @click-save-dropbox="fireUpdateData"
           @click-setting="onClickSetting"
           @click-detail="onClickDetail"
-          @click-ruler="onClickRuler"
           @click-image-edit="onClickImageEdit"
           @click-tier-add="onClickTierAdd"
           @click-tier-edit="onClickTierEdit"
@@ -139,7 +137,6 @@
           :frames="$frames"
           :textgrid="$textgrid"
           @click-image-edit="onClickImageEdit"
-          @click-ruler="onClickRuler"
         />
         <m-setting-dialog v-model="dialog.setting.show" />
         <m-tier-dialog
@@ -157,7 +154,6 @@
           :tiers="tiers"
           :current="current.tier.key"
         />
-        <m-ruler-dialog v-model="dialog.ruler.show" />
         <m-image-edit-dialog v-model="dialog.imageEdit.show" />
         <m-complates-dialog v-model="dialog.complates.show" />
       </template>
@@ -183,7 +179,6 @@ import MDetailDialog from "@/components/dialogs/MDetailDialog";
 import MTierDialog from "@/components/dialogs/MTierDialog";
 import MTierEditDialog from "@/components/dialogs/MTierEditDialog";
 import MTierDeleteDialog from "@/components/dialogs/MTierDeleteDialog";
-import MRulerDialog from "@/components/dialogs/MRulerDialog";
 import MImageEditDialog from "@/components/dialogs/MImageEditDialog";
 import MSettingDialog from "@/components/dialogs/MSettingDialog";
 import MTextgridDialog from "@/components/dialogs/MTextgridDialog";
@@ -202,7 +197,6 @@ export default {
     MComplatesDialog,
     MDetailDialog,
     MImageEditDialog,
-    MRulerDialog,
     MSettingDialog,
     MTextgridDialog,
     MTierDeleteDialog,
@@ -939,15 +933,11 @@ export default {
       if (this.wavesurfer.isPlaying()) this.wavesurfer.pause();
       this.current.key = payload.key;
       this.current.time = payload.time;
-      if (payload.ctrl) {
-        if (this.$addRecordKey == "ctrl") {
-          if (payload.detail == 1) this.addRecord(payload.key, payload.time);
-        }
+      if (this.$store.state.setting.addRecordKey == "ctrl" && payload.ctrl) {
+        if (payload.detail == 1) this.addRecord(payload.key, payload.time);
       }
-      if (payload.alt) {
-        if (this.$addRecordKey == "alt") {
-          if (payload.detail == 1) this.addRecord(payload.key, payload.time);
-        }
+      if (this.$store.state.setting.addRecordKey == "alt" && payload.alt) {
+        if (payload.detail == 1) this.addRecord(payload.key, payload.time);
       }
       if (payload.item) {
         this.current.text = payload.item.text;
@@ -955,7 +945,7 @@ export default {
       }
     },
     onTextGridDblClick: function(payload) {
-      if (this.$addRecordKey == "dbl") {
+      if (this.$store.state.setting.addRecordKey == "dbl") {
         this.addRecord(payload.key, payload.time);
       }
     },
@@ -970,10 +960,10 @@ export default {
 
       // DELETE 系の動作
       if (~[8, 46].indexOf(key)) {
-        if (this.$deleteRecordKey == xKey) {
+        if (this.$store.state.setting.deleteRecordKey == xKey) {
           this.deleteRecord(item.key, item.index);
         }
-        if (this.$deleteRecordKey + "+shift" == xKey) {
+        if (this.$store.state.setting.deleteRecordKey + "+shift" == xKey) {
           this.onClickTierDelete();
         }
       } else if (key == 68) {

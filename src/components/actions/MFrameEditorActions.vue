@@ -95,7 +95,7 @@ export default {
         return this.$store.state.current.frame.color;
       },
       set(color) {
-        this.$store.commit("current/frame/mode", color);
+        this.$store.commit("current/frame/color", color);
       }
     },
     mode: {

@@ -63,12 +63,6 @@ export default {
             icon: "mdi-content-save"
           },
           {
-            event: "click-ruler",
-            color: "orange",
-            icon: "mdi-ruler",
-            hideSM: true
-          },
-          {
             event: "click-image-edit",
             color: "orange",
             icon: "mdi-selection-drag"

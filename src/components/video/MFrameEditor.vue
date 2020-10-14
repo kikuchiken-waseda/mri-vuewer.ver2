@@ -10,10 +10,7 @@
     <m-key-context ref="context" @keyup="onKeyup">
       <v-stage
         ref="stage"
-        :config="{
-          width: cw,
-          height: ch
-        }"
+        :config="{ width: cw, height: ch }"
         @mousemove="onStageMouseMove"
         @mousedown="onStageMouseDown"
         @touchstart="onStageMouseDown"

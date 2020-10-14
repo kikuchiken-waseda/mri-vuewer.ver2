@@ -19,9 +19,10 @@
     <div>
       <m-ruler-editor
         ref="editor"
+        v-if="src"
+        v-model="src"
         @update-max-width="onUpdateMaxWidth"
         @skip="onSkip"
-        :origin-size="$originSize"
       />
     </div>
   </m-card-dialog>
@@ -54,8 +55,13 @@ export default {
     }
   },
   computed: {
-    $originSize: function() {
-      return this.$store.state.current.originSize;
+    src: {
+      get() {
+        return this.$store.state.current.frame.src;
+      },
+      set(val) {
+        this.$store.commit("current/frame/src", val);
+      }
     },
     title: function() {
       return "$vuetify.forms.ruler.title";
