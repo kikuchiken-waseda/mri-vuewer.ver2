@@ -97,7 +97,6 @@ export default {
               .every(val => val === true);
           });
         }
-
         if (Object.keys(kwargs).length) {
           records = records.filter(x => {
             return Object.keys(kwargs)
