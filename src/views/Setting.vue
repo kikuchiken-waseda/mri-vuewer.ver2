@@ -6,7 +6,7 @@
           <m-app-setting-from />
         </v-card-text>
       </m-t-card>
-      <m-t-card dense accordion class="mt-5" title="WAVESURFER SETTING">
+      <m-t-card dense accordion class="mt-5" title="VUEWER SETTING">
         <v-card-text>
           <m-setting-from />
         </v-card-text>

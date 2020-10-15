@@ -8,7 +8,7 @@
     <v-text-field
       flat
       rounded
-      solo-inverted
+      solo
       hide-details
       label="Search"
       v-model="keyword"

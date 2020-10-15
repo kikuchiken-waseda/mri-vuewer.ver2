@@ -1,5 +1,13 @@
 export default {
   computed: {
+    $filesOrderKey: {
+      get() {
+        return this.$store.state.setting.filesOrderKey;
+      },
+      set(val) {
+        this.$store.commit("setting/filesOrderKey", val);
+      }
+    },
     // フレーム遷移時に前フレームの値をコピーする
     $syncPrevPoints: {
       get() {

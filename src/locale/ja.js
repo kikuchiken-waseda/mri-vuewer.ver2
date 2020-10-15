@@ -272,6 +272,14 @@ export default {
         },
         syncDropbox: {
           label: "ページ遷移時に dropbox へ自動バックアップを行う"
+        },
+        filesOrderKey: {
+          label: `${VIDEO}並べ替え項目`,
+          choices: {
+            default: "登録順",
+            name: "ファイル名順",
+            lastModifiedAt: "最終変更日順"
+          }
         }
       },
       video: {
@@ -493,9 +501,12 @@ export default {
   annotation: ANNOTATION,
   ver1: "MRI Vuewer ver.1 系",
   actions: "操作",
+  lastModifiedAt: "最終変更",
   docs: {
     fileRegistration: "ファイル登録",
     textgrid: "時系列転記",
+    frameEdit: "フレーム転記",
+    search: "データ検索",
     dropbox: "ドロップボックス連携"
   }
 };

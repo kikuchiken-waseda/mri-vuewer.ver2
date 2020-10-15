@@ -233,6 +233,14 @@ export default {
         },
         syncDropbox: {
           label: "Auto backup in dropbox"
+        },
+        filesOrderKey: {
+          label: "File Order",
+          choices: {
+            default: "Created At",
+            name: "File Name",
+            lastModifiedAt: "Last Modified At"
+          }
         }
       },
       metadata: {
@@ -464,6 +472,7 @@ export default {
       xlsx: "Download as xlsx file"
     }
   },
+  lastModifiedAt: "Last Modified",
   actions: "Actions",
   annotation: "annotation",
   frame: "frames",
@@ -472,6 +481,8 @@ export default {
   docs: {
     fileRegistration: "File Registration (Japanese only)",
     textgrid: "Time Series Annotation (Japanese only)",
+    frameEdit: "Frame Annotation (Japanese only)",
+    search: "Searching Annotated Data (Japanese only)",
     dropbox: "Works with Dropbox (Japanese only)"
   }
 };

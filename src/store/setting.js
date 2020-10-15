@@ -27,7 +27,8 @@ const DEFAULTSTATE = {
   targetChannel: 0,
   waveColor: "#333",
   nameSep: "-",
-  nameFormat: ""
+  nameFormat: "",
+  filesOrderKey: "default"
 };
 const DS = DEFAULTSTATE;
 
@@ -92,9 +93,14 @@ export default {
     targetChannel: Number(S.get("targetChannel")) || DS.targetChannel,
     waveColor: S.get("waveColor") || DS.waveColor,
     nameFormat: S.get("nameFormat") || DS.nameFormat,
-    nameSep: S.get("nameSep") || DS.nameSep
+    nameSep: S.get("nameSep") || DS.nameSep,
+    filesOrderKey: S.get("filesOrderKey") || DS.filesOrderKey
   }),
   mutations: {
+    filesOrderKey(state, payload) {
+      state.filesOrderKey = payload;
+      S.set("filesOrderKey", payload);
+    },
     syncPrevPoints(state, payload) {
       state.syncPrevPoints = payload;
       S.set("syncPrevPoints", payload);

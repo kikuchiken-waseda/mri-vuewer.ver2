@@ -40,13 +40,21 @@
       persistent-hint
       suffix="Milli Sec"
     />
+    <v-select
+      class="mb-5"
+      v-model="$filesOrderKey"
+      :items="filesOrderKeyChoices"
+      item-text="text"
+      item-value="val"
+      :label="t(`${locale}.app.filesOrderKey.label`)"
+    />
+
     <v-checkbox
       class="mt-0"
       hide-details
       v-model="$showDev"
       :label="t(`${locale}.app.showDev.label`)"
     />
-
     <v-checkbox
       class="mt-0"
       hide-details
@@ -65,6 +73,24 @@ export default {
     locale: "$vuetify.setting.form"
   }),
   computed: {
+    filesOrderKeyChoices: function() {
+      return [
+        {
+          text: this.t(`${this.locale}.app.filesOrderKey.choices.default`),
+          val: "default"
+        },
+        {
+          text: this.t(`${this.locale}.app.filesOrderKey.choices.name`),
+          val: "name"
+        },
+        {
+          text: this.t(
+            `${this.locale}.app.filesOrderKey.choices.lastModifiedAt`
+          ),
+          val: "lastModifiedAt"
+        }
+      ];
+    },
     timeout: {
       get() {
         return this.$store.state.snackbar.timeout;

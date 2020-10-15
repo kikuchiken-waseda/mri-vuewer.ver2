@@ -1063,13 +1063,9 @@ export default {
       }
 
       if (key == 73 && xKey == "default") {
-        if (preKey == 73) {
-          // i i で画像編集
-          this.onClickImageEdit();
-        } else {
-          // i でインサート
-          this.$refs.input.focus();
-        }
+        this.$refs.input.focus();
+      } else if (key == 73 && xKey == "ctrl") {
+        this.onClickImageEdit();
       }
 
       // o d で補完設定を開く
@@ -1095,6 +1091,8 @@ export default {
         this.$minPxPerSec = this.$minPxPerSec + 50;
       } else if (key == "-" && (xKey == "ctrl" || xKey == "ctrl+shift")) {
         this.$minPxPerSec = this.$minPxPerSec - 50;
+      } else if (key == "i" && xKey == "ctrl") {
+        this.onClickImageEdit();
       } else if (key == "j" && xKey == "default") {
         this.wavesurfer.skipBackward();
       } else if (key == "j" && xKey == "ctrl") {
@@ -1156,6 +1154,8 @@ export default {
 
       if (key == "tab" && xKey == "default") {
         this.playPause();
+      } else if (key == "i" && xKey == "ctrl") {
+        this.onClickImageEdit();
       } else if (key == "j" && xKey == "default") {
         this.wavesurfer.skipBackward();
       } else if (key == "j" && xKey == "ctrl") {

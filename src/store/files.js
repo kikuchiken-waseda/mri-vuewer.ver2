@@ -236,39 +236,7 @@ export default {
           for (const i in tier.values) {
             const record = tier.values[i];
             const prev = i == 0 ? { time: 0, text: "" } : tier.values[i - 1];
-            let releted = {};
             if (record.time && prev.time) {
-              if (tier.type == "interval") {
-                for (const rkey in f.textgrid) {
-                  releted[rkey] = f.textgrid[rkey].values
-                    .filter((x, ri) => {
-                      const rptime =
-                        ri == 0 ? 0 : f.textgrid[rkey].values[ri - 1].time;
-                      const check1 =
-                        rptime <= releted.time && releted.time <= x.time;
-                      const check2 =
-                        prev.time <= x.time && x.time <= record.time;
-                      return check1 || check2;
-                    })
-                    .map(x => x.text)
-                    .join(" ");
-                }
-              } else {
-                for (const key in f.textgrid) {
-                  const rtier = f.textgrid[key];
-                  if (rtier.type == "interval") {
-                    releted[key] = f.textgrid[key].values
-                      .filter(
-                        x => x.time <= record.time && record.time <= x.time
-                      )
-                      .map(x => x.text);
-                  } else {
-                    releted[key] = f.textgrid[key].values.filter(
-                      x => x.time == record.time
-                    );
-                  }
-                }
-              }
               const item = {
                 fileId: f.id,
                 fileName: f.name,
@@ -285,14 +253,15 @@ export default {
                 text: record.text,
                 search: {
                   field: key,
+                  tier: key,
+                  key: key,
                   text: record.text,
-                  text__p1: i > 0 ? tier.values[Number(i) - 1].text : "",
-                  text__p2: i > 1 ? tier.values[Number(i) - 2].text : "",
-                  text__p3: i > 2 ? tier.values[Number(i) - 3].text : "",
-                  text__n1: i < n - 1 ? tier.values[Number(i) + 1].text : "",
-                  text__n2: i < n - 2 ? tier.values[Number(i) + 2].text : "",
-                  text__n3: i < n - 3 ? tier.values[Number(i) + 3].text : "",
-                  ...releted
+                  $prev1_text: i > 0 ? tier.values[Number(i) - 1].text : "",
+                  $prev2_text: i > 1 ? tier.values[Number(i) - 2].text : "",
+                  $prev3_text: i > 2 ? tier.values[Number(i) - 3].text : "",
+                  $next1_text: i < n - 1 ? tier.values[Number(i) + 1].text : "",
+                  $next2_text: i < n - 2 ? tier.values[Number(i) + 2].text : "",
+                  $next3_text: i < n - 3 ? tier.values[Number(i) + 3].text : ""
                 }
               };
               records.push(item);

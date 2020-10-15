@@ -23,6 +23,21 @@
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
+      <v-list-item v-if="files.length" class="ma-0 py-0">
+        <v-list-item-content>
+          <v-text-field
+            v-model="keyword"
+            single-line
+            rounded
+            solo-inverted
+            dense
+            hide-details
+            label="File Name"
+            @focus="open.files = true"
+            prepend-inner-icon="mdi-magnify"
+          />
+        </v-list-item-content>
+      </v-list-item>
     </v-list>
     <v-divider />
 
@@ -110,7 +125,7 @@
               </v-chip>
             </v-list-item-title>
             <v-list-item-subtitle>
-              last modify:
+              {{ $vuetify.lang.t("$vuetify.lastModifiedAt") }}:
               {{ item.lastModifiedText }}
             </v-list-item-subtitle>
           </v-list-item-content>
@@ -299,6 +314,7 @@ export default {
   name: "MNavigationDrawer",
   components: { MFileUploadDialog, MDbImportDialog, MDropboxDialog },
   data: () => ({
+    keyword: "",
     current: null,
     open: {
       pages: true,
@@ -315,6 +331,12 @@ export default {
     updateToken: false
   }),
   computed: {
+    query: function() {
+      const util = this.$vuewer.text;
+      const query = util.toQuery(util.toParam(util.trim(this.keyword)));
+      const args = Object.keys(query).filter(x => query[x] === true);
+      return args;
+    },
     $showDev: function() {
       return this.$store.state.setting.showDev;
     },
@@ -335,16 +357,33 @@ export default {
       return this.$store.state.files.isLoading;
     },
     files: function() {
+      const order = this.$store.state.setting.filesOrderKey;
       let dformat = "dddd, MMMM Do YYYY, h:mm:ss a";
       if (this.$vuetify.lang.current == "ja") {
         moment.locale("ja");
         dformat = "YYYY 年 MM 月 DD 日(ddd) a h:mm:ss";
       }
-      const files = this.$store.state.files.files || [];
-      return files.map(x => {
+
+      let files = this.$store.state.files.files || [];
+      if (order != "default") {
+        files = files.sort((a, b) => {
+          if (a[order] < b[order]) return -1;
+          if (a[order] > b[order]) return 1;
+          return 0;
+        });
+      }
+      files = files.map(x => {
         x.lastModifiedText = moment(x.lastModifiedAt).format(dformat);
         return x;
       });
+      if (this.query.length) {
+        let $files = files;
+        for (const arg of this.query) {
+          $files = $files.filter(f => f.name.indexOf(arg) != -1);
+        }
+        if ($files.length) files = $files;
+      }
+      return files;
     },
     chaches: function() {
       return this.$store.state.files.chaches || [];
@@ -435,9 +474,19 @@ export default {
             "https://github.com/kikuchiken-waseda/mri-vuewer.ver2/wiki/%E6%99%82%E7%B3%BB%E5%88%97%E8%BB%A2%E8%A8%98"
         },
         {
+          title: "$vuetify.docs.frameEdit",
+          link:
+            "https://github.com/kikuchiken-waseda/mri-vuewer.ver2/wiki/%E3%83%95%E3%83%AC%E3%83%BC%E3%83%A0%E8%BB%A2%E8%A8%98"
+        },
+        {
           title: "$vuetify.docs.dropbox",
           link:
             "https://github.com/kikuchiken-waseda/mri-vuewer.ver2/wiki/Dropbox%E9%80%A3%E6%90%BA"
+        },
+        {
+          title: "$vuetify.docs.search",
+          link:
+            "https://github.com/kikuchiken-waseda/mri-vuewer.ver2/wiki/%E6%A4%9C%E7%B4%A2"
         },
         {
           title: "Release notes",
