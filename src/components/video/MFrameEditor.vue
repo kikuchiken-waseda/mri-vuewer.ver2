@@ -23,9 +23,10 @@
             :config="background"
           />
           <v-circle
-            v-for="(x, i) in ruler.points"
-            :key="i"
+            v-for="x in ruler.points"
+            :key="x.id"
             :config="{
+              id: x.id,
               x: x.x,
               y: x.y,
               stroke: 'white',
@@ -35,9 +36,10 @@
             }"
           />
           <v-line
-            v-for="(x, i) in ruler.lines"
-            :key="i"
+            v-for="x in ruler.lines"
+            :key="x.id"
             :config="{
+              id: x.id,
               points: x.points,
               stroke:
                 ruler.active == x.id
@@ -296,7 +298,7 @@ export default {
         await this.$store.dispatch("current/frame/addRect", item);
       }
     },
-    addRulerPoint: async function(x, y) {
+    addRulerPoint: function(x, y) {
       const id = this.ruler.points.length + 1;
       const label = `ruler-point-${id}`;
       this.ruler.points.push({ id, label, x, y });
@@ -306,13 +308,10 @@ export default {
       const idx = this.ruler.points.findIndex(x => x.id == pid);
       const a = this.ruler.points[idx - 1];
       const b = this.ruler.points[idx];
-
       const t = (b.y - a.y) / (b.x - a.x);
       const i = a.y - t * a.x;
-
       const f1 = { x: 0, y: i };
       const f2 = { x: this.cw, y: this.cw * t + i };
-
       const points = [f1.x, f1.y, f2.x, f2.y];
       const id = this.ruler.lines.length;
       this.ruler.lines.push({ id, points, t, i });
@@ -481,8 +480,8 @@ export default {
       }
     },
     onRulerMouseEnter: function(e) {
-      const i = e.target.index;
-      this.ruler.active = this.ruler.lines[i].id;
+      const id = e.target.attrs.id;
+      this.ruler.active = id;
     },
     onRulerMouseLeave: function() {
       this.ruler.active = null;
