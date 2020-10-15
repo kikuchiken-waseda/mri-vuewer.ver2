@@ -115,12 +115,7 @@ export default {
       }
     },
     modes: function() {
-      return [
-        { val: "circ", icon: "mdi-shape-circle-plus" },
-        { val: "rect", icon: "mdi-shape-rectangle-plus" },
-        { val: "ruler", icon: "mdi-ruler-square" },
-        { val: "eras", icon: "mdi-eraser" }
-      ];
+      return this.$store.state.current.frame.modes;
     },
     filters: function() {
       const cv = this.$vuewer.image;

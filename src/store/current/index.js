@@ -154,6 +154,12 @@ export default {
         }
       }
     },
+    skipBackward: function({ state }) {
+      if (state.wavesurfer) state.wavesurfer.skipBackward();
+    },
+    skipForward: function({ state }) {
+      if (state.wavesurfer) state.wavesurfer.skipForward();
+    },
     // 現在表示されている VUEWER の転記情報を更新します
     loadObj: function(context, payload) {
       if (payload.frames && payload.frames.length) {

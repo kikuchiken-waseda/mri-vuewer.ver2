@@ -1,5 +1,5 @@
 <template>
-  <v-card flat tile>
+  <v-card v-if="!isLoading" flat tile>
     <v-tabs v-model="tab" fixed-tabs background-color="primary" dark>
       <v-tab> Points </v-tab>
       <v-tab> Rects </v-tab>
@@ -28,6 +28,12 @@ import MRectTable from "@/components/table/MRectTable";
 import MFrameEditConfForm from "@/components/form/MFrameEditConfForm";
 export default {
   name: "m-frame-editor-tab",
+  props: {
+    isLoading: {
+      type: Boolean,
+      default: false
+    }
+  },
   components: {
     MFrameEditConfForm,
     MPointTable,

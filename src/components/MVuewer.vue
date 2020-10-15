@@ -98,18 +98,7 @@
               @esc="onEscTextField"
             />
           </template>
-
-          <div class="text-center" v-if="isLoading">
-            <v-progress-circular
-              :size="100"
-              :width="10"
-              color="primary"
-              indeterminate
-            />
-            <div class="font-weight-light subtitle-1">
-              Sound Analyzing ...
-            </div>
-          </div>
+          <m-loading text="$vuetify.loading" v-if="isLoading" />
         </wave-surfer>
       </v-card>
 
@@ -183,10 +172,12 @@ import MSettingDialog from "@/components/dialogs/MSettingDialog";
 import MTextgridDialog from "@/components/dialogs/MTextgridDialog";
 import MComplatesDialog from "@/components/dialogs/MComplatesDialog";
 import MSpeedDial from "@/components/MSpeedDial";
+import MLoading from "@/components/MLoading";
 
 export default {
   name: "WVuwer",
   components: {
+    MLoading,
     MVuwerLayout,
     MVideoArray,
     MTextGrid,

@@ -6,10 +6,16 @@ const mode = "circ";
 export default {
   namespaced: true,
   state: () => ({
+    modes: [
+      { val: "circ", icon: "mdi-shape-circle-plus" },
+      { val: "rect", icon: "mdi-shape-rectangle-plus" },
+      { val: "ruler", icon: "mdi-ruler-square" },
+      { val: "eras", icon: "mdi-eraser" }
+    ],
     mode: mode,
     filter: null,
-    color: color,
     tab: null,
+    color: color,
     src: null,
     id: null, // frame-id
     idx: null, // frame-idx
@@ -55,8 +61,8 @@ export default {
     },
     ow: (state, payload) => (state.ow = Number(payload)),
     oh: (state, payload) => (state.oh = Number(payload)),
-    points(state, payload) {
-      state.points = payload;
+    points(state, points) {
+      state.points = points;
     },
     rects(state, payload) {
       state.rects = payload;
@@ -92,22 +98,19 @@ export default {
         context.commit("texts", payload.texts || context.state.texts);
       }
     },
-    addPoint({ state, dispatch }, item) {
+    async addPoint({ state, dispatch }, item) {
       item.x = (item.x / state.cw) * state.ow;
       item.y = (item.y / state.ch) * state.oh;
       item.size = state.style.size;
       item.frameId = state.id;
-      db.points
-        .put(item)
-        .then(id => {
-          item.id = id;
-          state.points.push(item);
-          const frame = { id: state.id, points: state.points };
-          dispatch("current/updateFrames", frame, { root: true });
-        })
-        .catch(error => {
-          dispatch("snackbar/error", error.message, { root: true });
-        });
+      try {
+        item.id = await db.points.put(item);
+        state.points.push(item);
+        const frame = { id: state.id, points: state.points };
+        dispatch("current/updateFrames", frame, { root: true });
+      } catch (error) {
+        dispatch("snackbar/error", error.message, { root: true });
+      }
     },
     updatePoint({ state, dispatch }, item) {
       if (item.id) {
@@ -162,24 +165,21 @@ export default {
         Vue.set(state.points, i, active);
       }
     },
-    addRect({ state, dispatch }, item) {
+    async addRect({ state, dispatch }, item) {
       item.x = (item.x / state.cw) * state.ow;
       item.y = (item.y / state.ch) * state.oh;
       item.width = (item.width / state.cw) * state.ow;
       item.height = (item.height / state.ch) * state.oh;
       item.size = state.style.size;
       item.frameId = state.id;
-      db.rects
-        .put(item)
-        .then(id => {
-          item.id = id;
-          state.rects.push(item);
-          const frame = { id: state.id, rects: state.rects };
-          dispatch("current/updateFrames", frame, { root: true });
-        })
-        .catch(error => {
-          dispatch("snackbar/error", error.message, { root: true });
-        });
+      try {
+        item.id = db.rects.put(item);
+        state.rects.push(item);
+        const frame = { id: state.id, rects: state.rects };
+        dispatch("current/updateFrames", frame, { root: true });
+      } catch (error) {
+        dispatch("snackbar/error", error.message, { root: true });
+      }
     },
     updateRect({ state, dispatch }, item) {
       if (item.id) {
@@ -256,7 +256,7 @@ export default {
       });
     },
     points: function(state) {
-      const points = state.points.filter(p => p.x && p.y) || [];
+      const points = state.points.filter(p => p.id && p.x && p.y) || [];
       return points.map(p => {
         return {
           id: p.id,

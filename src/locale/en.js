@@ -353,6 +353,7 @@ export default {
   },
   converting: "Now Converting ...",
   loading: "Now Loading ...",
+  analyzing: "Now Analyzing ...",
   loaded: "The data was loaded",
   sending: "Sending the data to dropbox ...",
   sended: "Sended the data to dropbox",

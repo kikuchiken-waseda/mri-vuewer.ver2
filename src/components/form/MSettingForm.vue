@@ -116,12 +116,12 @@
       <v-checkbox
         hide-details
         v-model="$syncPrevPoints"
-        :label="t(`${locale}.video.showFrameInVideo.label`)"
+        :label="t(`${locale}.video.syncPrevPoints.label`)"
       />
       <v-checkbox
         hide-details
         v-model="$syncPrevRects"
-        :label="t(`${locale}.video.showFrameInVideo.label`)"
+        :label="t(`${locale}.video.syncPrevRects.label`)"
       />
     </div>
   </v-form>

@@ -10,6 +10,7 @@
     <m-key-context ref="context" @keyup="onKeyup">
       <v-stage
         ref="stage"
+        v-if="!syncing"
         :config="{ width: cw, height: ch }"
         @mousemove="onStageMouseMove"
         @mousedown="onStageMouseDown"
@@ -21,8 +22,6 @@
             @dblclick="onDblClick"
             :config="background"
           />
-        </v-layer>
-        <v-layer ref="layer">
           <v-circle
             v-for="(x, i) in ruler.points"
             :key="i"
@@ -35,8 +34,6 @@
               fill: ruler.conf.color
             }"
           />
-        </v-layer>
-        <v-layer ref="layer">
           <v-line
             v-for="(x, i) in ruler.lines"
             :key="i"
@@ -57,12 +54,14 @@
             @click="onRulerClick"
           />
         </v-layer>
+
         <v-layer ref="layer">
           <v-rect
             v-for="x in rects"
             :key="x.name"
             :config="{
               name: x.name,
+              id: x.id,
               x: x.x,
               y: x.y,
               width: x.width,
@@ -70,10 +69,10 @@
               rotation: x.rotation || 1,
               scaleX: x.scaleX || 1,
               scaleY: x.scaleY || 1,
-              stroke: x.color,
               strokeWidth: x.size || 1,
-              opacity: x.opacity || 1,
-              draggable: mode == 'rect'
+              draggable: mode == 'rect',
+              stroke: colorFilter('rect', x),
+              opacity: opacityFilter('rect')
             }"
             @click="onRectClick"
             @dragend="onRectDragEnd"
@@ -83,14 +82,15 @@
             v-for="(x, i) in points"
             :key="i"
             :config="{
+              id: x.id,
               x: x.x,
               y: x.y,
               stroke: 'white',
               strokeWidth: 1,
-              opacity: x.opacity || 1,
               radius: x.size,
-              fill: x.color,
-              draggable: mode == 'circ'
+              draggable: mode == 'circ',
+              fill: colorFilter('circ', x),
+              opacity: opacityFilter('circ')
             }"
             @click="onPointClick"
             @mouseenter="onPointMouseEnter"
@@ -100,36 +100,19 @@
           />
           <v-transformer v-if="mode == 'rect'" ref="transformer" />
         </v-layer>
-        <v-layer v-if="cursor.show" ref="layer">
-          <v-line
-            :config="{
-              points: [this.cursor.x || 0, 0, this.cursor.x || 0, this.ch],
-              stroke: cursor.color,
-              strokeWidth: 1,
-              lineCap: 'round',
-              lineJoin: 'round',
-              dash: [2, 5]
-            }"
-          />
-          <v-line
-            :config="{
-              points: [0, this.cursor.y || 0, this.cw, this.cursor.y || 0],
-              stroke: cursor.color,
-              strokeWidth: 1,
-              lineCap: 'round',
-              lineJoin: 'round',
-              dash: [2, 5]
-            }"
-          />
-        </v-layer>
+
+        <m-frame-editor-cursor
+          @dblclick="onDblClick"
+          v-if="cursor.show"
+          v-model="cursor"
+        />
       </v-stage>
     </m-key-context>
+    <m-loading v-if="syncing" text="$vuetify.loading" />
+
     <template v-slot:table>
       <m-frame-editor-tab
-        :rects="rects"
-        :points="points"
-        :origin-size="{ width: ow, height: oh }"
-        :canvas-size="{ width: cw, height: ch }"
+        :isLoading="syncing"
         @update-point="$store.dispatch('current/frame/updatePoint', $event)"
         @update-rect="$store.dispatch('current/frame/updateRect', $event)"
       />
@@ -137,18 +120,20 @@
   </m-frame-editor-layout>
 </template>
 <script>
-import MWavesurferMixin from "@/mixins/MWavesurferMixin";
 import MFrameEditorTab from "@/components/tab/MFrameEditorTab";
 import MFrameEditorLayout from "@/components/layouts/MFrameEditorLayout";
 import MFrameEditorActions from "@/components/actions/MFrameEditorActions";
+import MFrameEditorCursor from "@/components/video/MFrameEditorCursor";
 import MKeyContext from "@/components/contextmenus/MKeyContext";
+import MLoading from "@/components/MLoading";
 export default {
   name: "m-frame-editor",
-  mixins: [MWavesurferMixin],
   components: {
     MKeyContext,
     MFrameEditorLayout,
     MFrameEditorActions,
+    MFrameEditorCursor,
+    MLoading,
     MFrameEditorTab
   },
   props: {
@@ -191,14 +176,25 @@ export default {
     rects: function() {
       return this.$store.getters["current/frame/rects"];
     },
-    mode: function() {
-      return this.$store.state.current.frame.mode;
+    mode: {
+      get() {
+        return this.$store.state.current.frame.mode;
+      },
+      set(val) {
+        this.$store.commit("current/frame/mode", val);
+      }
     },
     filter: function() {
       return this.$store.state.current.frame.filter;
     },
     color: function() {
       return this.$store.state.current.frame.color;
+    },
+    disabledStyle: () => {
+      return {
+        opacity: 0.5,
+        color: "#757575"
+      };
     },
     isPointReserved: function() {
       // 入力予定の点群が存在するか
@@ -224,6 +220,7 @@ export default {
     reservedRects: [],
     syncPoints: [],
     syncRects: [],
+    syncing: false,
     ruler: {
       active: null,
       conf: {
@@ -264,7 +261,42 @@ export default {
         new ClipboardItem({ "image/png": blob })
       ]);
     },
-    addRulerPoint: function(x, y) {
+    async addPoint(x, y, color) {
+      const item = { x, y, color };
+      if (this.isPointReserved) {
+        const tmp = this.reservedPoints.shift();
+        if (tmp) {
+          if (this.points.findIndex(p => p.label == tmp.label) == -1) {
+            item.label = tmp.label;
+            item.color = tmp.color;
+            await this.$store.dispatch("current/frame/addPoint", item);
+          }
+        }
+      } else {
+        item.label = `points-${this.points.length}`;
+        await this.$store.dispatch("current/frame/addPoint", item);
+      }
+    },
+    async addRect(x, y, width, height, rotation, color) {
+      let item = { x, y, width, height, rotation, color };
+      if (this.isRectReserved) {
+        const tmp = this.reservedRects.shift();
+        if (tmp) {
+          if (this.rects.findIndex(r => r.label == tmp.label) == -1) {
+            item.name = tmp.label;
+            item.label = tmp.label;
+            item.color = tmp.color;
+            await this.$store.dispatch("current/frame/addRect", item);
+          }
+        }
+      } else {
+        const name = `rect-${this.rects.length + 1}`;
+        item.name = name;
+        item.label = name;
+        await this.$store.dispatch("current/frame/addRect", item);
+      }
+    },
+    addRulerPoint: async function(x, y) {
       const id = this.ruler.points.length + 1;
       const label = `ruler-point-${id}`;
       this.ruler.points.push({ id, label, x, y });
@@ -285,41 +317,24 @@ export default {
       const id = this.ruler.lines.length;
       this.ruler.lines.push({ id, points, t, i });
     },
-    addPoint: function(x, y, color) {
-      const item = { x, y, color };
-      if (this.isPointReserved) {
-        const tmp = this.reservedPoints.shift();
-        if (tmp) {
-          if (this.points.findIndex(p => p.label == tmp.label) == -1) {
-            item.label = tmp.label;
-            item.color = tmp.color;
-            this.$store.dispatch("current/frame/addPoint", item);
-          }
-        }
-      } else {
-        item.label = `points-${this.points.length}`;
-        this.$store.dispatch("current/frame/addPoint", item);
+    // ==============================================
+    // フィルター関数
+    // ==============================================
+    colorFilter(key, item) {
+      if ([key, "eras"].findIndex(m => m == this.mode) != -1) {
+        return item.color;
       }
+      return this.disabledStyle.color;
     },
-    addRect: async function(x, y, width, height, rotation, color) {
-      let item = { x, y, width, height, rotation, color };
-      if (this.isRectReserved) {
-        const tmp = this.reservedRects.shift();
-        if (tmp) {
-          if (this.rects.findIndex(r => r.label == tmp.label) == -1) {
-            item.name = tmp.label;
-            item.label = tmp.label;
-            item.color = tmp.color;
-            this.$store.dispatch("current/frame/addRect", item);
-          }
-        }
-      } else {
-        const name = `rect-${this.rects.length + 1}`;
-        item.name = name;
-        item.label = name;
-        this.$store.dispatch("current/frame/addRect", item);
+    opacityFilter(key) {
+      if ([key, "eras"].findIndex(m => m == this.mode) != -1) {
+        return 1;
       }
+      return this.disabledStyle.opacity;
     },
+    // ==============================================
+    // イベントハンドラ
+    // ==============================================
     onSkip: function(payload) {
       if (payload == "next") {
         if (this.$store.state.setting.syncPrevPoints) {
@@ -332,9 +347,9 @@ export default {
         } else {
           this.syncRects = [];
         }
-        this.skipForward();
+        this.$store.dispatch("current/skipForward");
       } else {
-        this.skipBackward();
+        this.$store.dispatch("current/skipBackward");
       }
       this.$emit("skip");
     },
@@ -383,16 +398,15 @@ export default {
     },
     // キー操作
     onKeyup: function(payload) {
-      console.log("FrameEditor:onKeyup", payload);
       const { key, xKey } = this.$vuewer.key.summary(payload);
       if (key == "tab" && xKey == "default") {
         // TAB でモード変更
-        // const idx = this.modes.findIndex(x => x.val == this.mode);
-        // if (idx + 1 == this.modes.length) {
-        //   this.mode = this.modes[0].val;
-        // } else {
-        //   this.mode = this.modes[idx + 1].val;
-        // }
+        const modes = this.$store.state.current.frame.modes;
+        const idx = modes.findIndex(m => m.val == this.mode);
+        if (idx !== -1) {
+          const next = idx + 1;
+          this.mode = next == modes.length ? modes[0].val : modes[next].val;
+        }
       } else if (key == "c" && xKey == "ctrl") {
         // ctrl + c で現在画像をクリップボードに挿入
         this.copyImage();
@@ -408,17 +422,26 @@ export default {
       } else if (key == "Escape" && xKey == "default") {
         // ect でキーボード操作を抜ける
         this.cursor.show = false;
-      } else if (key == "j" && xKey == "default") {
+      } else if (key == "h" && xKey == "default") {
         if (this.cursor.show) this.cursor.x = this.cursor.x - this.cw / 100;
-      } else if (key == "j" && xKey == "ctrl") {
+      } else if (key == "l" && xKey == "default") {
+        if (this.cursor.show) this.cursor.x = this.cursor.x + this.cw / 100;
+      } else if (key == "j" && xKey == "default") {
         if (this.cursor.show) this.cursor.y = this.cursor.y - this.ch / 100;
       } else if (key == "k" && xKey == "default") {
-        if (this.cursor.show) this.cursor.x = this.cursor.x + this.cw / 100;
-      } else if (key == "k" && xKey == "ctrl") {
         if (this.cursor.show) this.cursor.y = this.cursor.y + this.ch / 100;
       } else if (key == " " && xKey == "default") {
         if (this.cursor.show) this.onDblClick();
+      } else if (key == "h" && xKey == "ctrl") {
+        if (this.cursor.show) this.onSkip("prev");
+      } else if (key == "j" && xKey == "ctrl") {
+        if (this.cursor.show) this.onSkip("prev");
+      } else if (key == "k" && xKey == "ctrl") {
+        if (this.cursor.show) this.onSkip("next");
+      } else if (key == "l" && xKey == "ctrl") {
+        if (this.cursor.show) this.onSkip("next");
       } else {
+        console.log("FrameEditor:onKeyup", key, xKey);
         this.$emit("keyup", payload);
       }
     },
@@ -467,53 +490,54 @@ export default {
     // Point 系イベントハンドラ
     onPointClick: function(e) {
       if (this.mode == "eras") {
-        this.$store.dispatch(
-          "current/frame/deletePoint",
-          this.points[e.target.index].id
-        );
+        const id = e.target.attrs.id;
+        if (id) this.$store.dispatch("current/frame/deletePoint", id);
       }
     },
     onPointMouseEnter: function(e) {
       if (this.mode == "eras" || this.mode == "circ") {
-        this.$store.dispatch(
-          "current/frame/activePoint",
-          this.points[e.target.index].id
-        );
+        const id = e.target.attrs.id;
+        if (id) this.$store.dispatch("current/frame/activePoint", id);
       }
     },
     onPointMouseLeave: function(e) {
       if (this.mode == "eras" || this.mode == "circ") {
-        const point = this.points[e.target.index];
-        this.$store.dispatch("current/frame/inactivePoint", point.id);
+        const id = e.target.attrs.id;
+        if (id) this.$store.dispatch("current/frame/inactivePoint", id);
       }
     },
     onPointDragStart: function(e) {
-      const point = this.points[e.target.index];
-      this.$store.dispatch("current/frame/activePoint", point.id);
+      const id = e.target.attrs.id;
+      if (id) this.$store.dispatch("current/frame/inactivePoint", id);
     },
     onPointDragEnd: function(e) {
-      const i = e.target.index;
-      const point = this.points[i];
-      point.x = e.target.x();
-      point.y = e.target.y();
-      this.$store.dispatch("current/frame/updatePoint", point);
+      const id = e.target.attrs.id;
+      const idx = this.points.findIndex(p => p.id == id);
+      if (idx !== -1) {
+        const point = this.points[idx];
+        point.x = e.target.x();
+        point.y = e.target.y();
+        this.$store.dispatch("current/frame/updatePoint", point);
+      }
     },
     // Rect 系イベントハンドラ
     onRectClick: function(e) {
       if (this.mode == "circ") {
         this.addPoint(e.evt.offsetX, e.evt.offsetY, this.color);
       } else if (this.mode == "eras") {
-        this.$store.dispatch(
-          "current/frame/deleteRect",
-          this.rects[e.target.index].id
-        );
+        const id = e.target.attrs.id;
+        if (id) this.$store.dispatch("current/frame/deleteRect", id);
       }
     },
     onRectDragEnd: function(e) {
-      const rect = this.rects[e.target.index];
-      rect.x = e.target.x();
-      rect.y = e.target.y();
-      this.$store.dispatch("current/frame/updateRect", rect);
+      const id = e.target.attrs.id;
+      const idx = this.rects.findIndex(r => r.id == id);
+      if (idx !== -1) {
+        const rect = this.rects[idx];
+        rect.x = e.target.x();
+        rect.y = e.target.y();
+        this.$store.dispatch("current/frame/updateRect", rect);
+      }
     },
     onStageMouseMove() {
       const cursor = this.$refs.stage.getNode().getPointerPosition();
@@ -574,7 +598,7 @@ export default {
     }
   },
   watch: {
-    "$store.state.current.frame.id": function(val) {
+    "$store.state.current.frame.id": async function(val) {
       if (val) {
         // 拡大比率の変更
         this.scale = 0;
@@ -587,6 +611,7 @@ export default {
         );
         // 前フレームの値を確認
         if (this.syncPoints.length && this.points.length == 0) {
+          this.syncing = true;
           for (const p of this.syncPoints) {
             const item = {
               label: p.label,
@@ -594,10 +619,12 @@ export default {
               x: p.x,
               y: p.y
             };
-            this.$store.dispatch("current/frame/addPoint", item);
+            await this.$store.dispatch("current/frame/addPoint", item);
           }
+          this.syncing = false;
         }
         if (this.syncRects.length && this.rects.length == 0) {
+          this.syncing = true;
           for (const r of this.syncRects) {
             const item = {
               label: r.label,
@@ -610,8 +637,9 @@ export default {
               height: r.height,
               rotation: r.rotation
             };
-            this.$store.dispatch("current/frame/addRect", item);
+            await this.$store.dispatch("current/frame/addRect", item);
           }
+          this.syncing = false;
         }
       }
     },

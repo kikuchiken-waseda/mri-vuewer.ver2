@@ -1,14 +1,11 @@
 <template>
-  <v-data-table :headers="headers" :items="rects">
-    <template v-slot:item.label="props">
-      <v-edit-dialog
-        :return-value.sync="props.item.label"
-        @close="close(props.item)"
-      >
-        {{ props.item.label }}
+  <v-data-table item-key="id" :headers="headers" :items="rects">
+    <template v-slot:item.label="{ item }">
+      <v-edit-dialog :return-value.sync="item.label" @close="close(item)">
+        {{ item.label }}
         <template v-slot:input>
           <v-text-field
-            v-model="props.item.label"
+            v-model="item.label"
             :rules="[max25chars]"
             label="Edit"
             single-line
@@ -17,11 +14,11 @@
         </template>
       </v-edit-dialog>
     </template>
-    <template v-slot:item.x="props">
-      {{ Math.round(props.item.x) }}
+    <template v-slot:item.x="{ item }">
+      {{ Math.round(item.x) }}
     </template>
-    <template v-slot:item.y="props">
-      {{ Math.round(props.item.y) }}
+    <template v-slot:item.y="{ item }">
+      {{ Math.round(item.y) }}
     </template>
     <template v-slot:item.width="{ item }">
       <span class="d-inline-block text-truncate" style="max-width: 30px;">
@@ -43,7 +40,7 @@
     </template>
     <template v-slot:item.rotation="{ item }">
       <span class="d-inline-block text-truncate" style="max-width: 30px;">
-        {{ item.rotation }}
+        {{ item.rotation || 0 }}
       </span>
     </template>
     <template v-slot:item.scaleX="{ item }">
@@ -57,12 +54,8 @@
       </span>
     </template>
 
-    <template v-slot:item.color="props">
-      <m-color-menu
-        icon
-        v-model="props.item.color"
-        @input="close(props.item)"
-      />
+    <template v-slot:item.color="{ item }">
+      <m-color-menu icon v-model="item.color" @input="close(item)" />
     </template>
   </v-data-table>
 </template>
@@ -73,7 +66,8 @@ export default {
   components: { MColorMenu },
   computed: {
     rects: function() {
-      return this.$store.state.current.frame.rects;
+      const rects = this.$store.state.current.frame.rects;
+      return rects;
     },
     headers: function() {
       return [
