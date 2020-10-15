@@ -18,6 +18,13 @@
 
     <div class="my-5">
       <label>点群記述設定</label>
+      <v-checkbox
+        hide-details
+        v-model="$syncPrevPoints"
+        :label="
+          $vuetify.lang.t('$vuetify.setting.form.video.syncPrevPoints.label')
+        "
+      />
       <v-text-field
         label="点群ラベル"
         v-model="point.label"
@@ -28,7 +35,6 @@
           <m-color-menu icon v-model="point.color" />
         </template>
       </v-text-field>
-
       <v-list>
         <v-list-item v-for="(p, i) in points" :key="p.label">
           <v-list-item-content>
@@ -54,9 +60,17 @@
         </v-list-item>
       </v-list>
     </div>
-
     <div class="my-5">
       <label>矩形記述設定</label>
+
+      <v-checkbox
+        hide-details
+        v-model="$syncPrevRects"
+        :label="
+          $vuetify.lang.t('$vuetify.setting.form.video.syncPrevRects.label')
+        "
+      />
+
       <v-text-field
         v-model="rect.label"
         label="矩形ラベル"
@@ -157,6 +171,22 @@ export default {
         key => this.textgrid[key].type == "point"
       );
       return choices.concat(tiers);
+    },
+    $syncPrevPoints: {
+      get() {
+        return this.$store.state.setting.syncPrevPoints;
+      },
+      set(val) {
+        this.$store.commit("setting/syncPrevPoints", val);
+      }
+    },
+    $syncPrevRects: {
+      get() {
+        return this.$store.state.setting.syncPrevRects;
+      },
+      set(val) {
+        this.$store.commit("setting/syncPrevRects", val);
+      }
     }
   },
   methods: {
