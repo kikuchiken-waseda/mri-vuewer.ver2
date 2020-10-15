@@ -460,23 +460,26 @@ export default {
     },
     // Ruler 系イベントハンドラ
     onRulerClick: function(e) {
-      const i = e.target.index;
-      const line = this.ruler.lines[0];
-      if (this.mode == "eras") {
-        const a = this.ruler.points.findIndex(p => p.x == line.points[0]);
-        const b = this.ruler.points.findIndex(p => p.x == line.points[2]);
-        this.ruler.points.splice(a, 1);
-        this.ruler.points.splice(b, 1);
-        this.ruler.lines.splice(i, 1);
-      } else if (this.mode == "rect") {
-        const width = this.cw / 5;
-        const height = this.ch / 5;
-        const x = e.evt.offsetX;
-        const y = e.evt.offsetY;
-        const r = (line.t * 180) / Math.PI;
-        this.addRect(x, y, width, height, r, this.color);
-      } else {
-        this.addPoint(e.evt.offsetX, e.evt.offsetY, this.color);
+      const id = e.target.attrs.id;
+      const idx = this.ruler.lines.findIndex(l => l.id == id);
+      if (idx != -1) {
+        const line = this.ruler.lines[idx];
+        if (this.mode == "eras") {
+          const a = this.ruler.points.findIndex(p => p.x == line.points[0]);
+          const b = this.ruler.points.findIndex(p => p.x == line.points[2]);
+          this.ruler.points.splice(a, 1);
+          this.ruler.points.splice(b, 1);
+          this.ruler.lines.splice(idx, 1);
+        } else if (this.mode == "rect") {
+          const width = this.cw / 5;
+          const height = this.ch / 5;
+          const x = e.evt.offsetX;
+          const y = e.evt.offsetY;
+          const r = (line.t * 180) / Math.PI;
+          this.addRect(x, y, width, height, r, this.color);
+        } else {
+          this.addPoint(e.evt.offsetX, e.evt.offsetY, this.color);
+        }
       }
     },
     onRulerMouseEnter: function(e) {
