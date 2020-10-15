@@ -284,6 +284,12 @@ export default {
         },
         syncRects: {
           label: "矩形を動画に表示する"
+        },
+        syncPrevPoints: {
+          label: "フレーム変更時に前のポイントをコピーする"
+        },
+        syncPrevRects: {
+          label: "フレーム変更時に前の矩形をコピーする"
         }
       },
       metadata: {

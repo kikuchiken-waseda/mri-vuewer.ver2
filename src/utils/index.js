@@ -5,9 +5,10 @@ import image from "./image.js";
 import dropbox from "./dropbox.js";
 
 export default {
-  color: color,
-  image: image,
-  text: text,
-  math: math,
-  dropbox: dropbox
+  deepCopy: v => JSON.parse(JSON.stringify(v)),
+  color,
+  image,
+  text,
+  math,
+  dropbox
 };

@@ -170,9 +170,6 @@ export default {
         this.$emit("input", val);
       }
     },
-    id: function() {
-      return this.$store.state.current.frame.id;
-    },
     idx: function() {
       return this.$store.state.current.frame.idx;
     },
@@ -225,6 +222,8 @@ export default {
     },
     reservedPoints: [],
     reservedRects: [],
+    syncPoints: [],
+    syncRects: [],
     ruler: {
       active: null,
       conf: {
@@ -298,7 +297,7 @@ export default {
           }
         }
       } else {
-        item.lapel = `points-${this.points.length}`;
+        item.label = `points-${this.points.length}`;
         this.$store.dispatch("current/frame/addPoint", item);
       }
     },
@@ -323,6 +322,16 @@ export default {
     },
     onSkip: function(payload) {
       if (payload == "next") {
+        if (this.$store.state.setting.syncPrevPoints) {
+          this.syncPoints = this.$vuewer.deepCopy(this.points);
+        } else {
+          this.syncPoints = [];
+        }
+        if (this.$store.state.setting.syncPrevRects) {
+          this.syncRects = this.$vuewer.deepCopy(this.rects);
+        } else {
+          this.syncRects = [];
+        }
         this.skipForward();
       } else {
         this.skipBackward();
@@ -565,6 +574,47 @@ export default {
     }
   },
   watch: {
+    "$store.state.current.frame.id": function(val) {
+      if (val) {
+        // 拡大比率の変更
+        this.scale = 0;
+        // 予約値の更新
+        this.reservedPoints = this.$vuewer.deepCopy(
+          this.$store.state.current.frameConf.points
+        );
+        this.reservedRects = this.$vuewer.deepCopy(
+          this.$store.state.current.frameConf.rects
+        );
+        // 前フレームの値を確認
+        if (this.syncPoints.length && this.points.length == 0) {
+          for (const p of this.syncPoints) {
+            const item = {
+              label: p.label,
+              color: p.color,
+              x: p.x,
+              y: p.y
+            };
+            this.$store.dispatch("current/frame/addPoint", item);
+          }
+        }
+        if (this.syncRects.length && this.rects.length == 0) {
+          for (const r of this.syncRects) {
+            const item = {
+              label: r.label,
+              color: r.color,
+              x: r.x,
+              y: r.y,
+              scaleX: r.scaleX,
+              scaleY: r.scaleY,
+              width: r.width,
+              height: r.height,
+              rotation: r.rotation
+            };
+            this.$store.dispatch("current/frame/addRect", item);
+          }
+        }
+      }
+    },
     "$store.state.current.frameConf.points": function(val) {
       this.reservedPoints = JSON.parse(JSON.stringify(val));
     },
@@ -576,17 +626,9 @@ export default {
         this.loadImage(this.src);
       }
     },
+    // 元画像が変更されたタイミングの処理
     src: function(val) {
       if (val) {
-        // 元画像が変更されたタイミングで拡大比を戻す
-        this.scale = 0;
-        // 元画像が変更されたタイミングで予約ポイントが存在するかを確認
-        this.reservedPoints = JSON.parse(
-          JSON.stringify(this.$store.state.current.frameConf.points)
-        );
-        this.reservedRects = JSON.parse(
-          JSON.stringify(this.$store.state.current.frameConf.rects)
-        );
         // 動画をキャンバスに読み込み
         this.loadImage(val);
       }
@@ -604,5 +646,4 @@ export default {
   }
 };
 </script>
-
 <style scoped></style>

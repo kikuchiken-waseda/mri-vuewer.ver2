@@ -1,5 +1,22 @@
 export default {
   computed: {
+    // フレーム遷移時に前フレームの値をコピーする
+    $syncPrevPoints: {
+      get() {
+        return this.$store.state.setting.syncPrevPoints;
+      },
+      set(val) {
+        this.$store.commit("setting/syncPrevPoints", val);
+      }
+    },
+    $syncPrevRects: {
+      get() {
+        return this.$store.state.setting.syncPrevRects;
+      },
+      set(val) {
+        this.$store.commit("setting/syncPrevRects", val);
+      }
+    },
     // ビデオにフレーム情報を提示する
     $showFrameInVideo: {
       get() {

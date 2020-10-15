@@ -243,6 +243,12 @@ export default {
         showFrameInVideo: {
           label: "Show frame info"
         },
+        syncPrevPoints: {
+          label: "copy prev points when the frame time was changed"
+        },
+        syncPrevRects: {
+          label: "copy prev rects when the frame time was changed"
+        },
         syncPoints: {
           label: "show points in a video"
         },

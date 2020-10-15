@@ -2,6 +2,8 @@ import storage from "@/storage/localStorage.js";
 const S = storage.wavesurfer;
 
 const DEFAULTSTATE = {
+  syncPrevPoints: false,
+  syncPrevRects: false,
   syncDropbox: false,
   addRecordKey: "dbl",
   cursorColor: "#333",
@@ -32,6 +34,14 @@ const DS = DEFAULTSTATE;
 export default {
   namespaced: true,
   state: () => ({
+    syncPrevPoints:
+      S.get("syncPrevPoints") == null
+        ? DS.syncPrevPoints
+        : S.get("syncPrevPoints"),
+    syncPrevRects:
+      S.get("syncPrevRects") == null
+        ? DS.syncPrevRects
+        : S.get("syncPrevRects"),
     addRecordKey: S.get("addRecordKey") || DS.addRecordKey,
     cursorColor: S.get("cursorColor") || DS.cursorColor,
     deleteRecordKey: S.get("deleteRecordKey") || DS.deleteRecordKey,
@@ -85,6 +95,14 @@ export default {
     nameSep: S.get("nameSep") || DS.nameSep
   }),
   mutations: {
+    syncPrevPoints(state, payload) {
+      state.syncPrevPoints = payload;
+      S.set("syncPrevPoints", payload);
+    },
+    syncPrevRects(state, payload) {
+      state.syncPrevRects = payload;
+      S.set("syncPrevRects", payload);
+    },
     showDev(state, payload) {
       state.showDev = payload;
       S.set("showDev", payload);

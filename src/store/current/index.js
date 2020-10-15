@@ -104,7 +104,6 @@ export default {
         commit("files/update", state.item, { root: true });
       }
     },
-
     textgrid: function({ state, commit }, payload) {
       commit("textgrid", payload);
       const textgrid = Object.assign({}, payload);
@@ -155,7 +154,6 @@ export default {
         }
       }
     },
-
     // 現在表示されている VUEWER の転記情報を更新します
     loadObj: function(context, payload) {
       if (payload.frames && payload.frames.length) {

@@ -31,6 +31,7 @@ const Vuewer = {
         blob: io.file.download,
         url: io.file.downloadURL
       },
+      deepCopy: utils.deepCopy,
       math: utils.math,
       text: utils.text,
       image: utils.image,
