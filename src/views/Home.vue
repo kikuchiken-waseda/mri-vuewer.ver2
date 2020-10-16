@@ -106,7 +106,7 @@ export default {
             {
               icon: "mdi-dots-vertical",
               function: () => {
-                vm.$router.push({ name: "Meta" });
+                vm.$router.push({ name: "Demo" });
               }
             }
           ]
@@ -120,6 +120,10 @@ export default {
   },
   mounted: function() {
     this.$nextTick(() => {
+      if (this.$route.query.nextpage) {
+        const path = "/" + this.$route.query.nextpage.replace("-", "/");
+        this.$router.push({ path });
+      }
       if (this.$store.state.hash.info["drawer"] || false) {
         this.$store.commit("drawer", true);
       }
