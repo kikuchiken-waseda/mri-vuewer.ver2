@@ -895,12 +895,12 @@ export default {
       if (this.$textgrid) {
         this.isSyncing = true;
         this.$store.dispatch("current/setTextGrid", this.$textgrid);
-
         // start が指定されている場合そこに移動
         if (this.$route.query.start) {
           const time = Number(this.$route.query.start);
           this.$store.dispatch("current/seekTo", { time, center: false });
         }
+
         // current.tier を初期化
         this.current.tier.key = null;
         this.current.tier.values = [];

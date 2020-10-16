@@ -135,7 +135,9 @@ export default {
       // 現在表示されている TEXTGRID を更新します
       const ws = context.state.wavesurfer;
       if (ws) {
-        ws.setTextGrid(obj);
+        setTimeout(() => {
+          ws.setTextGrid(obj);
+        }, 10);
       }
     },
     zoom({ state }, val) {
