@@ -14,7 +14,7 @@
       </v-btn>
     </template>
     <v-btn
-      v-for="(item, key) in btns"
+      v-for="(item, key) in btns.filter(b => b.show)"
       :key="key"
       @click="$emit(item.event)"
       fab
@@ -45,50 +45,50 @@ export default {
       }
     },
     btns: function() {
-      if (this.$vuetify.breakpoint.smAndUp) {
-        return [
-          {
-            event: "click-detail",
-            color: "black",
-            icon: "mdi-eye"
-          },
-          {
-            event: "click-setting",
-            color: "black",
-            icon: "mdi-cog"
-          },
-          {
-            event: "click-save",
-            color: "black",
-            icon: "mdi-content-save"
-          },
-          {
-            event: "click-image-edit",
-            color: "orange",
-            icon: "mdi-selection-drag"
-          },
-          { event: "click-tier-edit", color: "green", icon: "mdi-pencil" },
-          { event: "click-tier-add", color: "indigo", icon: "mdi-plus" },
-          { event: "click-tier-delete", color: "red", icon: "mdi-delete" }
-        ];
-      } else {
-        return [
-          {
-            event: "click-ruler",
-            color: "orange",
-            icon: "mdi-ruler",
-            hideSM: true
-          },
-          {
-            event: "click-image-edit",
-            color: "orange",
-            icon: "mdi-selection-drag"
-          },
-          { event: "click-tier-edit", color: "green", icon: "mdi-pencil" },
-          { event: "click-tier-add", color: "indigo", icon: "mdi-plus" },
-          { event: "click-tier-delete", color: "red", icon: "mdi-delete" }
-        ];
-      }
+      return [
+        {
+          event: "click-detail",
+          color: "black",
+          icon: "mdi-eye",
+          show: this.$vuetify.breakpoint.smAndUp
+        },
+        {
+          event: "click-setting",
+          color: "black",
+          icon: "mdi-cog",
+          show: this.$vuetify.breakpoint.smAndUp
+        },
+        {
+          event: "click-save",
+          color: "black",
+          icon: "mdi-content-save",
+          show: this.$vuetify.breakpoint.smAndUp
+        },
+        {
+          event: "click-image-edit",
+          color: "orange",
+          icon: "mdi-selection-drag",
+          show: this.$store.state.current.frame.src !== null
+        },
+        {
+          event: "click-tier-edit",
+          color: "green",
+          icon: "mdi-pencil",
+          show: true
+        },
+        {
+          event: "click-tier-add",
+          color: "indigo",
+          icon: "mdi-plus",
+          show: true
+        },
+        {
+          event: "click-tier-delete",
+          color: "red",
+          icon: "mdi-delete",
+          show: true
+        }
+      ];
     }
   }
 };

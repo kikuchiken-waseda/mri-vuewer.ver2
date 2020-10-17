@@ -11,6 +11,7 @@ import db from "@/storage/db";
 export default {
   namespaced: true,
   state: () => ({
+    id: "",
     name: "", // 動画名
     wavesurfer: null, // 動画アノテーション用コンポーネント
     source: null, // 解析対象の動画 (base64) 形式
@@ -60,8 +61,9 @@ export default {
       dispatch("complates/init", { root: true });
       dispatch("cache/init", { root: true });
       if (id) {
+        state.id = Number(id);
         dispatch("loading/start", "$vuetify.loading", { root: true });
-        state.item = await db.files.get(Number(id));
+        state.item = await db.files.get(state.id);
         if (state.item.name) {
           state.source = state.item.source;
           commit("video/source", state.item.source);
@@ -98,7 +100,6 @@ export default {
         frame.points = payload.points || frame.points;
         frame.rects = payload.rects || frame.rects;
         Vue.set(state.frames, i, frame);
-
         state.item.lastModifiedAt = Date.now();
         state.item.frames = state.frames;
         commit("files/update", state.item, { root: true });
@@ -129,12 +130,59 @@ export default {
       });
     },
     // ===================================================
+    // フレーム操作
+    // ===================================================
+    deletePoints({ state, commit }) {
+      const ids = state.frames
+        .filter(f => f.points.length)
+        .map(f => f.points.map(p => p.id))
+        .flat();
+      if (ids.length) {
+        db.points
+          .bulkDelete(ids)
+          .then(() => {
+            state.frames = state.frames.map(f => {
+              f.points = [];
+              return f;
+            });
+            state.item.lastModifiedAt = Date.now();
+            state.item.frames = state.frames;
+            commit("files/update", state.item, { root: true });
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+    },
+    deleteRects({ state, commit }) {
+      const ids = state.frames
+        .filter(f => f.rects.length)
+        .map(f => f.rects.map(r => r.id))
+        .flat();
+      if (ids.length) {
+        db.rects
+          .bulkDelete(ids)
+          .then(() => {
+            state.frames = state.frames.map(f => {
+              f.rects = [];
+              return f;
+            });
+            state.item.lastModifiedAt = Date.now();
+            state.item.frames = state.frames;
+            commit("files/update", state.item, { root: true });
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+    },
+    // ===================================================
     // WS 操作関連
     // ===================================================
-    setTextGrid(context, obj) {
-      // 現在表示されている TEXTGRID を更新します
-      const ws = context.state.wavesurfer;
+    setTextGrid({ state }, obj) {
+      const ws = state.wavesurfer;
       if (ws) {
+        state.textgrid = obj;
         setTimeout(() => {
           ws.setTextGrid(obj);
         }, 10);
@@ -162,13 +210,22 @@ export default {
     skipForward: function({ state }) {
       if (state.wavesurfer) state.wavesurfer.skipForward();
     },
+    addRecord: function({ state }, payload) {
+      const { tier, record } = payload;
+      if (state.wavesurfer && tier && record) {
+        if ("text" in record && "time" in record) {
+          state.wavesurfer.addTierValue(tier, record);
+        }
+      }
+    },
     // 現在表示されている VUEWER の転記情報を更新します
     loadObj: function(context, payload) {
+      const textgrid = payload.textgrid;
       if (payload.frames && payload.frames.length) {
         context.commit("frames", payload.frames);
       }
-      if (payload.textgrid) {
-        context.dispatch("setTextGrid", payload.textgrid);
+      if (textgrid) {
+        context.dispatch("setTextGrid", textgrid);
       }
     }
   },

@@ -437,7 +437,9 @@ export default {
     },
     frame: {
       name: `Image Annotation`,
-      edit: `Show an Image Annotation Dialog`
+      edit: `Show an Image Annotation Dialog`,
+      deletePoints: `Delete All Points`,
+      deleteRects: `Delete All Rects`
     }
   },
   uploads: {

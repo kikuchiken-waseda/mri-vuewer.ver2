@@ -1,84 +1,12 @@
 <template>
-  <m-context-menu>
-    <slot> </slot>
-    <template v-slot:menus>
-      <v-card
-        ref="card"
-        class="mx-auto overflow-y-auto"
-        min-width="400"
-        max-height="600"
-      >
-        <v-toolbar dense color="primary" dark>
-          <v-toolbar-title>VUWER-MENU</v-toolbar-title>
-        </v-toolbar>
-        <input
-          ref="input"
-          :accept="accept"
-          @change="onChange"
-          type="file"
-          style="display:none"
-        />
-        <v-list dense subheader class="overflow-y-auto" max-height="450">
-          <div v-for="(item, key) in items" :key="key">
-            <v-subheader
-              v-if="item.subheader"
-              class="grey--text text--darken-3"
-            >
-              {{ $vuetify.lang.t(item.subheader) }}
-            </v-subheader>
-            <v-divider v-else />
-
-            <v-list-group
-              v-if="item.items"
-              v-model="item.show"
-              :prepend-icon="item.icon"
-              @click.stop.prevent
-            >
-              <template v-slot:activator>
-                <v-list-item-content>
-                  <v-list-item-title>
-                    {{ $vuetify.lang.t(item.text) }}
-                  </v-list-item-title>
-                </v-list-item-content>
-              </template>
-              <v-list-item
-                v-for="(x, key) in item.items"
-                :key="key"
-                @click="x.click"
-              >
-                <v-list-item-icon>
-                  <v-icon></v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>
-                    <v-icon v-if="x.icon"> {{ x.icon }} </v-icon>
-                    {{ $vuetify.lang.t(x.text) }}
-                  </v-list-item-title>
-                </v-list-item-content>
-                <v-list-item-action v-if="x.kbd">
-                  <v-spacer />
-                  <v-list-item-action-text v-text="x.kbd" />
-                </v-list-item-action>
-              </v-list-item>
-            </v-list-group>
-
-            <v-list-item v-else-if="item.text" @click="item.click">
-              <v-list-item-icon>
-                <v-icon> {{ item.icon }} </v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title>
-                  {{ $vuetify.lang.t(item.text) }}
-                </v-list-item-title>
-              </v-list-item-content>
-              <v-list-item-action v-if="item.kbd">
-                <v-list-item-action-text v-text="item.kbd" />
-              </v-list-item-action>
-            </v-list-item>
-          </div>
-        </v-list>
-      </v-card>
-    </template>
+  <m-context-menu
+    ref="menu"
+    title="VUWER-MENU"
+    :accept="accept"
+    :items="items"
+    @change="onChange"
+  >
+    <slot></slot>
   </m-context-menu>
 </template>
 <script>
@@ -88,9 +16,7 @@ import MWavesurferMixin from "@/mixins/MWavesurferMixin";
 export default {
   name: "m-w-context-menu",
   mixins: [FrameMixin, MWavesurferMixin],
-  components: {
-    MContextMenu
-  },
+  components: { MContextMenu },
   data: () => ({
     accept: "",
     clicked: null
@@ -261,7 +187,7 @@ export default {
               click: () => {
                 vm.accept = ".TextGrid,.textgrid,.Textgrid";
                 vm.clicked = "TEXTGRID/TEXTGRID";
-                vm.$nextTick(() => vm.$refs.input.click());
+                vm.$nextTick(() => vm.$refs.menu.open());
               }
             },
             {
@@ -270,7 +196,7 @@ export default {
               click: () => {
                 vm.accept = "application/json";
                 vm.clicked = "TEXTGRID/JSON";
-                vm.$nextTick(() => vm.$refs.input.click());
+                vm.$nextTick(() => vm.$refs.menu.open());
               }
             },
             {
@@ -279,7 +205,7 @@ export default {
               click: () => {
                 vm.accept = "application/json";
                 vm.clicked = "TEXTGRID/JSON/VER1";
-                vm.$nextTick(() => vm.$refs.input.click());
+                vm.$nextTick(() => vm.$refs.menu.open());
               }
             },
             {
@@ -288,7 +214,7 @@ export default {
               click: () => {
                 vm.accept = "application/json";
                 vm.clicked = "TEXTGRID/JSON/VER1/LEFT";
-                vm.$nextTick(() => vm.$refs.input.click());
+                vm.$nextTick(() => vm.$refs.menu.open());
               }
             },
             {
@@ -297,7 +223,7 @@ export default {
               click: () => {
                 vm.accept = "application/json";
                 vm.clicked = "TEXTGRID/JSON/VER1/RIGHT";
-                vm.$nextTick(() => vm.$refs.input.click());
+                vm.$nextTick(() => vm.$refs.menu.open());
               }
             }
           ]
@@ -632,7 +558,6 @@ export default {
             }
           ]
         },
-
         {
           subheader: "$vuetify.contexts.frame.name",
           divider: true
@@ -647,15 +572,35 @@ export default {
             }, 10);
           },
           divider: true
+        },
+        {
+          text: "$vuetify.contexts.frame.deletePoints",
+          icon: "mdi-close-circle",
+          click: () => {
+            setTimeout(function() {
+              vm.$store.dispatch("current/deletePoints");
+            }, 10);
+          },
+          divider: true
+        },
+        {
+          text: "$vuetify.contexts.frame.deleteRects",
+          icon: "mdi-close-box",
+          click: () => {
+            setTimeout(function() {
+              vm.$store.dispatch("current/deleteRects");
+            }, 10);
+          },
+          divider: true
         }
       ];
     }
   },
   methods: {
-    onChange() {
+    onChange(files) {
       const item = {
         click: this.clicked,
-        files: this.$refs.input.files
+        files: files
       };
       this.$emit("click-upload", item);
     },

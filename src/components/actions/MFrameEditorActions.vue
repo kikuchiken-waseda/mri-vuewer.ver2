@@ -9,6 +9,7 @@
       <div class="mx-1"></div>
       <m-color-menu icon v-model="color" />
       <v-text-field
+        ref="text"
         solo
         hide-details
         v-model="sendText"
@@ -64,14 +65,17 @@ export default {
   },
   methods: {
     addEvent() {
-      if (this.targetTier) {
-        if (this.sendText) {
-          const item = {
-            time: this.$store.state.current.frame.time,
-            text: this.sendText
-          };
-          if (this.$ws) this.$ws.addTierValue(this.targetTier, item);
-        }
+      const text = this.$store.state.current.frameConf.text || "";
+      const time = this.$store.state.current.frame.time;
+      const payload = {
+        tier: this.$store.state.current.frameConf.targetTier,
+        record: { time, text }
+      };
+      this.$store.dispatch("current/addRecord", payload);
+    },
+    focus() {
+      if (this.$refs.text) {
+        this.$refs.text.focus();
       }
     }
   },

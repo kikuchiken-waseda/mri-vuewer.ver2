@@ -1,11 +1,14 @@
 <template>
   <m-frame-editor-layout ref="layout">
     <template v-slot:toolbar>
-      <m-frame-editor-actions
-        @skip="onSkip"
-        @zoom="onZoom"
-        @download="onDownload"
-      />
+      <m-key-context ref="context" @keyup="onKeyup">
+        <m-frame-editor-actions
+          ref="actions"
+          @skip="onSkip"
+          @zoom="onZoom"
+          @download="onDownload"
+        />
+      </m-key-context>
     </template>
     <m-key-context ref="context" @keyup="onKeyup">
       <v-stage
@@ -109,8 +112,8 @@
           v-model="cursor"
         />
       </v-stage>
+      <m-loading v-if="syncing" text="$vuetify.loading" />
     </m-key-context>
-    <m-loading v-if="syncing" text="$vuetify.loading" />
 
     <template v-slot:table>
       <m-frame-editor-tab
@@ -263,6 +266,15 @@ export default {
         new ClipboardItem({ "image/png": blob })
       ]);
     },
+    addEvent: function() {
+      const text = this.$store.state.current.frameConf.text || "";
+      const time = this.$store.state.current.frame.time;
+      const payload = {
+        tier: this.$store.state.current.frameConf.targetTier,
+        record: { time, text }
+      };
+      this.$store.dispatch("current/addRecord", payload);
+    },
     async addPoint(x, y, color) {
       const item = { x, y, color };
       if (this.isPointReserved) {
@@ -315,6 +327,32 @@ export default {
       const points = [f1.x, f1.y, f2.x, f2.y];
       const id = this.ruler.lines.length;
       this.ruler.lines.push({ id, points, t, i });
+    },
+    async addConterPoint() {
+      const color = "#3E2723";
+      const contours = await this.$vuewer.image.findContours(this.src, {
+        width: this.ow,
+        height: this.oh
+      });
+      const _cnv = (obj, i, color) => {
+        return {
+          x: Math.round((obj.x * this.cw) / this.ow),
+          y: Math.round((obj.y * this.ch) / this.oh),
+          label: `ref-${i}`,
+          color: color
+        };
+      };
+      const points = contours
+        .filter(c => c.starts.length || c.ends.length || c.fars.length)
+        .map(c => {
+          return [
+            c.fars.map((f, i) => _cnv(f, i, color)),
+            c.starts.map((f, i) => _cnv(f, i, color)),
+            c.ends.map((f, i) => _cnv(f, i, color))
+          ].flat();
+        })
+        .flat();
+      console.log(points);
     },
     // ==============================================
     // フィルター関数
@@ -399,7 +437,6 @@ export default {
     onKeyup: function(payload) {
       const { key, xKey } = this.$vuewer.key.summary(payload);
       if (key == "tab" && xKey == "default") {
-        // TAB でモード変更
         const modes = this.$store.state.current.frame.modes;
         const idx = modes.findIndex(m => m.val == this.mode);
         if (idx !== -1) {
@@ -407,30 +444,43 @@ export default {
           this.mode = next == modes.length ? modes[0].val : modes[next].val;
         }
       } else if (key == "c" && xKey == "ctrl") {
-        // ctrl + c で現在画像をクリップボードに挿入
         this.copyImage();
       } else if (key == "s" && xKey == "ctrl") {
-        // ctrl + s で現在画像をダウンロード
         this.downloadImage();
       } else if (key == "i" && xKey == "default") {
-        // i でキーボード操作に切り替え
         this.cursor.show = true;
+      } else if (key == "i" && xKey == "ctrl") {
+        if (this.$refs.actions) {
+          this.$refs.actions.focus();
+        }
       } else if (key == "[" && xKey == "ctrl") {
-        // ctrl + [ でキーボード操作を抜ける
         this.cursor.show = false;
       } else if (key == "Escape" && xKey == "default") {
-        // ect でキーボード操作を抜ける
         this.cursor.show = false;
       } else if (key == "h" && xKey == "default") {
         if (this.cursor.show) this.cursor.x = this.cursor.x - this.cw / 100;
       } else if (key == "l" && xKey == "default") {
         if (this.cursor.show) this.cursor.x = this.cursor.x + this.cw / 100;
       } else if (key == "j" && xKey == "default") {
-        if (this.cursor.show) this.cursor.y = this.cursor.y - this.ch / 100;
+        if (this.cursor.show) {
+          this.cursor.y = this.cursor.y - this.ch / 100;
+        } else {
+          this.onSkip("prev");
+        }
       } else if (key == "k" && xKey == "default") {
-        if (this.cursor.show) this.cursor.y = this.cursor.y + this.ch / 100;
+        if (this.cursor.show) {
+          this.cursor.y = this.cursor.y + this.ch / 100;
+        } else {
+          this.onSkip("next");
+        }
       } else if (key == " " && xKey == "default") {
-        if (this.cursor.show) this.onDblClick();
+        if (this.cursor.show) {
+          // カーサーが存在する場合データの追加
+          this.onDblClick();
+        } else {
+          // 通常はイベント追加
+          this.addEvent();
+        }
       } else if (key == "h" && xKey == "ctrl") {
         if (this.cursor.show) this.onSkip("prev");
       } else if (key == "j" && xKey == "ctrl") {
@@ -440,7 +490,6 @@ export default {
       } else if (key == "l" && xKey == "ctrl") {
         if (this.cursor.show) this.onSkip("next");
       } else {
-        console.log("FrameEditor:onKeyup", key, xKey);
         this.$emit("keyup", payload);
       }
     },
@@ -643,6 +692,7 @@ export default {
           }
           this.syncing = false;
         }
+        this.loadImage(this.src);
       }
     },
     "$store.state.current.frameConf.points": function(val) {
@@ -654,13 +704,6 @@ export default {
     filter: function(val, old) {
       if (val != old) {
         this.loadImage(this.src);
-      }
-    },
-    // 元画像が変更されたタイミングの処理
-    src: function(val) {
-      if (val) {
-        // 動画をキャンバスに読み込み
-        this.loadImage(val);
       }
     }
   },

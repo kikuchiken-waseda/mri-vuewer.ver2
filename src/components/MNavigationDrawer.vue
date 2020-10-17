@@ -236,7 +236,7 @@
         :value="false"
       >
         <template v-slot:activator>
-          <v-list-item-title>CONVATER</v-list-item-title>
+          <v-list-item-title>CONVERTER</v-list-item-title>
         </template>
         <v-list-item
           v-for="x in converters"

@@ -450,7 +450,9 @@ export default {
     },
     frame: {
       name: `${FRAME.name}`,
-      edit: `${FRAME.name} 画面の表示`
+      edit: `${FRAME.name}画面の表示`,
+      deletePoints: `全ての点群データを削除する`,
+      deleteRects: `全ての矩形データを削除する`
     }
   },
   uploads: {
