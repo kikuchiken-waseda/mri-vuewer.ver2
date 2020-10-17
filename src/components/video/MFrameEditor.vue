@@ -1,140 +1,146 @@
 <template>
-  <m-frame-editor-layout ref="layout">
-    <template v-slot:toolbar>
+  <m-frame-editor-context-menu @click="onMenuClick">
+    <m-frame-editor-layout ref="layout">
+      <template v-slot:toolbar>
+        <m-key-context ref="context" @keyup="onKeyup">
+          <m-frame-editor-actions
+            ref="actions"
+            @skip="onSkip"
+            @zoom="onZoom"
+            @download="onDownload"
+          />
+        </m-key-context>
+      </template>
       <m-key-context ref="context" @keyup="onKeyup">
-        <m-frame-editor-actions
-          ref="actions"
-          @skip="onSkip"
-          @zoom="onZoom"
-          @download="onDownload"
-        />
-      </m-key-context>
-    </template>
-    <m-key-context ref="context" @keyup="onKeyup">
-      <v-stage
-        ref="stage"
-        v-if="!syncing"
-        :config="{ width: cw, height: ch }"
-        @mousemove="onStageMouseMove"
-        @mousedown="onStageMouseDown"
-        @touchstart="onStageMouseDown"
-      >
-        <v-layer ref="layer">
-          <v-image
-            ref="background"
+        <v-stage
+          ref="stage"
+          v-if="!syncing"
+          :config="{ width: cw, height: ch }"
+          @mousemove="onStageMouseMove"
+          @mousedown="onStageMouseDown"
+          @touchstart="onStageMouseDown"
+        >
+          <v-layer ref="layer">
+            <v-image
+              ref="background"
+              @dblclick="onDblClick"
+              :config="background"
+            />
+            <v-circle
+              v-for="x in ruler.points"
+              :key="x.id"
+              :config="{
+                id: x.id,
+                x: x.x,
+                y: x.y,
+                stroke: 'white',
+                strokeWidth: 1,
+                radius: ruler.conf.size,
+                fill: ruler.conf.color
+              }"
+            />
+            <v-line
+              v-for="x in ruler.lines"
+              :key="x.id"
+              :config="{
+                id: x.id,
+                points: x.points,
+                stroke:
+                  ruler.active == x.id
+                    ? ruler.conf.activeColor
+                    : ruler.conf.color,
+                strokeWidth:
+                  ruler.active == x.id
+                    ? ruler.conf.activeSize
+                    : ruler.conf.size,
+                lineCap: 'round',
+                lineJoin: 'round',
+                dash: [5, 10]
+              }"
+              @mouseenter="onRulerMouseEnter"
+              @mouseleave="onRulerMouseLeave"
+              @click="onRulerClick"
+            />
+          </v-layer>
+
+          <v-layer ref="layer">
+            <v-rect
+              v-for="x in rects"
+              :key="x.name"
+              :config="{
+                name: x.name,
+                id: x.id,
+                x: x.x,
+                y: x.y,
+                width: x.width,
+                height: x.height,
+                rotation: x.rotation || 1,
+                scaleX: x.scaleX || 1,
+                scaleY: x.scaleY || 1,
+                strokeWidth: x.size || 1,
+                draggable: mode == 'rect',
+                stroke: colorFilter('rect', x),
+                opacity: opacityFilter('rect')
+              }"
+              @click="onRectClick"
+              @dragend="onRectDragEnd"
+              @transformend="onTransformEnd"
+            />
+            <v-circle
+              v-for="(x, i) in points"
+              :key="i"
+              :config="{
+                id: x.id,
+                x: x.x,
+                y: x.y,
+                stroke: 'white',
+                strokeWidth: 1,
+                radius: x.size,
+                draggable: mode == 'circ',
+                fill: colorFilter('circ', x),
+                opacity: opacityFilter('circ')
+              }"
+              @click="onPointClick"
+              @mouseenter="onPointMouseEnter"
+              @mouseleave="onPointMouseLeave"
+              @dragstart="onPointDragStart"
+              @dragend="onPointDragEnd"
+            />
+            <v-transformer v-if="mode == 'rect'" ref="transformer" />
+          </v-layer>
+
+          <m-frame-editor-cursor
             @dblclick="onDblClick"
-            :config="background"
+            v-if="cursor.show"
+            v-model="cursor"
           />
-          <v-circle
-            v-for="x in ruler.points"
-            :key="x.id"
-            :config="{
-              id: x.id,
-              x: x.x,
-              y: x.y,
-              stroke: 'white',
-              strokeWidth: 1,
-              radius: ruler.conf.size,
-              fill: ruler.conf.color
-            }"
-          />
-          <v-line
-            v-for="x in ruler.lines"
-            :key="x.id"
-            :config="{
-              id: x.id,
-              points: x.points,
-              stroke:
-                ruler.active == x.id
-                  ? ruler.conf.activeColor
-                  : ruler.conf.color,
-              strokeWidth:
-                ruler.active == x.id ? ruler.conf.activeSize : ruler.conf.size,
-              lineCap: 'round',
-              lineJoin: 'round',
-              dash: [5, 10]
-            }"
-            @mouseenter="onRulerMouseEnter"
-            @mouseleave="onRulerMouseLeave"
-            @click="onRulerClick"
-          />
-        </v-layer>
+        </v-stage>
+        <m-loading v-if="syncing" text="$vuetify.loading" />
+      </m-key-context>
 
-        <v-layer ref="layer">
-          <v-rect
-            v-for="x in rects"
-            :key="x.name"
-            :config="{
-              name: x.name,
-              id: x.id,
-              x: x.x,
-              y: x.y,
-              width: x.width,
-              height: x.height,
-              rotation: x.rotation || 1,
-              scaleX: x.scaleX || 1,
-              scaleY: x.scaleY || 1,
-              strokeWidth: x.size || 1,
-              draggable: mode == 'rect',
-              stroke: colorFilter('rect', x),
-              opacity: opacityFilter('rect')
-            }"
-            @click="onRectClick"
-            @dragend="onRectDragEnd"
-            @transformend="onTransformEnd"
-          />
-          <v-circle
-            v-for="(x, i) in points"
-            :key="i"
-            :config="{
-              id: x.id,
-              x: x.x,
-              y: x.y,
-              stroke: 'white',
-              strokeWidth: 1,
-              radius: x.size,
-              draggable: mode == 'circ',
-              fill: colorFilter('circ', x),
-              opacity: opacityFilter('circ')
-            }"
-            @click="onPointClick"
-            @mouseenter="onPointMouseEnter"
-            @mouseleave="onPointMouseLeave"
-            @dragstart="onPointDragStart"
-            @dragend="onPointDragEnd"
-          />
-          <v-transformer v-if="mode == 'rect'" ref="transformer" />
-        </v-layer>
-
-        <m-frame-editor-cursor
-          @dblclick="onDblClick"
-          v-if="cursor.show"
-          v-model="cursor"
+      <template v-slot:table>
+        <m-frame-editor-tab
+          :isLoading="syncing"
+          @update-point="$store.dispatch('current/frame/updatePoint', $event)"
+          @update-rect="$store.dispatch('current/frame/updateRect', $event)"
         />
-      </v-stage>
-      <m-loading v-if="syncing" text="$vuetify.loading" />
-    </m-key-context>
-
-    <template v-slot:table>
-      <m-frame-editor-tab
-        :isLoading="syncing"
-        @update-point="$store.dispatch('current/frame/updatePoint', $event)"
-        @update-rect="$store.dispatch('current/frame/updateRect', $event)"
-      />
-    </template>
-  </m-frame-editor-layout>
+      </template>
+    </m-frame-editor-layout>
+  </m-frame-editor-context-menu>
 </template>
 <script>
 import MFrameEditorTab from "@/components/tab/MFrameEditorTab";
 import MFrameEditorLayout from "@/components/layouts/MFrameEditorLayout";
 import MFrameEditorActions from "@/components/actions/MFrameEditorActions";
 import MFrameEditorCursor from "@/components/video/MFrameEditorCursor";
+import MFrameEditorContextMenu from "@/components/contextmenus/MFrameEditorContextMenu";
 import MKeyContext from "@/components/contextmenus/MKeyContext";
 import MLoading from "@/components/MLoading";
 export default {
   name: "m-frame-editor",
   components: {
     MKeyContext,
+    MFrameEditorContextMenu,
     MFrameEditorLayout,
     MFrameEditorActions,
     MFrameEditorCursor,
@@ -328,31 +334,30 @@ export default {
       const id = this.ruler.lines.length;
       this.ruler.lines.push({ id, points, t, i });
     },
-    async addConterPoint() {
-      const color = "#3E2723";
-      const contours = await this.$vuewer.image.findContours(this.src, {
+    async convexDefects() {
+      const concavosColor = "#3E2723";
+      const convexesColor = "#BF360C";
+      const _conv = (obj, i, type) => {
+        obj.color = type == "concavos" ? concavosColor : convexesColor;
+        obj.label = type == "concavos" ? `concavo-${i}` : `convex-${i}`;
+        return obj;
+      };
+      const defects = await this.$vuewer.image.convexDefects(this.src, {
         width: this.ow,
         height: this.oh
       });
-      const _cnv = (obj, i, color) => {
-        return {
-          x: Math.round((obj.x * this.cw) / this.ow),
-          y: Math.round((obj.y * this.ch) / this.oh),
-          label: `ref-${i}`,
-          color: color
-        };
-      };
-      const points = contours
-        .filter(c => c.starts.length || c.ends.length || c.fars.length)
-        .map(c => {
-          return [
-            c.fars.map((f, i) => _cnv(f, i, color)),
-            c.starts.map((f, i) => _cnv(f, i, color)),
-            c.ends.map((f, i) => _cnv(f, i, color))
-          ].flat();
+      const points = defects
+        .map(res => {
+          const concav = res.concavos.map((obj, i) =>
+            _conv(obj, i, "concavos")
+          );
+          const convex = res.convexes.map((obj, i) =>
+            _conv(obj, i, "convexes")
+          );
+          return concav.concat(convex);
         })
         .flat();
-      console.log(points);
+      await this.$store.dispatch("current/frame/addPoints", points);
     },
     // ==============================================
     // フィルター関数
@@ -372,6 +377,47 @@ export default {
     // ==============================================
     // イベントハンドラ
     // ==============================================
+    onMenuClick(payload) {
+      if (payload == "SKIP/NEXT") {
+        this.onSkip("next");
+      } else if (payload == "SKIP/PREV") {
+        this.onSkip("prev");
+      } else if (payload == "ZOOM/IN") {
+        this.onZoom("in");
+      } else if (payload == "ZOOM/OUT") {
+        this.onZoom("out");
+      } else if (payload == "COPY") {
+        this.copyImage();
+      } else if (payload == "DOWNLOAD") {
+        this.onDownload("image");
+      } else if (payload == "FILTER/THRESHOLD") {
+        this.$store.commit(
+          "current/frame/filter",
+          "$vuetify.iFilter.threshold"
+        );
+      } else if (payload == "FILTER/ADAPTIVE") {
+        this.$store.commit(
+          "current/frame/filter",
+          "$vuetify.iFilter.adaptiveThreshold"
+        );
+      } else if (payload == "FILTER/CANNY") {
+        this.$store.commit("current/frame/filter", "$vuetify.iFilter.canny");
+      } else if (payload == "FILTER/BILATERAL") {
+        this.$store.commit(
+          "current/frame/filter",
+          "$vuetify.iFilter.bilateral"
+        );
+      } else if (payload == "FILTER/LAPLACIAN") {
+        this.$store.commit(
+          "current/frame/filter",
+          "$vuetify.iFilter.laplacian"
+        );
+      } else if (payload == "FILTER/CONCAVECONVEX") {
+        this.convexDefects();
+      } else {
+        console.log("onMenuClick", payload);
+      }
+    },
     onSkip: function(payload) {
       if (payload == "next") {
         if (this.$store.state.setting.syncPrevPoints) {
@@ -446,7 +492,7 @@ export default {
       } else if (key == "c" && xKey == "ctrl") {
         this.copyImage();
       } else if (key == "s" && xKey == "ctrl") {
-        this.downloadImage();
+        this.onDownload("image");
       } else if (key == "i" && xKey == "default") {
         this.cursor.show = true;
       } else if (key == "i" && xKey == "ctrl") {

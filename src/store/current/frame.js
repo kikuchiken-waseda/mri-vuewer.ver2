@@ -1,5 +1,6 @@
 import Vue from "vue";
 import db from "@/storage/db";
+import cv from "@/utils/image";
 
 const color = "#F44336";
 const mode = "circ";
@@ -11,6 +12,32 @@ export default {
       { val: "rect", icon: "mdi-shape-rectangle-plus" },
       { val: "ruler", icon: "mdi-ruler-square" },
       { val: "eras", icon: "mdi-eraser" }
+    ],
+    filters: [
+      {
+        func: async (src, originSize) =>
+          await cv.otsuThreshold(src, originSize),
+        name: "$vuetify.iFilter.threshold"
+      },
+      {
+        func: async (src, originSize) =>
+          await cv.adaptiveThreshold(src, originSize),
+        name: "$vuetify.iFilter.adaptiveThreshold"
+      },
+      {
+        func: async (src, originSize) => await cv.canny(src, originSize),
+        name: "$vuetify.iFilter.canny"
+      },
+      {
+        func: async (src, originSize) =>
+          await cv.bilateralFilter(src, originSize),
+        name: "$vuetify.iFilter.bilateral"
+      },
+      {
+        func: async (src, originSize) =>
+          await cv.laplacianFilter(src, originSize),
+        name: "$vuetify.iFilter.laplacian"
+      }
     ],
     mode: mode,
     filter: null,
@@ -47,7 +74,10 @@ export default {
         state.tab = 1;
       }
     },
-    filter: (state, func) => (state.filter = func),
+    filter: (state, name) => {
+      const idx = state.filters.findIndex(f => f.name == name);
+      state.filter = idx == -1 ? null : state.filters[idx].func;
+    },
     color: (state, str) => (state.color = str),
     src: (state, str) => (state.src = str),
     id: (state, payload) => (state.id = Math.round(Number(payload))),
@@ -106,6 +136,26 @@ export default {
       try {
         item.id = await db.points.put(item);
         state.points.push(item);
+        const frame = { id: state.id, points: state.points };
+        dispatch("current/updateFrames", frame, { root: true });
+      } catch (error) {
+        dispatch("snackbar/error", error.message, { root: true });
+      }
+    },
+    async addPoints({ state, dispatch }, points) {
+      const $points = points.map(p => {
+        return {
+          x: p.x,
+          y: p.y,
+          color: p.color,
+          label: p.label,
+          size: state.style.size,
+          frameId: state.id
+        };
+      });
+      try {
+        await db.points.bulkPut($points);
+        state.points = await db.points.where({ frameId: state.id }).toArray();
         const frame = { id: state.id, points: state.points };
         dispatch("current/updateFrames", frame, { root: true });
       } catch (error) {

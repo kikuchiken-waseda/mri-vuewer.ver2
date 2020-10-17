@@ -10,13 +10,14 @@
       </v-card>
     </template>
     <slot name="toolbar">
-      <v-toolbar v-if="title" dense color="primary" dark>
+      <v-toolbar v-if="title" dense :color="color" dark>
         <v-toolbar-title>{{ $vuetify.lang.t(title) }}</v-toolbar-title>
       </v-toolbar>
     </slot>
     <slot name="menu">
       <v-card
         tile
+        flat
         class="mx-auto overflow-y-auto"
         :min-width="minWidth"
         max-height="600"
@@ -29,7 +30,12 @@
           style="display:none"
         />
         <slot name="menu-contents">
-          <v-list dense subheader class="overflow-y-auto" max-height="450">
+          <v-list
+            dense
+            subheader
+            class="overflow-y-auto"
+            :max-height="maxHeight"
+          >
             <div v-for="(item, key) in items" :key="key">
               <v-subheader
                 v-if="item.subheader"
@@ -101,6 +107,10 @@ export default {
       type: String,
       default: ""
     },
+    color: {
+      type: String,
+      default: "primary"
+    },
     items: {
       type: Array,
       default: () => []
@@ -108,6 +118,10 @@ export default {
     accept: {
       type: String,
       default: ""
+    },
+    maxHeight: {
+      type: String,
+      default: "450"
     },
     minWidth: {
       type: String,

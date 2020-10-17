@@ -437,6 +437,8 @@ export default {
     },
     frame: {
       name: `Image Annotation`,
+      download: "Save a image as png",
+      copy: "Copy a image to clipboard",
       edit: `Show an Image Annotation Dialog`,
       deletePoints: `Delete All Points`,
       deleteRects: `Delete All Rects`
@@ -486,5 +488,14 @@ export default {
     frameEdit: "Frame Annotation (Japanese only)",
     search: "Searching Annotated Data (Japanese only)",
     dropbox: "Works with Dropbox (Japanese only)"
+  },
+  iFilter: {
+    name: "Image Filer",
+    threshold: "Threshold (OTSU)",
+    adaptiveThreshold: "Threshold (ADAPTIVE)",
+    canny: "Canny",
+    bilateral: "Bilateral",
+    laplacian: "Laplacian",
+    concaveConvex: "Concave‐Convex Defect"
   }
 };

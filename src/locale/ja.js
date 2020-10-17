@@ -218,7 +218,7 @@ export default {
       title: "フレーム計測ダイアログ"
     },
     imageEdit: {
-      title: `フレーム${EDIT}モード`
+      title: `フレーム${EDIT}ダイアログ`
     }
   },
   wVideo: {
@@ -451,6 +451,8 @@ export default {
     frame: {
       name: `${FRAME.name}`,
       edit: `${FRAME.name}画面の表示`,
+      download: "画像を PNG 形式で保存",
+      copy: "画像をクリップボードにコピー",
       deletePoints: `全ての点群データを削除する`,
       deleteRects: `全ての矩形データを削除する`
     }
@@ -510,6 +512,15 @@ export default {
     frameEdit: "フレーム転記",
     search: "データ検索",
     dropbox: "ドロップボックス連携"
+  },
+  iFilter: {
+    name: "画像フィルタリング",
+    threshold: "二値化",
+    adaptiveThreshold: "適応的閾値",
+    canny: "キャニー",
+    bilateral: "バイラテラル",
+    laplacian: "ラプラシアン",
+    concaveConvex: "凹凸欠落を点に追加"
   }
 };
 //# sourceMappingURL=ja.js.map

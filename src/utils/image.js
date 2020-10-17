@@ -79,6 +79,70 @@ const findContours = (dataURL, size) => {
   });
 };
 
+const convexDefects = (dataURL, size) => {
+  return new Promise((resolve, reject) => {
+    const opt = cv.THRESH_BINARY + cv.THRESH_OTSU;
+    readBase64(dataURL, size).then(src => {
+      let dst = new cv.Mat();
+      let contours = new cv.MatVector();
+      let hierarchy = new cv.Mat();
+      let hull = new cv.Mat();
+      let defect = new cv.Mat();
+      try {
+        cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY, 0);
+        cv.threshold(src, dst, 0, 255, opt);
+        cv.findContours(
+          dst,
+          contours,
+          hierarchy,
+          cv.RETR_CCOMP,
+          cv.CHAIN_APPROX_SIMPLE
+        );
+        const results = [];
+        for (let i = 0; i < contours.size(); i++) {
+          const cnt = contours.get(i);
+          const area = cv.contourArea(cnt, false);
+          if (area > 30000 && area < 50000) {
+            cv.convexHull(cnt, hull, false, false);
+            cv.convexityDefects(cnt, hull, defect);
+            const item = {
+              id: i,
+              area: area,
+              concavos: [],
+              convexes: []
+            };
+            for (let ii = 0; ii < defect.rows; ++ii) {
+              item.convexes.push({
+                x: cnt.data32S[defect.data32S[ii * 4] * 2],
+                y: cnt.data32S[defect.data32S[ii * 4] * 2 + 1]
+              });
+              item.convexes.push({
+                x: cnt.data32S[defect.data32S[ii * 4 + 1] * 2],
+                y: cnt.data32S[defect.data32S[ii * 4 + 1] * 2 + 1]
+              });
+              item.concavos.push({
+                x: cnt.data32S[defect.data32S[ii * 4 + 2] * 2],
+                y: cnt.data32S[defect.data32S[ii * 4 + 2] * 2 + 1]
+              });
+            }
+            results.push(item);
+          }
+        }
+        resolve(results);
+      } catch (e) {
+        reject(e);
+      } finally {
+        src.delete();
+        dst.delete();
+        contours.delete();
+        hierarchy.delete();
+        hull.delete();
+        defect.delete();
+      }
+    });
+  });
+};
+
 const adaptiveThreshold = (dataURL, size) => {
   return new Promise((resolve, reject) => {
     const opt = cv.ADAPTIVE_THRESH_GAUSSIAN_C;
@@ -220,6 +284,7 @@ const grabCut = (dataURL, size) => {
 };
 export default {
   findContours,
+  convexDefects,
   grabCut,
   bilateralFilter,
   laplacianFilter,

@@ -40,8 +40,8 @@
     </v-toolbar>
     <v-toolbar dense>
       <v-btn-toggle v-model="filter" dense group color="primary">
-        <v-btn :value="f.func" text v-for="f in filters" :key="f.name">
-          {{ f.name }}
+        <v-btn :value="f.name" text v-for="f in filters" :key="f.name">
+          {{ $vuetify.lang.t(f.name) }}
         </v-btn>
       </v-btn-toggle>
       <v-spacer />
@@ -114,41 +114,15 @@ export default {
       get() {
         return this.$store.state.current.frame.filter;
       },
-      set(filter) {
-        this.$store.commit("current/frame/filter", filter);
+      set(name) {
+        this.$store.commit("current/frame/filter", name);
       }
     },
     modes: function() {
       return this.$store.state.current.frame.modes;
     },
     filters: function() {
-      const cv = this.$vuewer.image;
-      return [
-        {
-          func: async (src, originSize) =>
-            await cv.otsuThreshold(src, originSize),
-          name: "二値化"
-        },
-        {
-          func: async (src, originSize) =>
-            await cv.adaptiveThreshold(src, originSize),
-          name: "適応的閾値"
-        },
-        {
-          func: async (src, originSize) => await cv.canny(src, originSize),
-          name: "キャニー"
-        },
-        {
-          func: async (src, originSize) =>
-            await cv.bilateralFilter(src, originSize),
-          name: "バイラテラル"
-        },
-        {
-          func: async (src, originSize) =>
-            await cv.laplacianFilter(src, originSize),
-          name: "ラプラシアン"
-        }
-      ];
+      return this.$store.state.current.frame.filters;
     }
   }
 };
