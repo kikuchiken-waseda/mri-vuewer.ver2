@@ -38,7 +38,7 @@ const findContours = (dataURL, size) => {
         for (let i = 0; i < contours.size(); i++) {
           const cnt = contours.get(i);
           const area = cv.contourArea(cnt, false);
-          if (area > 30000 && area < 50000) {
+          if (area > 100) {
             cv.convexHull(cnt, hull, false, false);
             cv.convexityDefects(cnt, hull, defect);
             const item = {
@@ -81,7 +81,6 @@ const findContours = (dataURL, size) => {
 
 const convexDefects = (dataURL, size) => {
   return new Promise((resolve, reject) => {
-    const opt = cv.THRESH_BINARY + cv.THRESH_OTSU;
     readBase64(dataURL, size).then(src => {
       let dst = new cv.Mat();
       let contours = new cv.MatVector();
@@ -90,7 +89,7 @@ const convexDefects = (dataURL, size) => {
       let defect = new cv.Mat();
       try {
         cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY, 0);
-        cv.threshold(src, dst, 0, 255, opt);
+        cv.threshold(src, dst, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
         cv.findContours(
           dst,
           contours,
