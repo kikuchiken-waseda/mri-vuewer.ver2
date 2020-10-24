@@ -943,10 +943,14 @@ export default {
 
       // DELETE 系の動作
       if (~[8, 46].indexOf(key)) {
-        if (this.$store.state.setting.deleteRecordKey == xKey) {
+        let dKey = this.$store.state.setting.deleteRecordKey;
+        if (dKey == "delete" && xKey == "default") {
           this.deleteRecord(item.key, item.index);
         }
-        if (this.$store.state.setting.deleteRecordKey + "+shift" == xKey) {
+        if (dKey == xKey) {
+          this.deleteRecord(item.key, item.index);
+        }
+        if (dKey + "+shift" == xKey) {
           this.onClickTierDelete();
         }
       } else if (key == 68) {
