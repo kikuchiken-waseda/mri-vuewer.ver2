@@ -308,7 +308,7 @@ export default {
     },
     $duration: {
       get() {
-        return this.$store.state.current.duration;
+        return Number(this.$store.state.current.duration);
       },
       set(val) {
         this.$store.commit("current/duration", Number(val));
@@ -601,11 +601,12 @@ export default {
       this.focusTier(key);
     },
     extendRecord(key, idx) {
-      const tier = this.$textgrid[key];
-      const target = tier.values[idx];
-      const d = this.$duration;
-      const lim = idx + 1 == tier.length ? d : tier.values[idx + 1].time;
-      const time = target.time + this.$frameRate;
+      const tier = this.$textgrid[key].values;
+      const target = tier[idx];
+      const maxTime = this.$duration - this.$frameRate;
+      const time = Number(target.time) + this.$frameRate;
+      const lim =
+        idx + 1 == tier.length ? maxTime : tier[idx + 1].time - this.$frameRate;
       if (time < lim) {
         const item = { text: target.text, time: time };
         this.wavesurfer.setTierValue(key, idx, item);
@@ -938,7 +939,6 @@ export default {
       const check = (this.keybuffer.from == "textgrid") & (time < 150);
       const preKey = check ? this.keybuffer.keycode : null;
       const { key, xKey } = this.$vuewer.key.summary(payload);
-
       const item = payload.current;
 
       // DELETE 系の動作
@@ -1505,16 +1505,21 @@ export default {
     const layout = this.$refs.layout;
     if (layout) {
       const el = layout.$el;
-      el.addEventListener("mouseup", this.onLayoutMouseUp, { passive: false });
+      if (el) {
+        el.addEventListener("mouseup", this.onLayoutMouseUp, {
+          passive: false
+        });
+      }
     }
   },
   beforeDestroy: function() {
     this.$store.dispatch("current/init");
     this.$store.dispatch("search/init");
-
     const layout = this.$refs.layout;
     const el = layout.$el;
-    el.removeEventListener("mouseup", this.onLayoutMouseUp);
+    if (el) {
+      el.removeEventListener("mouseup", this.onLayoutMouseUp);
+    }
   }
 };
 </script>
