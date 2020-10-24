@@ -30,7 +30,7 @@ export default {
   name: "video-png-converter",
   components: { MViewLayout, MVideoInput },
   data: () => ({
-    frame: -1,
+    frame: 1,
     crop: {
       show: false,
       x: 0,
@@ -58,6 +58,8 @@ export default {
           h: Math.round(this.crop.h)
         });
         const crop = this.crop.show ? this.crop : null;
+
+        const bname = payload.name.split(".")[0];
         if (this.frame == -1) {
           const result = await this.$vuewer.io.video.toPngs(
             buff,
@@ -73,24 +75,19 @@ export default {
               files.push({ name: out.name, base64 });
             }
             const zip = await this.$vuewer.io.zip.toZip(files);
-            const name = payload.name.split(".")[0] + ".zip";
+            const name = `${bname}.zip`;
             this.$vuewer.io.file.download(zip, name);
           }
         } else {
-          const result = this.$vuewer.io.video.toPng(
-            buff,
-            Number(this.frame),
-            payload.fps,
-            payload.duration,
-            crop
+          const time = (this.frame + 1) / Number(payload.fps);
+          const dataURL = await this.$vuewer.video.toPng(
+            payload.source,
+            payload.originSize,
+            time
           );
-          if (result.MEMFS) {
-            console.log(result.MEMFS.length);
-            const out = result.MEMFS[0];
-            const blob = new Blob([out.data], { type: out.type });
-            const name = payload.name.split(".")[0] + ".png";
-            this.$vuewer.io.file.download(blob, name);
-          }
+          const blob = this.$vuewer.io.file.toBlob(dataURL);
+          const name = `${bname}-${this.frame}.png`;
+          this.$vuewer.io.file.download(blob, name);
         }
       }
       this.$vuewer.loading.end();

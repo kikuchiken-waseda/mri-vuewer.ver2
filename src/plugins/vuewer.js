@@ -35,6 +35,7 @@ const Vuewer = {
       math: utils.math,
       text: utils.text,
       image: utils.image,
+      video: utils.video,
       dropbox: utils.dropbox,
       console: $console,
       db: {
