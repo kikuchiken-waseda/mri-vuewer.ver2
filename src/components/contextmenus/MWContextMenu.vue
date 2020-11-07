@@ -530,6 +530,33 @@ export default {
               }
             },
             {
+              text: "$vuetify.contexts.record.splitByFrames",
+              icon: "",
+              click: () => {
+                setTimeout(function() {
+                  vm.$emit("click-interval", "split-by-frames");
+                }, 10);
+              }
+            },
+            {
+              text: "$vuetify.contexts.record.splitByChars",
+              icon: "",
+              click: () => {
+                setTimeout(function() {
+                  vm.$emit("click-interval", "split-by-chars");
+                }, 10);
+              }
+            },
+            {
+              text: "$vuetify.contexts.record.splitBySlash",
+              icon: "",
+              click: () => {
+                setTimeout(function() {
+                  vm.$emit("click-interval", "split-by-slash");
+                }, 10);
+              }
+            },
+            {
               text: "$vuetify.contexts.tier.interval.owakati",
               icon: "",
               click: () => {

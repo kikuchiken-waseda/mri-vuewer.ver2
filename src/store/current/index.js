@@ -40,7 +40,10 @@ export default {
   },
   actions: {
     async init({ dispatch, commit, state }, id = null) {
-      state.wavesurfer = null;
+      if (state.wavesurfer !== null) {
+        state.wavesurfer.wavesurfer.destroy();
+        state.wavesurfer = null;
+      }
       state.source = null;
       state.textgrid = {};
       state.fps = 0;

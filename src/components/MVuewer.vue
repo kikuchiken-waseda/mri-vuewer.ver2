@@ -647,10 +647,6 @@ export default {
       }
     },
     splitRecord(key, idx, type) {
-      this.$vuewer.console.log(
-        this.tag,
-        `split a record (key: ${key} idx: ${idx})`
-      );
       if (type == "frames") {
         // フレーム分割
         this.wavesurfer.splitTierValue(key, idx, this.$frameRate);
@@ -1412,6 +1408,62 @@ export default {
           }
           const textgrid = this.$textgrid;
           textgrid[key].values = new_records;
+          this.$store.dispatch("current/setTextGrid", textgrid);
+        } else if (payload == "split-by-frames") {
+          const times = this.$frames
+            .filter(x => x.time > 0 && x.time < this.$duration)
+            .map(x => x.time);
+          const values = times.map(t => ({ text: "", time: t }));
+          const textgrid = this.$textgrid;
+          textgrid[key].values = values;
+          this.$store.dispatch("current/setTextGrid", textgrid);
+        } else if (payload == "split-by-chars") {
+          const tier = this.$textgrid[key];
+          const textgrid = this.$textgrid;
+          for (const idx in tier.values) {
+            const rec = this.$textgrid[key].values[idx];
+            const prev = idx - 1 == 0 ? tier.values[0] : tier.values[idx - 1];
+            if (rec.text) {
+              const texts = rec.text.split("");
+              const num = texts.length;
+              const duration = rec.time - prev.time;
+              const step = duration / num;
+              for (let i = 1; i < num + 1; i++) {
+                const time = prev.time + step * i;
+                const text = texts[i - 1];
+                if (i == 1) {
+                  textgrid[key].values[idx].text = text;
+                  textgrid[key].values[idx].time = time;
+                } else {
+                  textgrid[key].values.push({ text: text, time: time });
+                }
+              }
+            }
+          }
+          this.$store.dispatch("current/setTextGrid", textgrid);
+        } else if (payload == "split-by-slash") {
+          const tier = this.$textgrid[key];
+          const textgrid = this.$textgrid;
+          for (const idx in tier.values) {
+            const rec = this.$textgrid[key].values[idx];
+            const prev = idx - 1 == 0 ? tier.values[0] : tier.values[idx - 1];
+            if (rec.text) {
+              const duration = rec.time - prev.time;
+              const texts = rec.text.split("/");
+              const num = texts.length;
+              const step = duration / num;
+              for (let i = 1; i < num + 1; i++) {
+                const time = prev.time + step * i;
+                const text = texts[i - 1];
+                if (i == 1) {
+                  textgrid[key].values[idx].text = text;
+                  textgrid[key].values[idx].time = time;
+                } else {
+                  textgrid[key].values.push({ text: text, time: time });
+                }
+              }
+            }
+          }
           this.$store.dispatch("current/setTextGrid", textgrid);
         }
       } else {
