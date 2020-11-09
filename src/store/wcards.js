@@ -9,15 +9,21 @@ export default {
       state.cards.push(payload);
     },
     closing(state, payload) {
-      const idx = state.closings.findIndex(x => x._uid == payload._uid);
-      if (idx == -1) {
-        state.closings.push(payload);
+      if (payload._uid) {
+        const idx = state.closings.findIndex(x => x._uid == payload._uid);
+        if (idx == -1) state.closings.push(payload);
+      } else {
+        const idx = state.closings.findIndex(x => x.title == payload);
+        if (idx == -1) state.closings.push(payload);
       }
     },
     open(state, payload) {
-      const idx = state.closings.findIndex(x => x._uid == payload._uid);
-      if (idx > -1) {
-        state.closings.splice(idx, 1);
+      if (payload._uid) {
+        const idx = state.closings.findIndex(x => x._uid == payload._uid);
+        if (idx > -1) state.closings.splice(idx, 1);
+      } else {
+        const idx = state.closings.findIndex(x => x.title == payload);
+        if (idx > -1) state.closings.splice(idx, 1);
       }
     }
   },
@@ -32,7 +38,7 @@ export default {
       card.setZIndex(payload.zIndex + cards.length);
       for (const i in cards) {
         if (i != payload.id) {
-          cards[i].setZIndex(1);
+          if (cards[i].setZIndex) cards[i].setZIndex(1);
         }
       }
     }

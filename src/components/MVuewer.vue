@@ -9,6 +9,7 @@
     @click-tier-delete="onClickTierDelete"
     @click-upload="onUploadClick"
     @click-download="onDownloadClick"
+    @click-window="onWindowClick"
     @click-noise-reduction="onClickNoiseReduction"
     @click-complate="onClickComplate"
     @click-record="onClickRecordContextMenu"
@@ -101,8 +102,8 @@
           <m-loading text="$vuetify.loading" v-if="isLoading" />
         </wave-surfer>
       </v-card>
-
       <template v-slot:bottom>
+        <m-diff-card ref="diffCard" hide />
         <m-speed-dial
           v-model="fab"
           @click-save="fireUpdateData"
@@ -173,6 +174,7 @@ import MTextgridDialog from "@/components/dialogs/MTextgridDialog";
 import MComplatesDialog from "@/components/dialogs/MComplatesDialog";
 import MSpeedDial from "@/components/MSpeedDial";
 import MLoading from "@/components/MLoading";
+import MDiffCard from "@/components/windows/MDiffCard.vue";
 
 export default {
   name: "WVuwer",
@@ -193,6 +195,7 @@ export default {
     MTierDialog,
     MTierEditDialog,
     MRecordTextField,
+    MDiffCard,
     MVuwerActions
   },
   props: {
@@ -809,6 +812,14 @@ export default {
         this.$vuewer.io.file.download(blob, `${bname}.xlsx`);
       } else {
         this.$vuewer.snackbar.warning("$vuetify.yet");
+      }
+    },
+    onWindowClick: function(payload) {
+      if (payload == "FRAMEDIFF") {
+        const elm = this.$refs.diffCard;
+        if (elm) elm.open();
+      } else {
+        this.$vuewer.snackbar.error("$vuetify.yet");
       }
     },
     onUploadClick: function(payload) {

@@ -34,7 +34,7 @@
       <v-toolbar dense :color="color" dark>
         <slot name="toolbar">
           <v-toolbar-title v-if="title">
-            {{ title }}
+            {{ $vuetify.lang.t(title) }}
           </v-toolbar-title>
           <v-spacer></v-spacer>
           <slot name="toolbar-actions"></slot>

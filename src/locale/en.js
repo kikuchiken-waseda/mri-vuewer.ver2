@@ -392,6 +392,10 @@ export default {
     denoising: {
       audio: "Audio Noise Reduction"
     },
+    windows: {
+      name: "Windows",
+      framediff: "Frame Difference"
+    },
     playPause: "play or pause",
     skip: "skip",
     skipBackward: "skip backward",

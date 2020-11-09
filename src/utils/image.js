@@ -281,6 +281,32 @@ const grabCut = (dataURL, size) => {
     });
   });
 };
+
+// フレーム間差分画像を取得
+const frameDiff = (src1, src2, size) => {
+  return new Promise((resolve, reject) => {
+    const promise1 = readBase64(src1, size);
+    const promise2 = readBase64(src2, size);
+    Promise.all([promise1, promise2]).then(srcs => {
+      const dst = new cv.Mat();
+      const src1 = new cv.Mat();
+      const src2 = new cv.Mat();
+      try {
+        cv.cvtColor(srcs[0], src1, cv.COLOR_RGB2GRAY, 0);
+        cv.cvtColor(srcs[1], src2, cv.COLOR_RGB2GRAY, 0);
+        cv.absdiff(src1, src2, dst);
+        resolve(writeBase64(dst));
+      } catch (e) {
+        reject(e);
+      } finally {
+        dst.delete();
+        src1.delete();
+        src2.delete();
+      }
+    });
+  });
+};
+
 export default {
   findContours,
   convexDefects,
@@ -289,5 +315,6 @@ export default {
   laplacianFilter,
   adaptiveThreshold,
   otsuThreshold,
-  canny
+  canny,
+  frameDiff
 };

@@ -44,6 +44,11 @@ export default {
     tab: null,
     color: color,
     src: null,
+    prev: null,
+    next: null,
+    isChange: false,
+    isChangePrev: false,
+    isChangeNext: false,
     id: null, // frame-id
     idx: null, // frame-idx
     time: null, // frame-time
@@ -80,6 +85,27 @@ export default {
     },
     color: (state, str) => (state.color = str),
     src: (state, str) => (state.src = str),
+    prev: (state, str) => (state.prev = str),
+    next: (state, str) => (state.next = str),
+    isChange: (state, bool) => {
+      state.isChange = bool;
+      if (bool === true) {
+        state.isChangePrev = false;
+        state.isChangeNext = false;
+      }
+    },
+    isChangePrev: (state, bool) => {
+      state.isChangePrev = bool;
+      if (state.isChangeNext === false) {
+        state.isChange = false;
+      }
+    },
+    isChangeNext: (state, bool) => {
+      state.isChangeNext = bool;
+      if (state.isChangePrev === false) {
+        state.isChange = false;
+      }
+    },
     id: (state, payload) => (state.id = Math.round(Number(payload))),
     idx: (state, payload) => (state.idx = Math.round(Number(payload))),
     time: (state, payload) => (state.time = Number(payload)),
@@ -119,6 +145,7 @@ export default {
     },
     frame: function(context, payload) {
       if (payload.idx && payload.src) {
+        context.commit("isChange", true);
         context.commit("src", payload.src || context.state.src);
         context.commit("idx", payload.idx || context.state.idx);
         context.commit("id", payload.id || context.state.id);

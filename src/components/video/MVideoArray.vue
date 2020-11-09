@@ -7,6 +7,7 @@
         ref="prev"
         :style="videoStyle"
         :src="src"
+        @frame-updated="onPrevFrameUpdated"
         :frames="$frames"
         :origin-size="$originSize"
         @keyup="onKeyup('prev', $event)"
@@ -36,6 +37,7 @@
         :origin-size="$originSize"
         :style="videoStyle"
         :frames="$frames"
+        @frame-updated="onNextFrameUpdated"
         @keyup="onKeyup('prev', $event)"
         @mouseover="$emit('mouseover')"
       />
@@ -107,6 +109,22 @@ export default {
           const time = currentTime + offsetTime;
           this.$refs.next.setCurrentTime(time);
         }
+      }
+    },
+    onPrevFrameUpdated: function(payload) {
+      if (payload) {
+        const video = this.$refs.prev;
+        const dataURL = video.getVideoDataURL();
+        this.$store.commit("current/frame/prev", dataURL);
+        this.$store.commit("current/frame/isChangePrev", false);
+      }
+    },
+    onNextFrameUpdated: function(payload) {
+      if (payload) {
+        const video = this.$refs.next;
+        const dataURL = video.getVideoDataURL();
+        this.$store.commit("current/frame/next", dataURL);
+        this.$store.commit("current/frame/isChangeNext", false);
       }
     },
     onFrameUpdated: function(payload) {

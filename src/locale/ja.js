@@ -405,6 +405,10 @@ export default {
     denoising: {
       audio: "音声ノイズ除去"
     },
+    windows: {
+      name: "補助ウインドウ",
+      framediff: "フレーム間差分"
+    },
     playPause: "再生/停止",
     skip: "スキップ",
     skipBackward: "戻る",

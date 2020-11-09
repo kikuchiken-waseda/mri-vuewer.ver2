@@ -1,20 +1,13 @@
 <template>
   <m-view-layout :heading="heading" :desc="desc">
-    <m-window-card :x="100" :y="200" title="window-card" max-width="400px">
-      <v-card tile flat>
-        <v-img
-          class="white--text align-end"
-          height="200px"
-          src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-        >
-          <v-card-title>Top 10 Australian beaches</v-card-title>
-        </v-img>
-        <v-card-subtitle class="pb-0">Number 10</v-card-subtitle>
-        <v-card-text class="text--primary">
-          <div>Whitehaven Beach</div>
-          <div>Whitsunday Island, Whitsunday Islands</div>
-        </v-card-text>
-      </v-card>
+    <m-window-card :x="0" :y="0" title="window-card" max-width="400px">
+      <v-img
+        class="white--text align-end"
+        height="200px"
+        src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+      >
+        <v-card-title>Top 10 Australian beaches</v-card-title>
+      </v-img>
     </m-window-card>
 
     <m-window-card hide right title="right-card" max-width="300px">

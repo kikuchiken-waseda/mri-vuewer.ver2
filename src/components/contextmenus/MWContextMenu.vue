@@ -317,6 +317,23 @@ export default {
           ]
         },
         {
+          text: "$vuetify.contexts.windows.name",
+          show: false,
+          icon: "mdi-dock-window",
+          items: [
+            {
+              text: "$vuetify.contexts.windows.framediff",
+              icon: "",
+              click: () => {
+                setTimeout(function() {
+                  vm.$emit("click-window", "FRAMEDIFF");
+                }, 10);
+              }
+            }
+          ]
+        },
+
+        {
           subheader: "$vuetify.textgrid.name"
         },
         {
