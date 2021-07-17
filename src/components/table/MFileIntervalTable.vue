@@ -99,6 +99,7 @@ export default {
         }
         if (Object.keys(kwargs).length) {
           records = records.filter(x => {
+            console.log(x.search);
             return Object.keys(kwargs)
               .map(key =>
                 key in x.search ? x.search[key] == kwargs[key] : false

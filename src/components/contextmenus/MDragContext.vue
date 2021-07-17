@@ -33,11 +33,14 @@ export default {
     onDroped: async function(e) {
       if (e.dataTransfer) {
         const files = [...e.dataTransfer.files];
+        const mp4s = files.filter(x => {
+          return x.type == "video/mp4";
+        });
 
-        const mp4s = files.filter(x => x.type == "video/mp4");
-        for (const i in mp4s) {
-          if (i == 0) this.$vuewer.loading.start("downloading mp4 files ...");
-          const f = mp4s[i];
+        mp4s.forEach(async (f, i) => {
+          if (i == 0) {
+            this.$vuewer.loading.start("downloading mp4 files ...");
+          }
           const video = this.$vuewer.io.video.initObj();
           const buff = await f.arrayBuffer();
           this.$vuewer.io.video.info(buff, async res => {
@@ -49,12 +52,10 @@ export default {
             const source = await this.$vuewer.io.file.toBase64(f);
             video.source = source;
             video.name = f.name;
-
             // フレーム情報の追加
             video.frames = [];
             const total = Math.floor(video.duration * video.fps);
             const frameRate = 1 / video.fps;
-
             let time = 0;
             let idx = 0;
             while (idx < total) {
@@ -74,7 +75,8 @@ export default {
               }
             }
           });
-        }
+        });
+        this.overlay = false;
       }
     }
   }
