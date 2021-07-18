@@ -74,7 +74,7 @@ export default {
       {
         text: "TEXTGRID",
         val: "TEXTGRID/TEXTGRID",
-        accept: ".TextGrid,.textgrid,.Textgrid"
+        accept: ".TextGrid"
       },
       {
         text: "JSON",

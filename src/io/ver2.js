@@ -1,6 +1,5 @@
 export default {
   loadTextGrid: obj => {
-    const textgrid = {};
     if (obj.name && obj.textgrid) {
       return obj.textgrid;
     } else {
@@ -13,7 +12,7 @@ export default {
           }
         }
       }
+      return textgrid;
     }
-    return textgrid;
   }
 };
