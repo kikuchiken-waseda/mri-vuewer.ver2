@@ -31,6 +31,7 @@ export default {
       if (e.fromElement == null) this.overlay = false;
     },
     onDroped: async function(e) {
+      this.overlay = false;
       if (e.dataTransfer) {
         const files = [...e.dataTransfer.files];
         const mp4s = files.filter(x => {
@@ -69,14 +70,12 @@ export default {
             const vid = await this.$store.dispatch("files/push", video);
             if (i == mp4s.length - 1) {
               this.$vuewer.loading.end();
-              this.overlay = false;
               if (this.$store.state.setting.shouldMovePageAferAddingFile) {
                 this.$router.push({ path: `/files/${vid}` });
               }
             }
           });
         });
-        this.overlay = false;
       }
     }
   }

@@ -80,7 +80,9 @@ const Vuewer = {
         }
       },
       loading: {
-        start: message => $store.dispatch("loading/start", message),
+        start: message => {
+          $store.dispatch("loading/start", message);
+        },
         end: () => $store.dispatch("loading/finish")
       },
       key: {
