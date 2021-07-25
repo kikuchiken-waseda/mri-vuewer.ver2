@@ -231,6 +231,28 @@ const trim = (buff, start, end) => {
   return result;
 };
 
+const trimPng = (buff, start, end) => {
+  const video = new Uint8Array(buff);
+  const duration = end - start;
+  const result = ffmpeg({
+    MEMFS: [{ name: "data.mp4", data: video }],
+    arguments: [
+      "-ss",
+      String(start),
+      "-i",
+      "data.mp4",
+      "-t",
+      String(duration),
+      "-vcodec",
+      "png",
+      "img_%03d.png"
+    ],
+    print: function() {},
+    printErr: function() {}
+  });
+  return result;
+};
+
 // const concat = buffs => {
 //   const datas = buffs.map((x, i) => {
 //     const video = new Uint8Array(x);
@@ -315,6 +337,7 @@ export default {
   anlmdn,
   afftdn,
   trim,
+  trimPng,
   concat,
   toWav,
   toMp4,

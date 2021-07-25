@@ -40,7 +40,12 @@
         <m-video-dialog v-model="dialog" :src="src" :start="start" :end="end" />
         <v-card-actions v-if="selected.length > 1">
           <v-spacer />
-          <v-btn color="primary" @click="resynthesis">Download (ZIP)</v-btn>
+          <v-btn color="primary" @click="resynthesis">
+            Download (MP4 ZIP)
+          </v-btn>
+          <v-btn color="primary" @click="resynthesisPng">
+            Download (PNG ZIP)
+          </v-btn>
         </v-card-actions>
       </v-card>
     </template>
@@ -135,6 +140,22 @@ export default {
     },
     openItem: function(item) {
       this.$router.push({ path: `/files/${item.fileId}?start=${item.start}` });
+    },
+    resynthesisPng: async function() {
+      const files = [];
+      for (const item of this.selected) {
+        const buff = io.file.toBuff(item.src);
+        const result = io.video.trimPng(buff, item.start, item.end);
+        const pngs = result.MEMFS;
+        for (const x of pngs) {
+          const blob = new Blob([x.data], { type: "image/png" });
+          const base64 = await io.file.toBase64(blob);
+          const name = `${item.fileName}-${item.start}-${item.end}.${x.name}`;
+          files.push({ name, base64 });
+        }
+      }
+      const zip = await io.zip.toZip(files);
+      io.file.download(zip, "result.zip");
     },
     resynthesis: async function() {
       const files = [];
