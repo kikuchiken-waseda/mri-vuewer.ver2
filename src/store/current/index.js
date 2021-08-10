@@ -91,7 +91,7 @@ export default {
           state.textgrid = state.item.textgrid || {};
           state.frames = await db.frames
             .where({ fileId: state.item.id })
-            .with({ points: "points", rects: "rects" });
+            .with({ points: "points", rects: "rects", polygons: "polygons" });
           dispatch("loading/finish", {}, { root: true });
         }
       }

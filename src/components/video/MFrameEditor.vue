@@ -26,6 +26,24 @@
               @dblclick="onDblClick"
               :config="background"
             />
+          </v-layer>
+          <!-- 編集済みのポリゴン -->
+          <v-layer ref="layer" v-for="_p in polygons" :key="_p.id">
+            <v-line
+              v-for="x in _p.lines"
+              :key="`polygon-${x.id}`"
+              :config="{
+                id: `polygon-${x.id}`,
+                points: x.points,
+                stroke: _p.color || polygon.conf.color,
+                strokeWidth: polygon.conf.size,
+                lineCap: 'round',
+                lineJoin: 'round'
+              }"
+            />
+          </v-layer>
+          <v-layer ref="layer">
+            <!-- ルーラー -->
             <v-circle
               v-for="x in ruler.points"
               :key="x.id"
@@ -61,9 +79,48 @@
               @mouseleave="onRulerMouseLeave"
               @click="onRulerClick"
             />
-          </v-layer>
-
-          <v-layer ref="layer">
+            <!-- 編集中のポリゴン -->
+            <v-line
+              v-for="x in polygon.lines"
+              :key="`polygon-${x.id}`"
+              :config="{
+                id: `polygon-${x.id}`,
+                points: x.points,
+                stroke:
+                  polygon.active === true
+                    ? polygon.conf.activeColor
+                    : polygon.conf.color,
+                strokeWidth:
+                  polygon.active === true
+                    ? polygon.conf.activeSize
+                    : polygon.conf.size,
+                lineCap: 'round',
+                lineJoin: 'round'
+              }"
+            />
+            <v-circle
+              v-for="x in polygon.points"
+              :key="x.id"
+              :config="{
+                id: `polygon-${x.id}`,
+                x: x.x,
+                y: x.y,
+                stroke: 'white',
+                strokeWidth: 1,
+                radius:
+                  polygon.active === true
+                    ? polygon.conf.activeSize
+                    : polygon.conf.size,
+                fill:
+                  polygon.active === true
+                    ? polygon.conf.activeColor
+                    : polygon.conf.color
+              }"
+              @mouseenter="onPolygonMouseEnter"
+              @mouseleave="onPolygonMouseLeave"
+              @click="onClickPolygonsPoint"
+            />
+            <!-- 矩形 -->
             <v-rect
               v-for="x in rects"
               :key="x.name"
@@ -86,6 +143,7 @@
               @dragend="onRectDragEnd"
               @transformend="onTransformEnd"
             />
+            <!-- 点群 -->
             <v-circle
               v-for="(x, i) in points"
               :key="i"
@@ -108,7 +166,6 @@
             />
             <v-transformer v-if="mode == 'rect'" ref="transformer" />
           </v-layer>
-
           <m-frame-editor-cursor
             @dblclick="onDblClick"
             v-if="cursor.show"
@@ -187,6 +244,10 @@ export default {
     rects: function() {
       return this.$store.getters["current/frame/rects"];
     },
+    polygons: function() {
+      const items = this.$store.getters["current/frame/polygons"];
+      return items;
+    },
     mode: {
       get() {
         return this.$store.state.current.frame.mode;
@@ -230,10 +291,22 @@ export default {
     reservedPoints: [],
     reservedRects: [],
     syncPoints: [],
+    syncPolygons: [],
     syncRects: [],
     syncing: false,
     ruler: {
       active: null,
+      conf: {
+        size: 3,
+        color: "#607D8B",
+        activeSize: 5,
+        activeColor: "#FFC107"
+      },
+      points: [],
+      lines: []
+    },
+    polygon: {
+      active: false,
       conf: {
         size: 3,
         color: "#607D8B",
@@ -281,6 +354,7 @@ export default {
       };
       this.$store.dispatch("current/addRecord", payload);
     },
+    // 点群データの記述および保存
     async addPoint(x, y, color) {
       const item = { x, y, color };
       if (this.isPointReserved) {
@@ -297,6 +371,7 @@ export default {
         await this.$store.dispatch("current/frame/addPoint", item);
       }
     },
+    // 矩形データの記述および保存
     async addRect(x, y, width, height, rotation, color) {
       let item = { x, y, width, height, rotation, color };
       if (this.isRectReserved) {
@@ -316,12 +391,14 @@ export default {
         await this.$store.dispatch("current/frame/addRect", item);
       }
     },
+    // 参照線点データの記述
     addRulerPoint: function(x, y) {
       const id = this.ruler.points.length + 1;
       const label = `ruler-point-${id}`;
       this.ruler.points.push({ id, label, x, y });
       if (id % 2 == 0) this.addRulerLine(id);
     },
+    // 参照線データの記述
     addRulerLine(pid) {
       const idx = this.ruler.points.findIndex(x => x.id == pid);
       const a = this.ruler.points[idx - 1];
@@ -333,6 +410,47 @@ export default {
       const points = [f1.x, f1.y, f2.x, f2.y];
       const id = this.ruler.lines.length;
       this.ruler.lines.push({ id, points, t, i });
+    },
+    // ポリゴンを追加
+    addPolygon: async function() {
+      const count = this.polygons.length;
+      const id = count + 1;
+      const label = `polygon-${id}`;
+
+      const _points = this.polygon.points;
+      const lines = _points.slice(1).map((f2, id) => {
+        const f1 = _points[id];
+        const points = [f1.x, f1.y, f2.x, f2.y];
+        return { id: `line-${id}`, points };
+      });
+      const item = {
+        label,
+        lines,
+        id: label,
+        color: this.color,
+        points: _points
+      };
+      await this.$store.dispatch("current/frame/addPolygon", item);
+      this.polygon.active = false;
+      this.polygon.points = [];
+      this.polygon.lines = [];
+    },
+
+    addPolygonPoint: function(x, y) {
+      const count = this.polygon.points.length;
+      const id = count + 1;
+      const label = `polygon-point-${id}`;
+      this.polygon.points.push({ id, label, x, y });
+      if (id > 1) this.setPolygonLine();
+    },
+    setPolygonLine() {
+      // 2 番目の要素から取得
+      const _points = this.polygon.points;
+      this.polygon.lines = _points.slice(1).map((f2, id) => {
+        const f1 = _points[id];
+        const points = [f1.x, f1.y, f2.x, f2.y];
+        return { id: `line-${id}`, points };
+      });
     },
     async convexDefects() {
       const concavosColor = "#3E2723";
@@ -551,7 +669,23 @@ export default {
         this.addRect(x, y, width, height, 0, this.color);
       } else if (this.mode == "ruler") {
         this.addRulerPoint(this.cursor.x, this.cursor.y);
+      } else if (this.mode == "polygon") {
+        this.addPolygonPoint(this.cursor.x, this.cursor.y);
       }
+    },
+    // Polygon 系イベントハンドラ
+    onPolygonMouseEnter: function() {
+      const points = this.polygon.points;
+      this.polygon.active = points.length > 2 ? true : false;
+    },
+    onPolygonMouseLeave: function() {
+      this.polygon.active = false;
+    },
+    onClickPolygonsPoint: function() {
+      // ポリゴンの終了判定およびデータ追加.
+      const item = this.polygon.points[0];
+      this.addPolygonPoint(item.x, item.y);
+      this.addPolygon();
     },
     // Ruler 系イベントハンドラ
     onRulerClick: function(e) {
@@ -584,11 +718,14 @@ export default {
     onRulerMouseLeave: function() {
       this.ruler.active = null;
     },
+
     // Point 系イベントハンドラ
     onPointClick: function(e) {
       if (this.mode == "eras") {
         const id = e.target.attrs.id;
-        if (id) this.$store.dispatch("current/frame/deletePoint", id);
+        if (id) {
+          this.$store.dispatch("current/frame/deletePoint", id);
+        }
       }
     },
     onPointMouseEnter: function(e) {

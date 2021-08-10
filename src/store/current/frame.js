@@ -11,6 +11,7 @@ export default {
       { val: "circ", icon: "mdi-shape-circle-plus" },
       { val: "rect", icon: "mdi-shape-rectangle-plus" },
       { val: "ruler", icon: "mdi-ruler-square" },
+      { val: "polygon", icon: "mdi-shape-polygon-plus" },
       { val: "eras", icon: "mdi-eraser" }
     ],
     filters: [
@@ -60,6 +61,7 @@ export default {
     style: { size: 5 },
     points: [],
     rects: [],
+    polygons: [],
     texts: []
   }),
   mutations: {
@@ -120,6 +122,9 @@ export default {
     points(state, points) {
       state.points = points;
     },
+    polygons(state, polygons) {
+      state.polygons = polygons;
+    },
     rects(state, payload) {
       state.rects = payload;
     },
@@ -142,17 +147,44 @@ export default {
       context.state.points = [];
       context.state.rects = [];
       context.state.texts = [];
+      context.state.polygons = [];
     },
     frame: function(context, payload) {
+      // 現在動画が変更された際に呼び出される関数
       if (payload.idx && payload.src) {
         context.commit("isChange", true);
         context.commit("src", payload.src || context.state.src);
         context.commit("idx", payload.idx || context.state.idx);
         context.commit("id", payload.id || context.state.id);
         context.commit("time", payload.time || context.state.time);
+
         context.commit("points", payload.points || context.state.points);
+
+        context.commit("polygons", payload.polygons || context.state.polygons);
         context.commit("rects", payload.rects || context.state.rects);
         context.commit("texts", payload.texts || context.state.texts);
+      }
+    },
+    async addPolygon({ state, dispatch }, polygon) {
+      const points = polygon.points.map(item => {
+        const x = (item.x / state.cw) * state.ow;
+        const y = (item.y / state.ch) * state.oh;
+        return { x, y, id: item.id };
+      });
+      console.log(polygon.color);
+      const item = {
+        frameId: state.id,
+        color: polygon.color,
+        points: points,
+        size: state.style.size
+      };
+      try {
+        item.id = await db.polygons.put(item);
+        state.polygons.push(item);
+        const frame = { id: state.id, polygons: state.polygons };
+        dispatch("current/updateFrames", frame, { root: true });
+      } catch (error) {
+        dispatch("snackbar/error", error.message, { root: true });
       }
     },
     async addPoint({ state, dispatch }, item) {
@@ -342,6 +374,28 @@ export default {
           label: p.label || `point-${p.id}`,
           size: p.size,
           color: p.color
+        };
+      });
+    },
+    polygons: function(state) {
+      const polygons = state.polygons.filter(p => p.id) || [];
+      return polygons.map(_polygon => {
+        const points = _polygon.points.map(p => {
+          return {
+            ...p,
+            x: (p.x * state.cw) / state.ow,
+            y: (p.y * state.ch) / state.oh
+          };
+        });
+        const lines = points.slice(1).map((f2, id) => {
+          const f1 = points[id];
+          const line_points = [f1.x, f1.y, f2.x, f2.y];
+          return { id: `line-${id}`, points: line_points };
+        });
+        return {
+          ..._polygon,
+          points: points,
+          lines: lines
         };
       });
     }

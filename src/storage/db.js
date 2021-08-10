@@ -41,6 +41,23 @@ db.version(5)
       file.lastModifiedAt = now;
     });
   });
+db.version(6)
+  .stores({
+    files:
+      "++id,name,source,fps,duration,originSize,videoStream,audioStream,metaData,textgrid,lastModifiedAt",
+    frames: "++id, idx, time, fileId -> files.id",
+    points: "++id, x, y, size, color, label, frameId -> frames.id",
+    rects:
+      "++id, x, y, width, height, rotation, scaleX, scaleY, size, color, label, frameId -> frames.id",
+    polygons: "++id, points, size, color, label, frameId -> frames.id"
+  })
+  .upgrade(trans => {
+    const now = Date.now();
+    return trans.files.toCollection().modify(file => {
+      file.lastModifiedAt = now;
+    });
+  });
+
 db.open();
 
 const dump = function() {
@@ -254,6 +271,7 @@ export default {
   frames: db.frames,
   points: db.points,
   rects: db.rects,
+  polygons: db.polygons,
   dump: dump,
   load: load,
   get: get,
