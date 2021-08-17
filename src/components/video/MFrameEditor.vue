@@ -18,7 +18,7 @@
           :config="{ width: cw, height: ch }"
           @mousemove="onStageMouseMove"
           @mousedown="onStageMouseDown"
-          @touchstart="onStageMouseDown"
+          @mouseup="onStageMouseUp"
         >
           <v-layer ref="layer">
             <v-image
@@ -38,7 +38,7 @@
                 line_id: x.id,
                 points: x.points,
                 stroke: _p.color || polygon.conf.color,
-                strokeWidth: _p.size || polygon.conf.size,
+                strokeWidth: mode == 'pen' ? 3 : _p.size || polygon.conf.size,
                 lineCap: 'round',
                 lineJoin: 'round'
               }"
@@ -53,8 +53,8 @@
                 x: x.x,
                 y: x.y,
                 stroke: 'white',
-                strokeWidth: 1,
-                radius: x.size || polygon.conf.size,
+                strokeWidth: mode == 'pen' ? 0 : 1,
+                radius: mode == 'pen' ? 0 : x.size || polygon.conf.size,
                 fill: _p.color || polygon.conf.color
               }"
               @click="onPolygonPointClick"
@@ -110,10 +110,7 @@
                   polygon.active === true
                     ? polygon.conf.activeColor
                     : polygon.conf.color,
-                strokeWidth:
-                  polygon.active === true
-                    ? polygon.conf.activeSize
-                    : polygon.conf.size,
+                strokeWidth: mode == 'pen' ? 2 : polygon.conf.size,
                 lineCap: 'round',
                 lineJoin: 'round'
               }"
@@ -127,10 +124,7 @@
                 y: x.y,
                 stroke: 'white',
                 strokeWidth: 1,
-                radius:
-                  polygon.active === true
-                    ? polygon.conf.activeSize
-                    : polygon.conf.size,
+                radius: mode == 'pen' ? 0 : polygon.conf.size,
                 fill:
                   polygon.active === true
                     ? polygon.conf.activeColor
@@ -194,7 +188,6 @@
         </v-stage>
         <m-loading v-if="syncing" text="$vuetify.loading" />
       </m-key-context>
-
       <template v-slot:table>
         <m-frame-editor-tab
           :isLoading="syncing"
@@ -327,6 +320,7 @@ export default {
     },
     polygon: {
       active: false,
+      drawing: false,
       conf: {
         size: 5,
         color: "#607D8B",
@@ -436,7 +430,6 @@ export default {
       const count = this.polygons.length;
       const id = count + 1;
       const label = `polygon-${id}`;
-
       const _points = this.polygon.points;
       const lines = _points.slice(1).map((f2, id) => {
         const f1 = _points[id];
@@ -455,7 +448,6 @@ export default {
       this.polygon.points = [];
       this.polygon.lines = [];
     },
-
     addPolygonPoint: function(x, y) {
       const count = this.polygon.points.length;
       const id = count + 1;
@@ -471,6 +463,20 @@ export default {
         const points = [f1.x, f1.y, f2.x, f2.y];
         return { id: `line-${id}`, points };
       });
+    },
+    addLinePoint: function(x, y) {
+      const count = this.polygon.points.length;
+      const last = this.polygon.points[count - 1];
+      if (last) {
+        const diff_x = Math.abs(last.x - x);
+        const diff_y = Math.abs(last.y - y);
+        const offset = this.polygon.conf.size * 2;
+        if ((diff_x > offset) | (diff_y > offset)) {
+          this.addPolygonPoint(x, y);
+        }
+      } else {
+        this.addPolygonPoint(x, y);
+      }
     },
     async convexDefects() {
       const concavosColor = "#3E2723";
@@ -834,26 +840,43 @@ export default {
       const cursor = this.$refs.stage.getNode().getPointerPosition();
       this.cursor.x = cursor.x;
       this.cursor.y = cursor.y;
+      if (this.mode == "pen" && this.polygon.drawing) {
+        this.addLinePoint(this.cursor.x, this.cursor.y);
+      }
     },
     onStageMouseDown(e) {
-      if (e.target === e.target.getStage()) {
-        this.selectedShapeName = "";
-        this.updateTransformer();
-        return;
-      }
-      const clickedOnTransformer =
-        e.target.getParent().className === "Transformer";
-      if (clickedOnTransformer) {
-        return;
-      }
-      const name = e.target.name();
-      const rect = this.rects.find(r => r.name === name);
-      if (rect) {
-        this.selectedShapeName = name;
+      // ペンモードの場合
+      if (this.mode == "pen") {
+        this.polygon.drawing = true;
+        this.addLinePoint(this.cursor.x, this.cursor.y);
       } else {
-        this.selectedShapeName = "";
+        if (e.target === e.target.getStage()) {
+          this.selectedShapeName = "";
+          this.updateTransformer();
+          return;
+        }
+        const clickedOnTransformer =
+          e.target.getParent().className === "Transformer";
+        if (clickedOnTransformer) {
+          return;
+        }
+        const name = e.target.name();
+        const rect = this.rects.find(r => r.name === name);
+        if (rect) {
+          this.selectedShapeName = name;
+        } else {
+          this.selectedShapeName = "";
+        }
+        this.updateTransformer();
       }
-      this.updateTransformer();
+    },
+    onStageMouseUp() {
+      if (this.mode == "pen") {
+        this.polygon.drawing = false;
+      }
+    },
+    onStageTouchStart(e) {
+      console.log("onStageTouchStart", e);
     },
     onTransformEnd(e) {
       const idx = this.rects.findIndex(r => r.name == this.selectedShapeName);

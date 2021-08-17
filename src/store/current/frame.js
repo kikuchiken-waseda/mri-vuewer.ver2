@@ -12,6 +12,7 @@ export default {
       { val: "rect", icon: "mdi-shape-rectangle-plus" },
       { val: "ruler", icon: "mdi-ruler-square" },
       { val: "polygon", icon: "mdi-shape-polygon-plus" },
+      { val: "pen", icon: "mdi-pencil-plus" },
       { val: "eras", icon: "mdi-eraser" }
     ],
     filters: [
