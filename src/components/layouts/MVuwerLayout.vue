@@ -3,10 +3,10 @@
     <v-col class="pa-0">
       <v-card flat tile>
         <v-row dense v-resize="onResize">
-          <v-col ref="videoArray" :cols="$videoCols" dense class="pa-0 mr-2">
+          <v-col ref="videoArray" :cols="$videoCols" dense class="pa-0">
             <slot name="video"></slot>
           </v-col>
-          <v-col :cols="$textgridCols" class="pa-0  mr-2">
+          <v-col :cols="$videoCols" dense class="pa-0 pl-2">
             <v-card v-if="!$mini" tile flat class="overflow-y-auto">
               <slot name="table"></slot>
             </v-card>
@@ -44,9 +44,6 @@ export default {
       set: function(val) {
         this.$store.dispatch("current/layout/videoCols", val);
       }
-    },
-    $textgridCols: function() {
-      return this.$store.state.current.layout.mini;
     },
     $mini: function() {
       return this.$store.state.current.layout.mini;
