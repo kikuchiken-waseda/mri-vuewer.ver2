@@ -31,15 +31,35 @@
           <v-layer ref="layer" v-for="_p in polygons" :key="_p.id">
             <v-line
               v-for="x in _p.lines"
-              :key="`polygon-${x.id}`"
+              :key="`polygon-${_p.id}-line-${x.id}`"
               :config="{
-                id: `polygon-${x.id}`,
+                id: `polygon-${_p.id}-line-${x.id}`,
+                polygon_id: _p.id,
+                line_id: x.id,
                 points: x.points,
                 stroke: _p.color || polygon.conf.color,
-                strokeWidth: polygon.conf.size,
+                strokeWidth: _p.size || polygon.conf.size,
                 lineCap: 'round',
                 lineJoin: 'round'
               }"
+            />
+            <v-circle
+              v-for="x in _p.points"
+              :key="`polygon-${_p.id}-point-${x.id}`"
+              :config="{
+                id: `polygon-${_p.id}-point-${x.id}`,
+                polygon_id: _p.id,
+                point_id: x.id,
+                x: x.x,
+                y: x.y,
+                stroke: 'white',
+                strokeWidth: 1,
+                radius: x.size || polygon.conf.size,
+                fill: _p.color || polygon.conf.color
+              }"
+              @click="onPolygonPointClick"
+              @mouseenter="onPolygonPointMouseEnter"
+              @mouseleave="onPolygonPointMouseLeave"
             />
           </v-layer>
           <v-layer ref="layer">
@@ -308,9 +328,9 @@ export default {
     polygon: {
       active: false,
       conf: {
-        size: 3,
+        size: 5,
         color: "#607D8B",
-        activeSize: 5,
+        activeSize: 7,
         activeColor: "#FFC107"
       },
       points: [],
@@ -686,6 +706,43 @@ export default {
       const item = this.polygon.points[0];
       this.addPolygonPoint(item.x, item.y);
       this.addPolygon();
+    },
+    /* 既存ポリゴンのノードクリック時の操作 */
+    onPolygonPointClick: function(e) {
+      if (this.mode == "eras") {
+        const { polygon_id, point_id } = e.target.attrs;
+        if (polygon_id && point_id) {
+          this.$store.dispatch("current/frame/deletePolygon", {
+            polygon_id
+          });
+        }
+      }
+    },
+    /* 既存ポリゴンのノードにマウスが入ってきた場合の操作 */
+    onPolygonPointMouseEnter: function(e) {
+      if (this.mode == "eras" || this.mode == "polygon") {
+        const { polygon_id, point_id } = e.target.attrs;
+        if (polygon_id && point_id) {
+          this.$store.dispatch("current/frame/activePolygonPoint", {
+            polygon_id,
+            point_id,
+            mode: this.mode
+          });
+        }
+      }
+    },
+    /* 既存ポリゴンのノードからマウスが出た場合の操作 */
+    onPolygonPointMouseLeave: function(e) {
+      if (this.mode == "eras" || this.mode == "polygon") {
+        const { polygon_id, point_id } = e.target.attrs;
+        if (polygon_id && point_id) {
+          this.$store.dispatch("current/frame/inactivePolygonPoint", {
+            polygon_id,
+            point_id,
+            mode: this.mode
+          });
+        }
+      }
     },
     // Ruler 系イベントハンドラ
     onRulerClick: function(e) {

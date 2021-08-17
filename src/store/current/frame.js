@@ -187,6 +187,58 @@ export default {
         dispatch("snackbar/error", error.message, { root: true });
       }
     },
+    async deletePolygon({ state, dispatch }, payload) {
+      const { polygon_id } = payload;
+      const i = state.polygons.findIndex(x => x.id == polygon_id);
+      if (i != -1) {
+        try {
+          await db.points.delete(polygon_id);
+          state.polygons.splice(i, 1);
+        } catch (error) {
+          dispatch("snackbar/error", error.message, { root: true });
+        }
+      }
+    },
+
+    activePolygonPoint({ state }, pyload) {
+      const { polygon_id, point_id, mode } = pyload;
+      const i = state.polygons.findIndex(x => x.id == polygon_id);
+      if (i != -1) {
+        const points = state.polygons[i].points.map(x => {
+          return x.id == point_id ? Object.assign(x, state.activeStyle) : x;
+        });
+        if (mode == "eras") {
+          const active = Object.assign(state.polygons[i], {
+            points,
+            ...state.activeStyle
+          });
+          Vue.set(state.polygons, i, active);
+        } else {
+          const active = Object.assign(state.polygons[i], { points });
+          Vue.set(state.polygons, i, active);
+        }
+      }
+    },
+    inactivePolygonPoint({ state }, payload) {
+      const { polygon_id, point_id, mode } = payload;
+      const i = state.polygons.findIndex(x => x.id == polygon_id);
+      if (i != -1) {
+        const points = state.polygons[i].points.map(x => {
+          return x.id == point_id ? Object.assign(x, state.style) : x;
+        });
+        if (mode == "eras") {
+          const active = Object.assign(state.polygons[i], {
+            points,
+            ...state.style
+          });
+          Vue.set(state.polygons, i, active);
+        } else {
+          const active = Object.assign(state.polygons[i], { points });
+          Vue.set(state.polygons, i, active);
+        }
+      }
+    },
+
     async addPoint({ state, dispatch }, item) {
       item.x = (item.x / state.cw) * state.ow;
       item.y = (item.y / state.ch) * state.oh;
