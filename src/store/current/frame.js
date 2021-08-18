@@ -193,7 +193,7 @@ export default {
       const i = state.polygons.findIndex(x => x.id == polygon_id);
       if (i != -1) {
         try {
-          await db.points.delete(polygon_id);
+          await db.polygons.delete(polygon_id);
           state.polygons.splice(i, 1);
         } catch (error) {
           dispatch("snackbar/error", error.message, { root: true });
