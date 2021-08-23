@@ -58,7 +58,7 @@ db.version(6)
     });
   });
 
-db.open();
+// db.open();
 
 const dump = function() {
   return new Promise((resolve, reject) => {

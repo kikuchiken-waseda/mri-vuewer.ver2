@@ -88,8 +88,8 @@ export default {
       if (filename) {
         const name = filename.split(".")[0];
         const fps = this.$store.state.current.fps;
-        const duration = this.$store.state.current.duration;
-        return `${name}: ${fps} fps : ${duration} sec`;
+        const time = this.$store.state.current.frame.time;
+        return `${name}: ${fps} fps : ${time.toFixed(4)} sec`;
       }
       return null;
     },
