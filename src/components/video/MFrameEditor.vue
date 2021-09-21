@@ -31,9 +31,9 @@
           <v-layer ref="layer" v-for="_p in polygons" :key="_p.id">
             <v-line
               v-for="x in _p.lines"
-              :key="`polygon-${_p.id}-line-${x.id}`"
+              :key="`${_p.id}-${x.id}`"
               :config="{
-                id: `polygon-${_p.id}-line-${x.id}`,
+                id: `polygon-${_p.id}-${x.id}`,
                 polygon_id: _p.id,
                 line_id: x.id,
                 points: x.points,
@@ -42,6 +42,7 @@
                 lineCap: 'round',
                 lineJoin: 'round'
               }"
+              @dblclick="onPolygonLineDblClick"
             />
             <v-circle
               v-for="x in _p.points"
@@ -97,7 +98,7 @@
               }"
               @mouseenter="onRulerMouseEnter"
               @mouseleave="onRulerMouseLeave"
-              @click="onRulerClick"
+              @dblclick="onRulerDblClick"
             />
             <!-- 編集中のポリゴン -->
             <v-line
@@ -199,6 +200,7 @@
   </m-frame-editor-context-menu>
 </template>
 <script>
+import { nanoid } from "nanoid";
 import MFrameEditorTab from "@/components/tab/MFrameEditorTab";
 import MFrameEditorLayout from "@/components/layouts/MFrameEditorLayout";
 import MFrameEditorActions from "@/components/actions/MFrameEditorActions";
@@ -259,6 +261,7 @@ export default {
     },
     polygons: function() {
       const items = this.$store.getters["current/frame/polygons"];
+      console.log(items);
       return items;
     },
     mode: {
@@ -308,6 +311,7 @@ export default {
     syncRects: [],
     syncing: false,
     ruler: {
+      editable: false,
       active: null,
       conf: {
         size: 3,
@@ -377,13 +381,12 @@ export default {
           if (this.points.findIndex(p => p.label == tmp.label) == -1) {
             item.label = tmp.label;
             item.color = tmp.color;
-            await this.$store.dispatch("current/frame/addPoint", item);
           }
         }
       } else {
         item.label = `points-${this.points.length}`;
-        await this.$store.dispatch("current/frame/addPoint", item);
       }
+      await this.$store.dispatch("current/frame/addPoint", item);
     },
     // 矩形データの記述および保存
     async addRect(x, y, width, height, rotation, color) {
@@ -407,10 +410,10 @@ export default {
     },
     // 参照線点データの記述
     addRulerPoint: function(x, y) {
-      const id = this.ruler.points.length + 1;
+      const id = nanoid();
       const label = `ruler-point-${id}`;
       this.ruler.points.push({ id, label, x, y });
-      if (id % 2 == 0) this.addRulerLine(id);
+      if (this.ruler.points.length % 2 == 0) this.addRulerLine(id);
     },
     // 参照線データの記述
     addRulerLine(pid) {
@@ -422,13 +425,12 @@ export default {
       const f1 = { x: 0, y: i };
       const f2 = { x: this.cw, y: this.cw * t + i };
       const points = [f1.x, f1.y, f2.x, f2.y];
-      const id = this.ruler.lines.length;
+      const id = nanoid();
       this.ruler.lines.push({ id, points, t, i });
     },
     // ポリゴンを追加
     addPolygon: async function() {
-      const count = this.polygons.length;
-      const id = count + 1;
+      const id = nanoid();
       const label = `polygon-${id}`;
       const _points = this.polygon.points;
       const lines = _points.slice(1).map((f2, id) => {
@@ -448,9 +450,9 @@ export default {
       this.polygon.points = [];
       this.polygon.lines = [];
     },
+    // ポリゴンのノードをを追加
     addPolygonPoint: function(x, y) {
-      const count = this.polygon.points.length;
-      const id = count + 1;
+      const id = nanoid();
       const label = `polygon-point-${id}`;
       this.polygon.points.push({ id, label, x, y });
       if (id > 1) this.setPolygonLine();
@@ -707,6 +709,7 @@ export default {
     onPolygonMouseLeave: function() {
       this.polygon.active = false;
     },
+
     onClickPolygonsPoint: function() {
       // ポリゴンの終了判定およびデータ追加.
       const item = this.polygon.points[0];
@@ -750,9 +753,43 @@ export default {
         }
       }
     },
+    // 編集済ポリゴンの LINE イベントハンドラ
+    onPolygonLineDblClick: async function(e) {
+      const { polygon_id, line_id } = e.target.attrs;
+      const { x, y } = this.cursor;
+      const polygon = this.polygons.find(p => p.id === polygon_id);
+      if (polygon) {
+        const { lines, points } = polygon;
+        const line = lines.find(l => l.id === line_id);
+        if (line) {
+          const point_idx = points.findIndex(p => {
+            return p.x === line.points[0] && p.y === line.points[1];
+          });
+          const _points = [...points];
+          _points.splice(point_idx, 0, {
+            x,
+            y,
+            id: nanoid()
+          });
+          const item = {
+            id: polygon.id,
+            size: polygon.size,
+            color: polygon.color,
+            label: polygon.label,
+            frameId: polygon.frameId,
+            points: _points
+          };
+          await this.$store.dispatch("current/frame/addPolygon", item);
+          await this.$store.dispatch("current/frame/deletePolygon", {
+            polygon_id
+          });
+        }
+      }
+    },
     // Ruler 系イベントハンドラ
-    onRulerClick: function(e) {
+    onRulerDblClick: function(e) {
       const id = e.target.attrs.id;
+      const { x, y } = this.cursor;
       const idx = this.ruler.lines.findIndex(l => l.id == id);
       if (idx != -1) {
         const line = this.ruler.lines[idx];
@@ -765,12 +802,16 @@ export default {
         } else if (this.mode == "rect") {
           const width = this.cw / 5;
           const height = this.ch / 5;
-          const x = e.evt.offsetX;
-          const y = e.evt.offsetY;
           const r = (line.t * 180) / Math.PI;
           this.addRect(x, y, width, height, r, this.color);
-        } else {
-          this.addPoint(e.evt.offsetX, e.evt.offsetY, this.color);
+        } else if (this.mode == "circ") {
+          this.addPoint(x, y, this.color);
+        } else if (this.mode == "polygon") {
+          this.addPolygonPoint(x, y);
+        } else if (this.mode == "ruler") {
+          if (this.ruler.points.length % 2 === 1) {
+            this.addRulerPoint(x, y);
+          }
         }
       }
     },

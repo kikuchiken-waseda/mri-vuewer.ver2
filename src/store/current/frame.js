@@ -172,7 +172,6 @@ export default {
         const y = (item.y / state.ch) * state.oh;
         return { x, y, id: item.id };
       });
-      console.log(polygon.color);
       const item = {
         frameId: state.id,
         color: polygon.color,

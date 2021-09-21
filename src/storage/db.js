@@ -2,45 +2,6 @@ import Dexie from "dexie";
 import relationships from "dexie-relationships";
 import io from "@/io";
 const db = new Dexie("mri_vuewer", { addons: [relationships] });
-db.version(1).stores({
-  files:
-    "++id,name,source,fps,duration,originSize,videoStream,audioStream,meta,frames,textgrid"
-});
-db.version(2).stores({
-  files:
-    "++id,name,source,fps,duration,originSize,videoStream,audioStream,metaData,frames,textgrid"
-});
-db.version(3).stores({
-  files:
-    "++id,name,source,fps,duration,originSize,videoStream,audioStream,metaData,textgrid",
-  frames: "++id, idx, time, fileId -> files.id",
-  points: "++id, x, y, size, color, frameId -> frames.id",
-  rects:
-    "++id, x, y, width, height, rotation, scaleX, scaleY, size, color, frameId -> frames.id"
-});
-db.version(4).stores({
-  files:
-    "++id,name,source,fps,duration,originSize,videoStream,audioStream,metaData,textgrid",
-  frames: "++id, idx, time, fileId -> files.id",
-  points: "++id, x, y, size, color, label, frameId -> frames.id",
-  rects:
-    "++id, x, y, width, height, rotation, scaleX, scaleY, size, color, label, frameId -> frames.id"
-});
-db.version(5)
-  .stores({
-    files:
-      "++id,name,source,fps,duration,originSize,videoStream,audioStream,metaData,textgrid,lastModifiedAt",
-    frames: "++id, idx, time, fileId -> files.id",
-    points: "++id, x, y, size, color, label, frameId -> frames.id",
-    rects:
-      "++id, x, y, width, height, rotation, scaleX, scaleY, size, color, label, frameId -> frames.id"
-  })
-  .upgrade(trans => {
-    const now = Date.now();
-    return trans.files.toCollection().modify(file => {
-      file.lastModifiedAt = now;
-    });
-  });
 db.version(6)
   .stores({
     files:
@@ -58,7 +19,46 @@ db.version(6)
     });
   });
 
-// db.open();
+db.version(5)
+  .stores({
+    files:
+      "++id,name,source,fps,duration,originSize,videoStream,audioStream,metaData,textgrid,lastModifiedAt",
+    frames: "++id, idx, time, fileId -> files.id",
+    points: "++id, x, y, size, color, label, frameId -> frames.id",
+    rects:
+      "++id, x, y, width, height, rotation, scaleX, scaleY, size, color, label, frameId -> frames.id"
+  })
+  .upgrade(trans => {
+    const now = Date.now();
+    return trans.files.toCollection().modify(file => {
+      file.lastModifiedAt = now;
+    });
+  });
+
+db.version(4).stores({
+  files:
+    "++id,name,source,fps,duration,originSize,videoStream,audioStream,metaData,textgrid",
+  frames: "++id, idx, time, fileId -> files.id",
+  points: "++id, x, y, size, color, label, frameId -> frames.id",
+  rects:
+    "++id, x, y, width, height, rotation, scaleX, scaleY, size, color, label, frameId -> frames.id"
+});
+db.version(3).stores({
+  files:
+    "++id,name,source,fps,duration,originSize,videoStream,audioStream,metaData,textgrid",
+  frames: "++id, idx, time, fileId -> files.id",
+  points: "++id, x, y, size, color, frameId -> frames.id",
+  rects:
+    "++id, x, y, width, height, rotation, scaleX, scaleY, size, color, frameId -> frames.id"
+});
+db.version(2).stores({
+  files:
+    "++id,name,source,fps,duration,originSize,videoStream,audioStream,metaData,frames,textgrid"
+});
+db.version(1).stores({
+  files:
+    "++id,name,source,fps,duration,originSize,videoStream,audioStream,meta,frames,textgrid"
+});
 
 const dump = function() {
   return new Promise((resolve, reject) => {
