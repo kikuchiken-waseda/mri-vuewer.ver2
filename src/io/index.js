@@ -6,7 +6,8 @@ import json from "@/io/json.js";
 import zip from "@/io/zip.js";
 import ver1 from "@/io/ver1.js";
 import ver2 from "@/io/ver2.js";
+import tg from "@/io/textgrid.js";
 
 const obj = { ver1, ver2 };
 const download = file.download;
-export default { video, file, json, zip, obj, xlsx, image, download };
+export default { video, file, json, zip, obj, xlsx, image, download, tg };

@@ -790,7 +790,10 @@ export default {
         });
         this.$vuewer.io.file.download(blob, `${bname}-records.json`);
       } else if (payload == "TEXTGRID/TEXTGRID") {
-        this.wavesurfer.downloadTextGrid(`${bname}.TextGrid`);
+        const duration = this.wavesurfer.getDuration();
+        const content = this.$vuewer.io.tg.dump(duration, this.$textgrid);
+        const blob = new Blob([content], { type: "text/plain" });
+        this.$vuewer.io.file.download(blob, `${bname}-records.TextGrid`);
       } else if (payload == "TEXTGRID/XLSX") {
         const obj = {
           records: this.$store.getters["current/tgTable"]
