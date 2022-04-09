@@ -1,7 +1,7 @@
 <template>
   <v-file-input
     :label="`${$vuetify.lang.t('$vuetify.io.mVideoInput.title')}*`"
-    accept="video/mp4"
+    accept="video/mp4,video/webm"
     :rules="videoRules"
     show-size
     @change="onChange"
@@ -27,14 +27,24 @@ export default {
           this.video.source = await io.file.toBase64(e);
           if (e.arrayBuffer) {
             const buff = await e.arrayBuffer();
-            io.video.info(buff, res => {
-              this.video.fps = res.videoStream.fps;
-              this.video.videoStream = res.videoStream;
-              this.video.audioStream = res.audioStream;
-              this.video.originSize = res.size;
-              this.video.duration = res.duration;
+            try {
+              io.video.info(buff, res => {
+                this.video.fps = res.videoStream.fps;
+                this.video.videoStream = res.videoStream;
+                this.video.audioStream = res.audioStream;
+                this.video.originSize = res.size;
+                this.video.duration = res.duration;
+                this.$emit("loaded", this.video);
+              });
+            } catch (e) {
+              this.video.errors.fps = "$vuetify.io.video.error.fps";
+              this.video.errors.duration = "$vuetify.io.video.error.duration";
+              this.video.errors.originSize.width =
+                "$vuetify.io.video.error.originSize.width";
+              this.video.errors.originSize.height =
+                "$vuetify.io.video.error.originSize.height";
               this.$emit("loaded", this.video);
-            });
+            }
           }
         }
       }

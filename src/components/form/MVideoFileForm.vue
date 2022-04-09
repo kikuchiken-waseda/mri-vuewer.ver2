@@ -28,7 +28,7 @@
       v-else
       :label="`${t('$vuetify.io.mVideoInput.title')}*`"
       :rules="videoRules"
-      accept="video/mp4"
+      accept="video/mp4, video/webm"
       show-size
       @change="onChange"
     />

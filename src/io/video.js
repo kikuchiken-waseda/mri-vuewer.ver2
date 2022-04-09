@@ -310,6 +310,16 @@ const initVideoObject = () => {
     originSize: {
       width: null,
       height: null
+    },
+    errors: {
+      fps: null,
+      duration: null,
+      videoStream: null,
+      audioStream: null,
+      originSize: {
+        width: null,
+        height: null
+      }
     }
   };
 };

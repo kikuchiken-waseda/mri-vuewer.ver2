@@ -193,6 +193,28 @@ export default {
         title: "Select your db file (json)"
       }
     },
+    video: {
+      error: {
+        fps: "Failed to get the fps of this video file. Please enter fps.",
+        duration:
+          "Failed to get duration of this video file. Enter the duration of the video file.",
+        originSize: {
+          width:
+            "Failed to get the width of this video file. Enter the width of the video file.",
+          height:
+            "Failed to get the height of this video file. Enter the height of the video file."
+        }
+      }
+    },
+    mVideoCodec: {
+      name: "file name",
+      fps: "fps",
+      duration: "duration",
+      originSize: {
+        width: "video width",
+        height: "video height"
+      }
+    },
     mVideoInput: {
       title: "Select your video file (mp4)",
       hint: "supported format is mp4"

@@ -238,6 +238,26 @@ export default {
         title: `${DB} データを選択してください (json)`
       }
     },
+    video: {
+      error: {
+        fps: "動画 fps の取得に失敗しました. 対象動画の fps を入力してください",
+        duration: "時間の取得に失敗しました. 対象動画の時間を入力してください",
+        originSize: {
+          width: "動画幅の取得に失敗しました. 対象動画の幅を入力してください",
+          height:
+            "動画高さの取得に失敗しました. 対象動画の高さを入力してください"
+        }
+      }
+    },
+    mVideoCodec: {
+      name: "ファイル名",
+      fps: "フレームレート (fps)",
+      duration: "長さ (duration)",
+      originSize: {
+        width: "大きさ: 幅 (width)",
+        height: "大きさ: 高さ (height)"
+      }
+    },
     mVideoInput: {
       title: `${VIDEO}ファイルを選択`,
       hint: `${VIDEO} ファイルは mp4 形式のみをサポートしています`

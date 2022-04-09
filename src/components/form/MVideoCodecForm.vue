@@ -1,32 +1,48 @@
 <template>
   <v-form ref="form" v-model="valid">
-    <v-text-field required v-model="video.name" label="file name" />
     <v-text-field
       required
-      :rules="rules.positiveFloatRules"
+      v-model="video.name"
+      :label="t('$vuetify.io.mVideoCodec.name')"
+    />
+    <v-text-field
+      required
       v-model="video.fps"
-      label="fps"
+      :rules="rules.positiveFloatRules"
+      :label="t('$vuetify.io.mVideoCodec.fps')"
+      :hint="video.errors.fps ? t(video.errors.fps) : ''"
+      :persistent-hint="video.errors.fps ? true : false"
       suffix="fps"
     />
     <v-text-field
       required
-      :rules="rules.positiveFloatRules"
       v-model="video.duration"
-      label="duration"
+      :rules="rules.positiveFloatRules"
+      :label="t('$vuetify.io.mVideoCodec.duration')"
+      :hint="video.errors.duration ? t(video.errors.duration) : ''"
+      :persistent-hint="video.errors.duration ? true : false"
       suffix="sec"
     />
     <v-text-field
       required
-      :rules="rules.positiveFloatRules"
       v-model="video.originSize.width"
-      label="video width"
+      :rules="rules.positiveFloatRules"
+      :label="t('$vuetify.io.mVideoCodec.originSize.width')"
+      :hint="
+        video.errors.originSize.width ? t(video.errors.originSize.width) : ''
+      "
+      :persistent-hint="video.errors.originSize.width ? true : false"
       suffix="pixel"
     />
     <v-text-field
       required
-      :rules="rules.positiveFloatRules"
       v-model="video.originSize.height"
-      label="video height"
+      :rules="rules.positiveFloatRules"
+      :label="t('$vuetify.io.mVideoCodec.originSize.height')"
+      :hint="
+        video.errors.originSize.height ? t(video.errors.originSize.height) : ''
+      "
+      :persistent-hint="video.errors.originSize.height ? true : false"
       suffix="pixel"
     />
   </v-form>
@@ -50,6 +66,9 @@ export default {
     }
   },
   methods: {
+    t: function(val) {
+      return this.$vuetify.lang.t(val);
+    },
     validate: function() {
       this.$refs.form.validate();
       if (this.valid) {
