@@ -9,9 +9,19 @@
     class="overflow-y-auto"
   >
     <template v-slot:item.time="{ item }">
-      <span class="d-inline-block text-truncate" style="max-width: 30px;">
-        {{ item.time }}
-      </span>
+      <v-tooltip right>
+        <template v-slot:activator="{ on, attrs }">
+          <span
+            class="d-inline-block text-truncate"
+            style="max-width: 45px;"
+            v-bind="attrs"
+            v-on="on"
+          >
+            {{ item.time }}
+          </span>
+        </template>
+        <span>{{ item.time }}</span>
+      </v-tooltip>
     </template>
 
     <template v-slot:item.points="{ item }">
