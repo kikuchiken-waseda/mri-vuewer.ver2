@@ -34,20 +34,20 @@ export default {
       this.overlay = false;
       if (e.dataTransfer) {
         const files = [...e.dataTransfer.files];
-        const mp4s = files.filter(x => {
-          return x.type == "video/mp4";
+        const videos = files.filter(x => {
+          return (x.type == "video/mp4") | (x.type == "video/webm");
         });
 
-        mp4s.forEach(async (f, i) => {
+        videos.forEach(async (f, i) => {
           if (i == 0) {
-            this.$vuewer.loading.start("downloading mp4 files ...");
+            this.$vuewer.loading.start("downloading video files ...");
           }
           const video = this.$vuewer.io.video.initObj();
           const buff = await f.arrayBuffer();
           this.$vuewer.io.video.info(buff, async res => {
             video.fps = res.videoStream.fps;
             video.duration = res.duration;
-            video.originSize = res.size;
+            video.originSize = res.originSize;
             video.videoStream = res.videoStream;
             video.audioStream = res.audioStream;
             const source = await this.$vuewer.io.file.toBase64(f);
@@ -68,7 +68,7 @@ export default {
             const metadata = this.$store.getters["setting/fname2meta"](f.name);
             if (metadata) video.metaData = metadata;
             const vid = await this.$store.dispatch("files/push", video);
-            if (i == mp4s.length - 1) {
+            if (i == videos.length - 1) {
               this.$vuewer.loading.end();
               if (this.$store.state.setting.shouldMovePageAferAddingFile) {
                 this.$router.push({ path: `/files/${vid}` });

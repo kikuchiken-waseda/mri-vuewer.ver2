@@ -205,7 +205,7 @@ const add = async function(obj) {
           textgrid: obj.textgrid || {},
           fps: res.videoStream.fps,
           duration: res.duration,
-          originSize: res.size,
+          originSize: res.originSize,
           videoStream: res.videoStream,
           audioStream: res.audioStream
         };

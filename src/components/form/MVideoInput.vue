@@ -29,11 +29,13 @@ export default {
             const buff = await e.arrayBuffer();
             try {
               io.video.info(buff, res => {
-                this.video.fps = res.videoStream.fps;
+                // console.log(res.videoStream);
                 this.video.videoStream = res.videoStream;
                 this.video.audioStream = res.audioStream;
-                this.video.originSize = res.size;
+                this.video.originSize = res.originSize;
+                this.video.fps = res.videoStream.fps;
                 this.video.duration = res.duration;
+                this.video.errors = { ...res.errors };
                 this.$emit("loaded", this.video);
               });
             } catch (e) {

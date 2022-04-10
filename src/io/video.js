@@ -22,6 +22,45 @@ const version = callback => {
   return result;
 };
 
+const initVideoObject = () => {
+  return {
+    name: null,
+    source: null,
+    fps: null,
+    duration: null,
+    videoStream: {
+      codec_name: null,
+      pix_fmt: null,
+      bitrate: null,
+      fps: null,
+      tbr: null,
+      tbn: null,
+      tbc: null
+    },
+    audioStream: {
+      codec_name: null,
+      sample_rate: null,
+      channel_layout: null,
+      sample_fmt: null,
+      bitrate: null
+    },
+    originSize: {
+      width: null,
+      height: null
+    },
+    errors: {
+      fps: null,
+      duration: null,
+      videoStream: null,
+      audioStream: null,
+      originSize: {
+        width: null,
+        height: null
+      }
+    }
+  };
+};
+
 const info = (buff, callback) => {
   const video = new Uint8Array(buff);
   let stdout = "";
@@ -35,61 +74,102 @@ const info = (buff, callback) => {
       stdout += data + "\n";
     },
     onExit: function() {
-      let item = {};
+      let item = initVideoObject();
       if (stdout) {
         for (const line of stdout.split("\n")) {
-          if (~line.indexOf("Duration")) {
-            const timeInfo = line
-              .split(",")[0]
-              .split(": ")[1]
-              .split(":")
-              .map(val => {
-                return Number(val);
-              });
-            item.duration =
-              timeInfo[0] * 60 * 60 + timeInfo[1] * 60 + timeInfo[2];
+          try {
+            if (~line.indexOf("Duration")) {
+              const timeInfo = line
+                .split(",")[0]
+                .split(": ")[1]
+                .split(":")
+                .map(val => {
+                  return Number(val);
+                });
+              item.duration =
+                timeInfo[0] * 60 * 60 + timeInfo[1] * 60 + timeInfo[2];
+            }
+          } catch {
+            item.errors.duration = "$vuetify.io.video.error.duration";
           }
-
           if (~line.indexOf("Stream")) {
             const info = line.split(": ");
             if (info.length == 3) {
               const detail = info[2].split(", ");
               if (info[1] == "Video") {
-                item.videoStream = {};
-                const sizeText = detail.filter(x =>
-                  x.match(/^([1-9]\d*|0)(\.\d+)?x([1-9]\d*|0)(\.\d+)?/)
-                )[0];
-                if (sizeText) {
-                  const size = sizeText.split(" ")[0].split("x");
-                  item.size = {
-                    width: Number(size[0]),
-                    height: Number(size[1])
-                  };
+                try {
+                  const sizeText = detail.filter(x =>
+                    x.match(/^([1-9]\d*|0)(\.\d+)?x([1-9]\d*|0)(\.\d+)?/)
+                  )[0];
+                  if (sizeText) {
+                    const size = sizeText.split(" ")[0].split("x");
+                    item.originSize = {
+                      width: Number(size[0]),
+                      height: Number(size[1])
+                    };
+                  }
+                } catch {
+                  this.video.errors.originSize.width =
+                    "$vuetify.io.video.error.originSize.width";
+                  this.video.errors.originSize.height =
+                    "$vuetify.io.video.error.originSize.height";
                 }
+
                 item.videoStream.codec_name = detail[0];
                 item.videoStream.pix_fmt = detail[1];
-                item.videoStream.bitrate = Number(
-                  detail.filter(x => x.match(/kb\/s/))[0].split(" ")[0]
-                );
-                item.videoStream.fps = Number(
-                  detail.filter(x => x.match(/fps/))[0].split(" ")[0]
-                );
-                item.videoStream.tbr = Number(
-                  detail.filter(x => x.match(/tbr/))[0].split(" ")[0]
-                );
-                item.videoStream.tbn = Number(
-                  detail.filter(x => x.match(/tbn/))[0].split(" ")[0]
-                );
-                item.videoStream.tbc = Number(
-                  detail.filter(x => x.match(/tbc/))[0].split(" ")[0]
-                );
+                try {
+                  item.videoStream.bitrate = Number(
+                    detail.filter(x => x.match(/kb\/s/))[0].split(" ")[0]
+                  );
+                } catch {
+                  item.videoStream.bitrate = null;
+                }
+                try {
+                  item.videoStream.fps = Number(
+                    detail.filter(x => x.match(/fps/))[0].split(" ")[0]
+                  );
+                } catch {
+                  item.videoStream.fps = null;
+                  item.errors.fps = "$vuetify.io.video.error.fps";
+                }
+                try {
+                  item.videoStream.tbr = Number(
+                    detail.filter(x => x.match(/tbr/))[0].split(" ")[0]
+                  );
+                } catch {
+                  item.videoStream.tbr = null;
+                }
+
+                try {
+                  item.videoStream.tbn = Number(
+                    detail.filter(x => x.match(/tbn/))[0].split(" ")[0]
+                  );
+                } catch {
+                  item.videoStream.tbn = null;
+                }
+                try {
+                  item.videoStream.tbc = Number(
+                    detail.filter(x => x.match(/tbc/))[0].split(" ")[0]
+                  );
+                } catch {
+                  item.videoStream.tbc = null;
+                }
               } else {
-                item.audioStream = {};
                 item.audioStream.codec_name = detail[0];
-                item.audioStream.sample_rate = Number(detail[1].split(" ")[0]);
+                try {
+                  item.audioStream.sample_rate = Number(
+                    detail[1].split(" ")[0]
+                  );
+                } catch {
+                  item.audioStream.sample_rate = null;
+                }
                 item.audioStream.channel_layout = detail[2];
                 item.audioStream.sample_fmt = detail[3];
-                item.audioStream.bitrate = Number(detail[4].split(" ")[0]);
+                try {
+                  item.audioStream.bitrate = Number(detail[4].split(" ")[0]);
+                } catch {
+                  item.audioStream.bitrate = null;
+                }
               }
             }
           }
@@ -253,33 +333,6 @@ const trimPng = (buff, start, end) => {
   return result;
 };
 
-// const concat = buffs => {
-//   const datas = buffs.map((x, i) => {
-//     const video = new Uint8Array(x);
-//     return { name: `v${i}.mp4`, data: video };
-//   });
-//
-//   const args = [];
-//   for (const x of datas) {
-//     args.push("-i");
-//     args.push(x.name);
-//   }
-//   args.push("-filter_complex");
-//   args.push('"' + `concat=n=${datas.length}:v=1:a=1` + '"');
-//   args.push("output.mp4");
-//   const result = ffmpeg({
-//     MEMFS: datas,
-//     arguments: args,
-//     print: function(data) {
-//       console.log(data);
-//     },
-//     printErr: function(data) {
-//       console.log(data);
-//     }
-//   });
-//   return result;
-// };
-
 const concat = buffs => {
   const datas = buffs.map((x, i) => {
     const video = new Uint8Array(x);
@@ -297,31 +350,6 @@ const concat = buffs => {
     }
   });
   return result;
-};
-
-const initVideoObject = () => {
-  return {
-    name: null,
-    source: null,
-    fps: null,
-    duration: null,
-    videoStream: null,
-    audioStream: null,
-    originSize: {
-      width: null,
-      height: null
-    },
-    errors: {
-      fps: null,
-      duration: null,
-      videoStream: null,
-      audioStream: null,
-      originSize: {
-        width: null,
-        height: null
-      }
-    }
-  };
 };
 
 const toBlob = buff => {

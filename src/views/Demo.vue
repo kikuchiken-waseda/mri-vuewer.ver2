@@ -59,7 +59,7 @@ export default {
             io.video.info(buff, res => {
               video.fps = res.videoStream.fps;
               video.duration = res.duration;
-              video.originSize = res.size;
+              video.originSize = res.originSize;
               video.videoStream = res.videoStream;
               video.audioStream = res.audioStream;
               video.metaData = { demo: true };
