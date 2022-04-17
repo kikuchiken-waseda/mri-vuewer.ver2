@@ -1,8 +1,14 @@
 import Vue from "vue";
-import Vuetify from "vuetify";
+import Vuetify from "vuetify/lib";
+import "vuetify/dist/vuetify.min.css";
+import "@mdi/font/css/materialdesignicons.css";
+import store from "@/store";
 
 Vue.use(Vuetify);
 const vuetify = new Vuetify({
+  icons: {
+    iconfont: "mdi" // default - only for display purposes
+  },
   lang: {
     current: "ja"
   }
@@ -15,6 +21,7 @@ export const decorators = [
   (story, context) => {
     const wrapped = story(context);
     return Vue.extend({
+      store,
       vuetify,
       components: { wrapped },
       props: {
