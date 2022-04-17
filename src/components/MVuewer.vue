@@ -827,27 +827,28 @@ export default {
     },
     onUploadClick: function(payload) {
       this.$vuewer.console.log(this.tag, `on upload: ${payload.click}`);
-      const file = payload.files[0];
-      if (file) {
-        if (payload.click == "TEXTGRID/JSON") {
+      const { click, files } = payload;
+      if (files.length === 1) {
+        const file = files[0];
+        if (click == "TEXTGRID/JSON") {
           this.$vuewer.io.json.read(file).then(obj => {
             const textgrid = this.$vuewer.io.obj.ver2.loadTextGrid(obj);
             this.$store.dispatch("current/setTextGrid", textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
-        } else if (payload.click == "TEXTGRID/JSON/VER1") {
+        } else if (click == "TEXTGRID/JSON/VER1") {
           this.$vuewer.io.json.read(file).then(obj => {
             const textgrid = this.$vuewer.io.obj.ver1.loadTextGrid(obj, "both");
             this.$store.dispatch("current/setTextGrid", textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
-        } else if (payload.click == "TEXTGRID/JSON/VER1/LEFT") {
+        } else if (click == "TEXTGRID/JSON/VER1/LEFT") {
           this.$vuewer.io.json.read(file).then(obj => {
             const textgrid = this.$vuewer.io.obj.ver1.loadTextGrid(obj, "left");
             this.$store.dispatch("current/setTextGrid", textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
-        } else if (payload.click == "TEXTGRID/JSON/VER1/RIGHT") {
+        } else if (click == "TEXTGRID/JSON/VER1/RIGHT") {
           this.$vuewer.io.json.read(file).then(obj => {
             const textgrid = this.$vuewer.io.obj.ver1.loadTextGrid(
               obj,
@@ -856,7 +857,7 @@ export default {
             this.$store.dispatch("current/setTextGrid", textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
-        } else if (payload.click == "TEXTGRID/JSON/VER1/UP-DOWN") {
+        } else if (click == "TEXTGRID/JSON/VER1/UP-DOWN") {
           this.$vuewer.io.json.read(file).then(obj => {
             const textgrid = this.$vuewer.io.obj.ver1.loadTextGrid(
               obj,
@@ -865,9 +866,43 @@ export default {
             this.$store.dispatch("current/setTextGrid", textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
-        } else if (payload.click == "TEXTGRID/TEXTGRID") {
+        } else if (click == "TEXTGRID/TEXTGRID") {
           this.wavesurfer.loadTextGrid(file);
           this.$vuewer.snackbar.success("$vuetify.loaded");
+        } else if (click == "POINTS/XY") {
+          const vm = this;
+          this.$vuewer.io.xy
+            .read(file)
+            .then(obj => {
+              const newFrames = vm.$frames.map((frame, i) => {
+                const data = obj[i];
+                const points = [];
+                for (const key in data) {
+                  const p_array = data[key];
+                  for (const pi in p_array) {
+                    const p = p_array[pi];
+                    points.push({
+                      id: `points-${frame.id}-${key}-${pi}`,
+                      x: p.x,
+                      y: p.y,
+                      color: vm.$vuewer.io.xy.getColor(key),
+                      label: key,
+                      size: 5,
+                      frameId: frame.id
+                    });
+                  }
+                }
+                return { ...frame, points };
+              });
+              vm.$frames = newFrames;
+            })
+            .catch(error => {
+              if (error.name === "XYError") {
+                this.$vuewer.snackbar.warning(
+                  `$vuetify.io.xy.parse.${error.reason}`
+                );
+              }
+            });
         } else {
           this.$vuewer.snackbar.warning("$vuetify.notAcceptable");
         }

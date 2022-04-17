@@ -262,6 +262,12 @@ export default {
       title: `${VIDEO}ファイルを選択`,
       hint: `${VIDEO} ファイルは mp4 形式のみをサポートしています`
     },
+    xy: {
+      parse: {
+        invalidHeader: "指定された XY ファイルのヘッダーが不正です.",
+        invalidBody: "指定された XY ファイルの中身が不正です."
+      }
+    },
     completes: {
       title: "補完辞書ファイルを選択 (text/plain)",
       isTextComplated: "テキスト選択モード"

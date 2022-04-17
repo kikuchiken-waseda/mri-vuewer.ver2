@@ -99,7 +99,7 @@ export default {
       {
         text: "XY",
         val: "POINTS/XY",
-        accept: "text/csv"
+        accept: ".xy,.XY"
       }
     ]
   }),

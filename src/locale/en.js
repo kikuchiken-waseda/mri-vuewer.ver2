@@ -206,6 +206,12 @@ export default {
         }
       }
     },
+    xy: {
+      parse: {
+        invalidHeader: "your header of xy file is invalid!",
+        invalidBody: "your body of xy file is invalid!!"
+      }
+    },
     mVideoCodec: {
       name: "file name",
       fps: "fps",

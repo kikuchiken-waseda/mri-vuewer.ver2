@@ -254,6 +254,7 @@ export default {
       return this.$store.state.current.frame.oh;
     },
     points: function() {
+      console.log(this.$store.getters["current/frame/points"]);
       return this.$store.getters["current/frame/points"];
     },
     rects: function() {

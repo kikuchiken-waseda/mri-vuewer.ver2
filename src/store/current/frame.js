@@ -417,6 +417,7 @@ export default {
       });
     },
     points: function(state) {
+      console.log(state.points);
       const points = state.points.filter(p => p.id && p.x && p.y) || [];
       return points.map(p => {
         return {

@@ -1,10 +1,18 @@
 import MVideoUploadList from "./MVideoUploadList.vue";
 
 export default {
-  component: MVideoUploadList
+  component: MVideoUploadList,
+  argTypes: {
+    click: {
+      action: "click"
+    }
+  }
 };
 
-export const MVideoUploadListStory = () => ({
+const Template = (args, { argTypes }) => ({
+  props: Object.keys(argTypes),
   components: { MVideoUploadList },
-  template: "<MVideoUploadList />"
+  template: `<MVideoUploadList @click="onClick" v-bind="$props" />`
 });
+
+export const MVideoUploadListStory = Template.bind({});
