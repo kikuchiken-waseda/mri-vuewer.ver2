@@ -1,5 +1,5 @@
-import ja from "vuetify/src/locale/ja.ts";
-import store from "@/store/index.js";
+import ja from "vuetify/lib/locale/ja";
+import store from "@/store/index";
 const NEW = "新規";
 const DELETE = "削除";
 const EDIT = "編集";

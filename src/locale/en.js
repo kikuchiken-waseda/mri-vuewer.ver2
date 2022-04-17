@@ -1,4 +1,4 @@
-import en from "vuetify/src/locale/en.ts";
+import en from "vuetify/lib/locale/en";
 import store from "@/store/index.js";
 const pages = {
   home: "Home",

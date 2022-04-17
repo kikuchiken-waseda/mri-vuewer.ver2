@@ -1,15 +1,18 @@
 import Vue from "vue";
-import Vuetify from "vuetify/lib";
+import Vuetify from "vuetify";
 import "vuetify/dist/vuetify.min.css";
 import "@mdi/font/css/materialdesignicons.css";
 import store from "@/store";
+import ja from "@/locale/ja.js";
+import en from "@/locale/en.js";
 
 Vue.use(Vuetify);
 const vuetify = new Vuetify({
   icons: {
-    iconfont: "mdi" // default - only for display purposes
+    iconfont: "mdi"
   },
   lang: {
+    locales: { ja, en },
     current: "ja"
   }
 });
@@ -40,9 +43,9 @@ export const decorators = [
       },
       template: `
         <v-app>
-          <v-container fluid>
+          <v-main>
             <wrapped />
-          </v-container>
+          </v-main>
         </v-app>
       `
     });
