@@ -35,6 +35,18 @@
         <v-list-item-title>{{ item.text }}</v-list-item-title>
       </v-list-item>
     </v-list-group>
+    <v-list-group v-model="showPoint" @click.stop.prevent>
+      <template v-slot:activator>
+        <v-list-item-content>
+          <v-list-item-title>
+            {{ $vuetify.lang.t("$vuetify.frame.name") }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </template>
+      <v-list-item v-for="(item, i) in point" :key="i" @click="onClick(item)">
+        <v-list-item-title>{{ item.text }}</v-list-item-title>
+      </v-list-item>
+    </v-list-group>
   </v-list>
 </template>
 <script>
@@ -43,6 +55,7 @@ export default {
   data: () => ({
     showTextGrid: true,
     showVer1: false,
+    showPoint: false,
     clicked: {
       text: "",
       val: "",
@@ -81,6 +94,13 @@ export default {
         val: "TEXTGRID/JSON",
         accept: "application/json"
       }
+    ],
+    point: [
+      {
+        text: "XY",
+        val: "POINTS/XY",
+        accept: "text/csv"
+      }
     ]
   }),
   methods: {
@@ -100,4 +120,3 @@ export default {
   }
 };
 </script>
-<style scoped></style>
