@@ -97,6 +97,12 @@ export default {
     ],
     point: [
       {
+        text: "XLSX (点群データ)",
+        val: "POINTS/XLSX",
+        accept:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      },
+      {
         text: "XY",
         val: "POINTS/XY",
         accept: ".xy,.XY"

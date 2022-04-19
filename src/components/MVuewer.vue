@@ -154,7 +154,8 @@
 /**
  * MVuwer.vue
  *
- * このコンポーネントの役割は種々アノテーション画面情報の受け渡しです.
+ * このコンポーネントの役割は
+ * 種々アノテーション画面情報の受け渡しです.
  * 基本的にそれ以外のことはしないことに注意してください.
  */
 import WaveSurfer from "wavesurfer.vue";
@@ -223,15 +224,33 @@ export default {
     fab: false, // fab ボタンの開閉制御
     where: null, // マウスがどこにいるか
     dialog: {
-      detail: { show: false },
-      textgrid: { show: false },
-      tier: { show: false },
-      tierEdit: { show: false },
-      tierDelete: { show: false },
-      ruler: { show: false },
-      imageEdit: { show: false },
-      setting: { show: false },
-      complates: { show: false }
+      detail: {
+        show: false
+      },
+      textgrid: {
+        show: false
+      },
+      tier: {
+        show: false
+      },
+      tierEdit: {
+        show: false
+      },
+      tierDelete: {
+        show: false
+      },
+      ruler: {
+        show: false
+      },
+      imageEdit: {
+        show: false
+      },
+      setting: {
+        show: false
+      },
+      complates: {
+        show: false
+      }
     },
     keybuffer: {
       time: null,
@@ -369,7 +388,9 @@ export default {
   },
   methods: {
     rebaseTextgrid: function(n = 1) {
-      const textgrid = this.$store.getters["current/cache/textgrids"](n);
+      const textgrid = this.$store.getters["current/cache/textgrids"](
+        n
+      );
       if (textgrid !== null) {
         this.$store.dispatch("current/setTextGrid", textgrid);
       }
@@ -387,7 +408,10 @@ export default {
     },
     // レコード操作
     addRecord: function(key, time, text = "") {
-      const item = { time: time, text: text };
+      const item = {
+        time: time,
+        text: text
+      };
       this.wavesurfer.addTierValue(key, item);
       if (!this.isSyncing) {
         this.$vuewer.console.log(
@@ -413,7 +437,10 @@ export default {
     },
     updateRecordText(key, idx, text = "") {
       const time = this.$textgrid[key].values[idx].time;
-      const item = { time, text };
+      const item = {
+        time,
+        text
+      };
       this.wavesurfer.setTierValue(key, idx, item);
     },
     deleteRecordText(key, idx) {
@@ -444,8 +471,10 @@ export default {
         } else {
           const d = this.$duration;
           const offset = this.$playOffset * this.$frameRate;
-          const start = current.time - offset > 0 ? current.time - offset : 0;
-          const end = current.time + offset < d ? current.time + offset : d;
+          const start =
+            current.time - offset > 0 ? current.time - offset : 0;
+          const end =
+            current.time + offset < d ? current.time + offset : d;
           this.wavesurfer.play(start, end);
         }
       }
@@ -492,7 +521,10 @@ export default {
             this.focusRecord(keys[keys.length - 1]);
           }
         } catch {
-          this.pasteRecord(this.current.key, this.current.tier.record.idx);
+          this.pasteRecord(
+            this.current.key,
+            this.current.tier.record.idx
+          );
         }
       }
     },
@@ -500,7 +532,10 @@ export default {
       const target = this.$textgrid[key].values[idx];
       const time = target.time;
       const text = await navigator.clipboard.readText();
-      const item = { time, text };
+      const item = {
+        time,
+        text
+      };
       this.wavesurfer.setTierValue(key, idx, item);
       this.current.tier.record.text = text;
       if (!this.isSyncing) {
@@ -512,7 +547,9 @@ export default {
       const tg = this.wavesurfer.wavesurfer.textgrid;
       const time = this.wavesurfer.getCurrentTime();
       const $key =
-        key !== null ? key : this.current.key || Object.keys(this.$textgrid)[0];
+        key !== null
+          ? key
+          : this.current.key || Object.keys(this.$textgrid)[0];
       if ($key) {
         const values = this.$textgrid[$key].values;
         if (values) {
@@ -609,9 +646,14 @@ export default {
       const maxTime = this.$duration - this.$frameRate;
       const time = Number(target.time) + this.$frameRate;
       const lim =
-        idx + 1 == tier.length ? maxTime : tier[idx + 1].time - this.$frameRate;
+        idx + 1 == tier.length
+          ? maxTime
+          : tier[idx + 1].time - this.$frameRate;
       if (time < lim) {
-        const item = { text: target.text, time: time };
+        const item = {
+          text: target.text,
+          time: time
+        };
         this.wavesurfer.setTierValue(key, idx, item);
         if (!this.isSyncing) {
           this.$vuewer.console.log(
@@ -627,11 +669,15 @@ export default {
     },
     shrinkRecord(key, idx) {
       const target = this.$textgrid[key].values[idx];
-      const lim = idx == 0 ? 0 : this.$textgrid[key].values[idx - 1].time;
+      const lim =
+        idx == 0 ? 0 : this.$textgrid[key].values[idx - 1].time;
       const type = this.$textgrid[key].type;
       const time = target.time - this.$frameRate;
       if (time > lim) {
-        const item = { text: target.text, time: time };
+        const item = {
+          text: target.text,
+          time: time
+        };
         if (
           type == "interval" &&
           idx == this.$textgrid[key].values.length - 1
@@ -645,7 +691,10 @@ export default {
               `update time a record (key: ${key} idx: ${idx})`
             );
           }
-          this.$store.dispatch("current/seekTo", { time, center: false });
+          this.$store.dispatch("current/seekTo", {
+            time,
+            center: false
+          });
         }
       }
     },
@@ -667,7 +716,10 @@ export default {
       if (tokenize && record.text) {
         tokenize(record.text).then(res => {
           if (res) {
-            const item = { text: res.join("/"), time: record.time };
+            const item = {
+              text: res.join("/"),
+              time: record.time
+            };
             this.wavesurfer.setTierValue(key, idx, item);
           }
         });
@@ -744,7 +796,9 @@ export default {
     },
     onDownloadClick: function(payload) {
       // 各種ファイルのダウンロード処理
-      const bname = this.$store.state.current.video.filename.split(".")[0];
+      const bname = this.$store.state.current.video.filename.split(
+        "."
+      )[0];
       if (payload == "XLSX") {
         const obj = {
           records: this.$store.getters["current/tgTable"],
@@ -757,9 +811,11 @@ export default {
       } else if (payload == "JSON") {
         this.$emit("download-json");
       } else if (payload == "PNG") {
-        if (this.$refs.videoArray) this.$refs.videoArray.downloadImage();
+        if (this.$refs.videoArray)
+          this.$refs.videoArray.downloadImage();
       } else if (payload == "MP4") {
-        const key = this.current.tier.key || Object.keys(this.$textgrid)[0];
+        const key =
+          this.current.tier.key || Object.keys(this.$textgrid)[0];
         if (key) {
           const tier = this.$textgrid[key];
           const idx = this.current.tier.record.idx || 0;
@@ -776,7 +832,9 @@ export default {
             start = offsetS < 0 ? 0 : offsetS;
             end = offsetE > d ? d : offsetE;
           }
-          const bname = this.$store.state.current.video.filename.split(".")[0];
+          const bname = this.$store.state.current.video.filename.split(
+            "."
+          )[0];
           const name = `${bname}.mp4`;
           const buff = this.$vuewer.io.file.toBuff(this.$source);
           const result = this.$vuewer.io.video.trim(buff, start, end);
@@ -785,15 +843,26 @@ export default {
           this.$vuewer.io.file.download(blob, name);
         }
       } else if (payload == "TEXTGRID/JSON") {
-        const blob = new Blob([JSON.stringify(this.$textgrid, null, "  ")], {
-          type: "application/json"
-        });
+        const blob = new Blob(
+          [JSON.stringify(this.$textgrid, null, "  ")],
+          {
+            type: "application/json"
+          }
+        );
         this.$vuewer.io.file.download(blob, `${bname}-records.json`);
       } else if (payload == "TEXTGRID/TEXTGRID") {
         const duration = this.wavesurfer.getDuration();
-        const content = this.$vuewer.io.tg.dump(duration, this.$textgrid);
-        const blob = new Blob([content], { type: "text/plain" });
-        this.$vuewer.io.file.download(blob, `${bname}-records.TextGrid`);
+        const content = this.$vuewer.io.tg.dump(
+          duration,
+          this.$textgrid
+        );
+        const blob = new Blob([content], {
+          type: "text/plain"
+        });
+        this.$vuewer.io.file.download(
+          blob,
+          `${bname}-records.TextGrid`
+        );
       } else if (payload == "TEXTGRID/XLSX") {
         const obj = {
           records: this.$store.getters["current/tgTable"]
@@ -801,9 +870,12 @@ export default {
         const blob = this.$vuewer.io.xlsx.dump(obj);
         this.$vuewer.io.file.download(blob, `${bname}-records.xlsx`);
       } else if (payload == "FRAME/JSON") {
-        const blob = new Blob([JSON.stringify(this.$frames, null, "  ")], {
-          type: "application/json"
-        });
+        const blob = new Blob(
+          [JSON.stringify(this.$frames, null, "  ")],
+          {
+            type: "application/json"
+          }
+        );
         this.$vuewer.io.file.download(blob, `${bname}-frame.json`);
       } else if (payload == "FRAME/XLSX") {
         const obj = {
@@ -826,25 +898,37 @@ export default {
       }
     },
     onUploadClick: function(payload) {
-      this.$vuewer.console.log(this.tag, `on upload: ${payload.click}`);
+      this.$vuewer.console.log(
+        this.tag,
+        `on upload: ${payload.click}`
+      );
       const { click, files } = payload;
+      const default_error = "$vuetify.notAcceptable";
       if (files.length === 1) {
         const file = files[0];
         if (click == "TEXTGRID/JSON") {
           this.$vuewer.io.json.read(file).then(obj => {
-            const textgrid = this.$vuewer.io.obj.ver2.loadTextGrid(obj);
+            const textgrid = this.$vuewer.io.obj.ver2.loadTextGrid(
+              obj
+            );
             this.$store.dispatch("current/setTextGrid", textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
         } else if (click == "TEXTGRID/JSON/VER1") {
           this.$vuewer.io.json.read(file).then(obj => {
-            const textgrid = this.$vuewer.io.obj.ver1.loadTextGrid(obj, "both");
+            const textgrid = this.$vuewer.io.obj.ver1.loadTextGrid(
+              obj,
+              "both"
+            );
             this.$store.dispatch("current/setTextGrid", textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
         } else if (click == "TEXTGRID/JSON/VER1/LEFT") {
           this.$vuewer.io.json.read(file).then(obj => {
-            const textgrid = this.$vuewer.io.obj.ver1.loadTextGrid(obj, "left");
+            const textgrid = this.$vuewer.io.obj.ver1.loadTextGrid(
+              obj,
+              "left"
+            );
             this.$store.dispatch("current/setTextGrid", textgrid);
             this.$vuewer.snackbar.success("$vuetify.loaded");
           });
@@ -892,7 +976,10 @@ export default {
                     });
                   }
                 }
-                return { ...frame, points };
+                return {
+                  ...frame,
+                  points
+                };
               });
               vm.$frames = newFrames;
             })
@@ -903,8 +990,36 @@ export default {
                 );
               }
             });
+        } else if (click == "POINTS/XLSX") {
+          const vm = this;
+          const sheetName = "points";
+          this.$vuewer.io.xlsx
+            .load(file, sheetName)
+            .then(sheet => {
+              const [header, ...body] = sheet;
+              const points = body.map(row => {
+                const point = {};
+                header.forEach((key, row_i) => {
+                  point[key] = row[row_i];
+                });
+                return point;
+              });
+              this.$vuewer.loading.start("$vuetify.loading");
+              vm.$store
+                .dispatch("current/addPoints", points)
+                .then(() => {
+                  vm.$vuewer.loading.end();
+                })
+                .catch(error => {
+                  vm.$vuewer.loading.end();
+                  console.error(error);
+                });
+            })
+            .catch(error => {
+              console.error(error);
+            });
         } else {
-          this.$vuewer.snackbar.warning("$vuetify.notAcceptable");
+          this.$vuewer.snackbar.warning(default_error);
         }
       }
     },
@@ -933,7 +1048,10 @@ export default {
       }
     },
     onSpectrogramRenderStart() {
-      this.$vuewer.console.log(this.tag, `on spectrogram render start`);
+      this.$vuewer.console.log(
+        this.tag,
+        `on spectrogram render start`
+      );
       this.isLoading = true;
     },
     onSpectrogramRenderEnd() {
@@ -944,7 +1062,10 @@ export default {
         // start が指定されている場合そこに移動
         if (this.$route.query.start) {
           const time = Number(this.$route.query.start);
-          this.$store.dispatch("current/seekTo", { time, center: false });
+          this.$store.dispatch("current/seekTo", {
+            time,
+            center: false
+          });
         }
 
         // current.tier を初期化
@@ -953,7 +1074,9 @@ export default {
         this.current.tier.record.idx = 0;
         this.current.tier.record.text = "";
         this.current.tier.record.time = 0;
-        this.$duration = this.wavesurfer ? this.wavesurfer.getDuration() : 0;
+        this.$duration = this.wavesurfer
+          ? this.wavesurfer.getDuration()
+          : 0;
         this.isSyncing = false;
       }
       this.isLoading = false;
@@ -962,11 +1085,19 @@ export default {
       if (this.wavesurfer.isPlaying()) this.wavesurfer.pause();
       this.current.key = payload.key;
       this.current.time = payload.time;
-      if (this.$store.state.setting.addRecordKey == "ctrl" && payload.ctrl) {
-        if (payload.detail == 1) this.addRecord(payload.key, payload.time);
+      if (
+        this.$store.state.setting.addRecordKey == "ctrl" &&
+        payload.ctrl
+      ) {
+        if (payload.detail == 1)
+          this.addRecord(payload.key, payload.time);
       }
-      if (this.$store.state.setting.addRecordKey == "alt" && payload.alt) {
-        if (payload.detail == 1) this.addRecord(payload.key, payload.time);
+      if (
+        this.$store.state.setting.addRecordKey == "alt" &&
+        payload.alt
+      ) {
+        if (payload.detail == 1)
+          this.addRecord(payload.key, payload.time);
       }
       if (payload.item) {
         this.current.text = payload.item.text;
@@ -981,7 +1112,8 @@ export default {
     // key 操作系
     onTextGridKeydown: function(payload) {
       const time = Number(Date.now() - this.keybuffer.time);
-      const check = (this.keybuffer.from == "textgrid") & (time < 150);
+      const check =
+        (this.keybuffer.from == "textgrid") & (time < 150);
       const preKey = check ? this.keybuffer.keycode : null;
       const { key, xKey } = this.$vuewer.key.summary(payload);
       const item = payload.current;
@@ -1009,12 +1141,23 @@ export default {
       }
 
       // Ctrl + SPACE で現在時刻にティアーを挿入
-      if ((key == 32 && xKey == "ctrl") || (key == 32 && xKey == "default")) {
-        this.addRecord(item.key, this.wavesurfer.getCurrentTime(), "");
+      if (
+        (key == 32 && xKey == "ctrl") ||
+        (key == 32 && xKey == "default")
+      ) {
+        this.addRecord(
+          item.key,
+          this.wavesurfer.getCurrentTime(),
+          ""
+        );
       }
 
       if (key == 13) {
-        this.addRecord(item.key, this.wavesurfer.getCurrentTime(), "");
+        this.addRecord(
+          item.key,
+          this.wavesurfer.getCurrentTime(),
+          ""
+        );
       }
 
       // タブキー時に現在時刻の再生
@@ -1028,7 +1171,8 @@ export default {
       }
       if (key == 189 && xKey == "ctrl") {
         // ctrl - で拡大
-        if (this.$minPxPerSec > 100) this.$minPxPerSec = this.$minPxPerSec - 50;
+        if (this.$minPxPerSec > 100)
+          this.$minPxPerSec = this.$minPxPerSec - 50;
       }
 
       // 移動系操作
@@ -1102,7 +1246,10 @@ export default {
         this.fireUpdateData();
       }
       // ctrl + z または u で Textgrid の状態を一つ戻す
-      if ((key == 90 && xKey == "ctrl") || (key == 85 && xKey == "default")) {
+      if (
+        (key == 90 && xKey == "ctrl") ||
+        (key == 85 && xKey == "default")
+      ) {
         this.rebaseTextgrid();
       }
 
@@ -1136,9 +1283,15 @@ export default {
       };
       if (key == "tab" && xKey == "default") {
         this.playPause();
-      } else if (key == "+" && (xKey == "ctrl" || xKey == "ctrl+shift")) {
+      } else if (
+        key == "+" &&
+        (xKey == "ctrl" || xKey == "ctrl+shift")
+      ) {
         this.$minPxPerSec = this.$minPxPerSec + 50;
-      } else if (key == "-" && (xKey == "ctrl" || xKey == "ctrl+shift")) {
+      } else if (
+        key == "-" &&
+        (xKey == "ctrl" || xKey == "ctrl+shift")
+      ) {
         this.$minPxPerSec = this.$minPxPerSec - 50;
       } else if (key == "i" && xKey == "ctrl") {
         this.onClickImageEdit();
@@ -1228,7 +1381,13 @@ export default {
       } else if (key == "i" && xKey == "ctrl+shift") {
         this.onClickImageEdit();
       } else {
-        console.log("onVideoArrayKeyup", payload.ref, key, xKey, event);
+        console.log(
+          "onVideoArrayKeyup",
+          payload.ref,
+          key,
+          xKey,
+          event
+        );
       }
     },
     // TextField 操作
@@ -1322,7 +1481,10 @@ export default {
       this.$vuewer.console.log(this.tag, `on click ruler`);
       if (time) {
         this.lazyRular = true;
-        this.$store.dispatch("current/seekTo", { time, center: false });
+        this.$store.dispatch("current/seekTo", {
+          time,
+          center: false
+        });
       } else {
         this.dialog.ruler.show = true;
       }
@@ -1331,7 +1493,10 @@ export default {
       this.$vuewer.console.log(this.tag, `on click image edit`);
       if (time) {
         this.lazyImageEdit = true;
-        this.$store.dispatch("current/seekTo", { time, center: false });
+        this.$store.dispatch("current/seekTo", {
+          time,
+          center: false
+        });
       } else {
         this.dialog.imageEdit.show = true;
       }
@@ -1423,7 +1588,9 @@ export default {
           this.tokenizeRecord(key, record.idx, payload);
         }
       } else {
-        this.$vuewer.snackbar.warning("$vuetify.textgrid.tier.record.no");
+        this.$vuewer.snackbar.warning(
+          "$vuetify.textgrid.tier.record.no"
+        );
       }
     },
     onClickIntervalContextMenu: function(payload) {
@@ -1441,11 +1608,18 @@ export default {
           let new_records = records;
           if (rType == "interval") {
             records.map((r, i) => {
-              const time = Math.round(r.time * this.$fps) * this.$frameRate;
+              const time =
+                Math.round(r.time * this.$fps) * this.$frameRate;
               if (i == records.length - 1) {
-                return { text: r.text, time: r.time };
+                return {
+                  text: r.text,
+                  time: r.time
+                };
               }
-              return { text: r.text, time: time };
+              return {
+                text: r.text,
+                time: time
+              };
             });
           } else {
             new_records = records.map(r => {
@@ -1462,7 +1636,10 @@ export default {
           const times = this.$frames
             .filter(x => x.time > 0 && x.time < this.$duration)
             .map(x => x.time);
-          const values = times.map(t => ({ text: "", time: t }));
+          const values = times.map(t => ({
+            text: "",
+            time: t
+          }));
           const textgrid = this.$textgrid;
           textgrid[key].values = values;
           this.$store.dispatch("current/setTextGrid", textgrid);
@@ -1471,7 +1648,8 @@ export default {
           const textgrid = this.$textgrid;
           for (const idx in tier.values) {
             const rec = this.$textgrid[key].values[idx];
-            const prev = idx - 1 == 0 ? tier.values[0] : tier.values[idx - 1];
+            const prev =
+              idx - 1 == 0 ? tier.values[0] : tier.values[idx - 1];
             if (rec.text) {
               const texts = rec.text.split("");
               const num = texts.length;
@@ -1484,7 +1662,10 @@ export default {
                   textgrid[key].values[idx].text = text;
                   textgrid[key].values[idx].time = time;
                 } else {
-                  textgrid[key].values.push({ text: text, time: time });
+                  textgrid[key].values.push({
+                    text: text,
+                    time: time
+                  });
                 }
               }
             }
@@ -1495,7 +1676,8 @@ export default {
           const textgrid = this.$textgrid;
           for (const idx in tier.values) {
             const rec = this.$textgrid[key].values[idx];
-            const prev = idx - 1 == 0 ? tier.values[0] : tier.values[idx - 1];
+            const prev =
+              idx - 1 == 0 ? tier.values[0] : tier.values[idx - 1];
             if (rec.text) {
               const duration = rec.time - prev.time;
               const texts = rec.text.split("/");
@@ -1508,7 +1690,10 @@ export default {
                   textgrid[key].values[idx].text = text;
                   textgrid[key].values[idx].time = time;
                 } else {
-                  textgrid[key].values.push({ text: text, time: time });
+                  textgrid[key].values.push({
+                    text: text,
+                    time: time
+                  });
                 }
               }
             }
@@ -1516,7 +1701,9 @@ export default {
           this.$store.dispatch("current/setTextGrid", textgrid);
         }
       } else {
-        this.$vuewer.snackbar.warning("$vuetify.textgrid.tier.record.no");
+        this.$vuewer.snackbar.warning(
+          "$vuetify.textgrid.tier.record.no"
+        );
       }
     },
 
@@ -1624,4 +1811,3 @@ export default {
   }
 };
 </script>
-<style scoped></style>

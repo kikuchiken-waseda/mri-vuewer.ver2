@@ -91,7 +91,11 @@ export default {
           state.textgrid = state.item.textgrid || {};
           state.frames = await db.frames
             .where({ fileId: state.item.id })
-            .with({ points: "points", rects: "rects", polygons: "polygons" });
+            .with({
+              points: "points",
+              rects: "rects",
+              polygons: "polygons"
+            });
           dispatch("loading/finish", {}, { root: true });
         }
       }
@@ -135,6 +139,40 @@ export default {
     // ===================================================
     // フレーム操作
     // ===================================================
+    async addPoints({ state, dispatch }, payload) {
+      await Promise.all(
+        payload.map(async point => {
+          const { id, index, time, label, color, x, y } = point;
+          if (id && index && time && label && color && x && y) {
+            const frame = state.frames.find(
+              frame => frame.idx === index
+            );
+            if (frame !== undefined) {
+              const old_point = frame.points.find(p => p.id == id);
+              if (old_point === undefined) {
+                try {
+                  const item = {
+                    x,
+                    y,
+                    color,
+                    label,
+                    frameId: frame.id
+                  };
+                  const new_id = await db.points.put(item);
+                  item.id = new_id;
+                  frame.points.push(item);
+                } catch (error) {
+                  dispatch("snackbar/error", error.message, {
+                    root: true
+                  });
+                }
+              }
+            }
+          }
+          return null;
+        })
+      );
+    },
     deletePoints({ state, commit }) {
       const ids = state.frames
         .filter(f => f.points.length)
@@ -254,10 +292,20 @@ export default {
       return array;
     },
     pointTable: function(state) {
-      const array = [["id", "index", "time", "label", "x", "y", "color"]];
+      const array = [
+        ["id", "index", "time", "label", "x", "y", "color"]
+      ];
       for (const f of state.frames) {
         for (const p of f.points || []) {
-          const row = [p.id, f.idx, f.time, p.label, p.x, p.y, p.color];
+          const row = [
+            p.id,
+            f.idx,
+            f.time,
+            p.label,
+            p.x,
+            p.y,
+            p.color
+          ];
           array.push(row);
         }
       }
