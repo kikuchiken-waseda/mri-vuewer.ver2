@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel=icon href=/mri-vuewer.dev/favicon.ico>
+    <title>mri-vuewer.ver2</title>
+    <script>
+      const path = window.location.pathname.split("/");
+      const nexts = [];
+      for (const i in path) {
+        if (path[i] && path[i] !== "mri-vuewer.ver2") {
+          nexts.push(path[i]);
+        }
+      }
+      const nextpage = nexts.join("-");
+      if (nextpage) {
+        const protocol = window.location.protocol;
+        const hostname = window.location.hostname;
+
+        const query = window.location.search;
+        const search = query
+          ? `{query}&nextpage=${nextpage}`
+          : `?nextpage=${nextpage}`;
+        const url = `${protocol}//${hostname}/mri-vuewer.ver2/${search}`;
+        window.location.replace(url);
+      } else {
+        window.location.pathname = `/mri-vuewer.ver2/`;
+      }
+    </script>
+  </head>
+  <body>
+    <noscript>
+      <strong>
+        We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work
+        properly without JavaScript enabled. Please enable it to continue.
+      </strong>
+    </noscript>
+  </body>
+</html>
