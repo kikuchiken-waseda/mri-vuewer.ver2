@@ -5,11 +5,17 @@
     </template>
     <v-list>
       <v-subheader>Open in</v-subheader>
-      <v-list-item @click="open(item)" v-for="(item, i) in cards" :key="i">
+      <v-list-item
+        @click="open(item)"
+        v-for="(item, i) in cards"
+        :key="i"
+      >
         <v-list-item-icon v-if="item.icon">
           <v-icon>{{ item.icon }}</v-icon>
         </v-list-item-icon>
-        <v-list-item-title>{{ item.title.toUpperCase() }}</v-list-item-title>
+        <v-list-item-title>{{
+          item.title.toUpperCase()
+        }}</v-list-item-title>
       </v-list-item>
     </v-list>
   </v-bottom-sheet>

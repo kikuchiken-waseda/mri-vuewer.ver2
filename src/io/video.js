@@ -87,7 +87,9 @@ const info = (buff, callback) => {
                   return Number(val);
                 });
               item.duration =
-                timeInfo[0] * 60 * 60 + timeInfo[1] * 60 + timeInfo[2];
+                timeInfo[0] * 60 * 60 +
+                timeInfo[1] * 60 +
+                timeInfo[2];
             }
           } catch {
             item.errors.duration = "$vuetify.io.video.error.duration";
@@ -99,7 +101,9 @@ const info = (buff, callback) => {
               if (info[1] == "Video") {
                 try {
                   const sizeText = detail.filter(x =>
-                    x.match(/^([1-9]\d*|0)(\.\d+)?x([1-9]\d*|0)(\.\d+)?/)
+                    x.match(
+                      /^([1-9]\d*|0)(\.\d+)?x([1-9]\d*|0)(\.\d+)?/
+                    )
                   )[0];
                   if (sizeText) {
                     const size = sizeText.split(" ")[0].split("x");
@@ -119,14 +123,18 @@ const info = (buff, callback) => {
                 item.videoStream.pix_fmt = detail[1];
                 try {
                   item.videoStream.bitrate = Number(
-                    detail.filter(x => x.match(/kb\/s/))[0].split(" ")[0]
+                    detail
+                      .filter(x => x.match(/kb\/s/))[0]
+                      .split(" ")[0]
                   );
                 } catch {
                   item.videoStream.bitrate = null;
                 }
                 try {
                   item.videoStream.fps = Number(
-                    detail.filter(x => x.match(/fps/))[0].split(" ")[0]
+                    detail
+                      .filter(x => x.match(/fps/))[0]
+                      .split(" ")[0]
                   );
                 } catch {
                   item.videoStream.fps = null;
@@ -134,7 +142,9 @@ const info = (buff, callback) => {
                 }
                 try {
                   item.videoStream.tbr = Number(
-                    detail.filter(x => x.match(/tbr/))[0].split(" ")[0]
+                    detail
+                      .filter(x => x.match(/tbr/))[0]
+                      .split(" ")[0]
                   );
                 } catch {
                   item.videoStream.tbr = null;
@@ -142,14 +152,18 @@ const info = (buff, callback) => {
 
                 try {
                   item.videoStream.tbn = Number(
-                    detail.filter(x => x.match(/tbn/))[0].split(" ")[0]
+                    detail
+                      .filter(x => x.match(/tbn/))[0]
+                      .split(" ")[0]
                   );
                 } catch {
                   item.videoStream.tbn = null;
                 }
                 try {
                   item.videoStream.tbc = Number(
-                    detail.filter(x => x.match(/tbc/))[0].split(" ")[0]
+                    detail
+                      .filter(x => x.match(/tbc/))[0]
+                      .split(" ")[0]
                   );
                 } catch {
                   item.videoStream.tbc = null;
@@ -166,7 +180,9 @@ const info = (buff, callback) => {
                 item.audioStream.channel_layout = detail[2];
                 item.audioStream.sample_fmt = detail[3];
                 try {
-                  item.audioStream.bitrate = Number(detail[4].split(" ")[0]);
+                  item.audioStream.bitrate = Number(
+                    detail[4].split(" ")[0]
+                  );
                 } catch {
                   item.audioStream.bitrate = null;
                 }
@@ -341,7 +357,9 @@ const concat = buffs => {
   const args = datas.map(x => x.name).join("|");
   const result = ffmpeg({
     MEMFS: datas,
-    arguments: `-i "concat:${args}" -codec copy output.mp4`.split(" "),
+    arguments: `-i "concat:${args}" -codec copy output.mp4`.split(
+      " "
+    ),
     print: function(data) {
       console.log(data);
     },

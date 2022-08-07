@@ -96,7 +96,9 @@ export default {
           dropbox
             .get("/data")
             .then(res => {
-              const chaches = res.entries.filter(x => x[".tag"] == "file");
+              const chaches = res.entries.filter(
+                x => x[".tag"] == "file"
+              );
               context.commit("chaches", chaches);
               resolve(true);
             })
@@ -195,7 +197,10 @@ export default {
                 .toArray()
                 .then(files => {
                   context.commit("files", files);
-                  context.dispatch("deleteLog", `delete files: ${id}`);
+                  context.dispatch(
+                    "deleteLog",
+                    `delete files: ${id}`
+                  );
                   context.commit("isLoading", false);
                   resolve(id);
                 })
@@ -235,7 +240,8 @@ export default {
           const n = tier.values.length - 1;
           for (const i in tier.values) {
             const record = tier.values[i];
-            const prev = i == 0 ? { time: 0, text: "" } : tier.values[i - 1];
+            const prev =
+              i == 0 ? { time: 0, text: "" } : tier.values[i - 1];
             if (record.time && prev.time) {
               const item = {
                 fileId: f.id,
@@ -256,12 +262,18 @@ export default {
                   tier: key,
                   key: key,
                   text: record.text,
-                  $prev1_text: i > 0 ? tier.values[Number(i) - 1].text : "",
-                  $prev2_text: i > 1 ? tier.values[Number(i) - 2].text : "",
-                  $prev3_text: i > 2 ? tier.values[Number(i) - 3].text : "",
-                  $next1_text: i < n - 1 ? tier.values[Number(i) + 1].text : "",
-                  $next2_text: i < n - 2 ? tier.values[Number(i) + 2].text : "",
-                  $next3_text: i < n - 3 ? tier.values[Number(i) + 3].text : ""
+                  $prev1_text:
+                    i > 0 ? tier.values[Number(i) - 1].text : "",
+                  $prev2_text:
+                    i > 1 ? tier.values[Number(i) - 2].text : "",
+                  $prev3_text:
+                    i > 2 ? tier.values[Number(i) - 3].text : "",
+                  $next1_text:
+                    i < n - 1 ? tier.values[Number(i) + 1].text : "",
+                  $next2_text:
+                    i < n - 2 ? tier.values[Number(i) + 2].text : "",
+                  $next3_text:
+                    i < n - 3 ? tier.values[Number(i) + 3].text : ""
                 }
               };
               records.push(item);

@@ -99,7 +99,8 @@ export default {
         const iconSize = 50 * (this.actions.length + 1);
         if (this.$refs.card) {
           if (this.$refs.card.$el) {
-            const subTextMaxWidth = this.$refs.card.$el.clientWidth - iconSize;
+            const subTextMaxWidth =
+              this.$refs.card.$el.clientWidth - iconSize;
             this.subTextMaxWidth = subTextMaxWidth;
           }
         }

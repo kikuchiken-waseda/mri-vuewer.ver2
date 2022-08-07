@@ -3,7 +3,9 @@
     <v-col cols="12">
       <m-t-card title="Sample Videos">
         <v-list flat>
-          <v-subheader>Select one item for the live demo.</v-subheader>
+          <v-subheader
+            >Select one item for the live demo.</v-subheader
+          >
           <v-list-item-group v-model="sample" color="primary">
             <v-list-item v-for="(item, i) in samples" :key="i">
               <v-list-item-icon>
@@ -51,7 +53,9 @@ export default {
       this.$vuewer.loading.start("downloading a demo file ...");
       const url = this.toUrl(filename);
       try {
-        const file = await io.file.fetch(url, filename, { type: "video/mp4" });
+        const file = await io.file.fetch(url, filename, {
+          type: "video/mp4"
+        });
         if (file) {
           if (file.arrayBuffer) {
             const video = io.video.initObj();

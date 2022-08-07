@@ -61,7 +61,9 @@ export default {
     handleTransformEnd(e) {
       // shape is transformed, let us save new attrs back to the node
       // find element in our state
-      const rect = this.rectangles.find(r => r.name === this.selectedShapeName);
+      const rect = this.rectangles.find(
+        r => r.name === this.selectedShapeName
+      );
       // update the state
       rect.x = e.target.x();
       rect.y = e.target.y();

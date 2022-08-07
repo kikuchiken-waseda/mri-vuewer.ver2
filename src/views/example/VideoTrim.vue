@@ -3,7 +3,9 @@
     <v-card>
       <v-card-text>
         <v-file-input
-          :label="`${$vuetify.lang.t('$vuetify.io.mVideoInput.title')}*`"
+          :label="
+            `${$vuetify.lang.t('$vuetify.io.mVideoInput.title')}*`
+          "
           accept="video/mp4"
           :rules="videoRules"
           show-size
@@ -25,7 +27,8 @@ export default {
   },
   data: () => ({
     heading: "Example: TRIM VIDEO",
-    desc: "動画切り出し関数の処理例です(特定の動画の5-10secを切り出します)"
+    desc:
+      "動画切り出し関数の処理例です(特定の動画の5-10secを切り出します)"
   }),
   methods: {
     onChange: async function(e) {

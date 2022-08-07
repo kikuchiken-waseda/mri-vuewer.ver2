@@ -89,7 +89,13 @@ const convexDefects = (dataURL, size) => {
       let defect = new cv.Mat();
       try {
         cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY, 0);
-        cv.threshold(src, dst, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
+        cv.threshold(
+          src,
+          dst,
+          0,
+          255,
+          cv.THRESH_BINARY + cv.THRESH_OTSU
+        );
         cv.findContours(
           dst,
           contours,
@@ -258,7 +264,10 @@ const grabCut = (dataURL, size) => {
         );
         for (let i = 0; i < src.rows; i++) {
           for (let j = 0; j < src.cols; j++) {
-            if (mask.ucharPtr(i, j)[0] == 0 || mask.ucharPtr(i, j)[0] == 2) {
+            if (
+              mask.ucharPtr(i, j)[0] == 0 ||
+              mask.ucharPtr(i, j)[0] == 2
+            ) {
               src.ucharPtr(i, j)[0] = 0;
               src.ucharPtr(i, j)[1] = 0;
               src.ucharPtr(i, j)[2] = 0;
@@ -267,7 +276,10 @@ const grabCut = (dataURL, size) => {
         }
         let color = new cv.Scalar(0, 0, 255);
         let point1 = new cv.Point(rect.x, rect.y);
-        let point2 = new cv.Point(rect.x + rect.width, rect.y + rect.height);
+        let point2 = new cv.Point(
+          rect.x + rect.width,
+          rect.y + rect.height
+        );
         cv.rectangle(src, point1, point2, color);
         resolve(writeBase64(src));
       } catch (e) {

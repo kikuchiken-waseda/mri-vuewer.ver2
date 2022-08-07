@@ -79,7 +79,8 @@ export default {
       actions: "File Actions",
       forms: {
         setTier: {
-          label: "Set Tiers (name:[interval|point] name2:[interval|point]...)",
+          label:
+            "Set Tiers (name:[interval|point] name2:[interval|point]...)",
           hint: `Gives some textgrid tiers to the selected files. To add a interval tier called IPU, enter "IPU-interval" in input form. And then, click the icon on the right of input form.
           `
         }
@@ -95,7 +96,8 @@ export default {
     less: "This value is less then {0}",
     times: "This value is a multiple of {0}",
     maxVideoSize: `Video size should be less than ${store.state.setting.maxVideoSize} MB!`,
-    hasArrayBuffer: "This is an unexpected video file [No Array buffer]!",
+    hasArrayBuffer:
+      "This is an unexpected video file [No Array buffer]!",
     shorter: "This field must be less than {0} characters",
     alreadyExists: "This value alredy exists",
     notExist: "This value does not exist"
@@ -195,7 +197,8 @@ export default {
     },
     video: {
       error: {
-        fps: "Failed to get the fps of this video file. Please enter fps.",
+        fps:
+          "Failed to get the fps of this video file. Please enter fps.",
         duration:
           "Failed to get duration of this video file. Enter the duration of the video file.",
         originSize: {
@@ -441,10 +444,13 @@ export default {
       delete: "Delete a Tier",
       interval: {
         name: "Interval Tier",
-        time2frame: "Match time of records in a current tier to images time",
-        owakati: "word-separation for the current tier (for Japanese)",
+        time2frame:
+          "Match time of records in a current tier to images time",
+        owakati:
+          "word-separation for the current tier (for Japanese)",
         oyomi: "Convert current tier to reading (for Japanese)",
-        opronunciation: "Convert current tier to pronunciation (for Japanese)"
+        opronunciation:
+          "Convert current tier to pronunciation (for Japanese)"
       }
     },
     record: {
@@ -461,10 +467,13 @@ export default {
       splitByFrames: "split a current record by frames.",
       splitByChars: "split a current record by chars.",
       splitBySlash: "split a current record by slash.",
-      owakati: "word-separation for the current record (for Japanese)",
+      owakati:
+        "word-separation for the current record (for Japanese)",
       oyomi: "Convert current record to reading (for Japanese)",
-      opronunciation: "Convert current record to pronunciation (for Japanese)",
-      obasic: "Convert current record to representative type (for Japanese)",
+      opronunciation:
+        "Convert current record to pronunciation (for Japanese)",
+      obasic:
+        "Convert current record to representative type (for Japanese)",
       opos: "Convert current record to part of speech (for Japanese)"
     },
     frame: {

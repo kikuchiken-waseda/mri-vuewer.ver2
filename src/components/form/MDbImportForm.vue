@@ -13,7 +13,11 @@
         </v-col>
         <v-col class="shrink pa-1">
           <v-btn @click="dbLoad" color="error darken-2">YES</v-btn>
-          <v-btn @click="$emit('reject')" class="mt-4" color="error darken-3">
+          <v-btn
+            @click="$emit('reject')"
+            class="mt-4"
+            color="error darken-3"
+          >
             NO
           </v-btn>
         </v-col>

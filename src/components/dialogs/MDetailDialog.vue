@@ -9,7 +9,9 @@
     </template>
     <template v-slot:toolbar-actions>
       <m-video-upload-menu @click="$emit('upload-click', $event)" />
-      <m-video-download-menu @click="$emit('download-click', $event)" />
+      <m-video-download-menu
+        @click="$emit('download-click', $event)"
+      />
     </template>
     <v-card tile>
       <v-img
@@ -37,7 +39,9 @@
             <v-icon></v-icon>
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title> {{ x.key.toUpperCase() }}: </v-list-item-title>
+            <v-list-item-title>
+              {{ x.key.toUpperCase() }}:
+            </v-list-item-title>
           </v-list-item-content>
           <v-list-item-action>
             {{ x.val }}

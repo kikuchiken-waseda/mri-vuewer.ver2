@@ -11,7 +11,9 @@
       :rules="rules.positiveFloatRules"
       :label="t('$vuetify.io.mVideoCodec.fps')"
       :hint="video.errors.fps ? t(video.errors.fps) : ''"
-      :persistent-hint="video.errors.fps ? !Boolean(video.fps) : false"
+      :persistent-hint="
+        video.errors.fps ? !Boolean(video.fps) : false
+      "
       suffix="fps"
     />
     <v-text-field
@@ -31,10 +33,14 @@
       :rules="rules.positiveFloatRules"
       :label="t('$vuetify.io.mVideoCodec.originSize.width')"
       :hint="
-        video.errors.originSize.width ? t(video.errors.originSize.width) : ''
+        video.errors.originSize.width
+          ? t(video.errors.originSize.width)
+          : ''
       "
       :persistent-hint="
-        video.errors.originSize.width ? !Boolean(video.originSize.width) : false
+        video.errors.originSize.width
+          ? !Boolean(video.originSize.width)
+          : false
       "
       suffix="pixel"
     />
@@ -44,7 +50,9 @@
       :rules="rules.positiveFloatRules"
       :label="t('$vuetify.io.mVideoCodec.originSize.height')"
       :hint="
-        video.errors.originSize.height ? t(video.errors.originSize.height) : ''
+        video.errors.originSize.height
+          ? t(video.errors.originSize.height)
+          : ''
       "
       :persistent-hint="
         video.errors.originSize.height

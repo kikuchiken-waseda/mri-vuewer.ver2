@@ -1,7 +1,10 @@
 <template>
   <m-view-layout :heading="heading" :desc="desc">
     <v-card class="text-center">
-      <v-card-text class="font-weight-light subtitle-1" v-html="license" />
+      <v-card-text
+        class="font-weight-light subtitle-1"
+        v-html="license"
+      />
     </v-card>
   </m-view-layout>
 </template>

@@ -22,20 +22,30 @@ const loadRegions = (obj, type) => {
       const r = obj.regions[i];
       if (type == "left") {
         if (r.start) {
-          const text = i == 0 ? "" : obj.regions[i - 1].attributes.label || "";
+          const text =
+            i == 0 ? "" : obj.regions[i - 1].attributes.label || "";
           regions.push({ time: r.start, text: text });
         }
       } else if (type == "right") {
         if (r.end) {
-          regions.push({ time: r.end, text: r.attributes.label || "" });
+          regions.push({
+            time: r.end,
+            text: r.attributes.label || ""
+          });
         }
       } else if (type == "up-down") {
         if (i % 2 == 0) {
           regions.push({ time: r.start, text: "" });
-          regions.push({ time: r.end, text: r.attributes.label || "" });
+          regions.push({
+            time: r.end,
+            text: r.attributes.label || ""
+          });
         } else {
           regionsDown.push({ time: r.start, text: "" });
-          regionsDown.push({ time: r.end, text: r.attributes.label || "" });
+          regionsDown.push({
+            time: r.end,
+            text: r.attributes.label || ""
+          });
         }
       } else {
         if (i != 0) {
@@ -87,12 +97,16 @@ export default {
   loadTextGrid: (obj, type) => {
     const textgrid = {};
     const points = loadPoints(obj);
-    if (points.length) textgrid["points"] = { type: "point", values: points };
+    if (points.length)
+      textgrid["points"] = { type: "point", values: points };
 
     const { regions, regionsDown } = loadRegions(obj, type);
     if (regionsDown.length) {
       textgrid["region_up"] = { type: "interval", values: regions };
-      textgrid["region_down"] = { type: "interval", values: regionsDown };
+      textgrid["region_down"] = {
+        type: "interval",
+        values: regionsDown
+      };
     } else {
       if (regions.length)
         textgrid["regions"] = { type: "interval", values: regions };

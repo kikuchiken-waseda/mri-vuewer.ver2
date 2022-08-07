@@ -8,7 +8,9 @@
         <pre>{{ video }}</pre>
       </v-card-text>
     </v-card>
-    <m-loading-dialog v-model="isLoading">{{ status }}</m-loading-dialog>
+    <m-loading-dialog v-model="isLoading">{{
+      status
+    }}</m-loading-dialog>
   </m-view-layout>
 </template>
 <script>

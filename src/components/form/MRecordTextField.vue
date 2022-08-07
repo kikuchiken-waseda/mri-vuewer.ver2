@@ -100,7 +100,9 @@ export default {
       const inputs = [
         ...this.$refs.text.$el.getElementsByTagName("input")
       ].filter(e => e.type == "text");
-      const text = this.$vuewer.text.clean(inputs.map(e => e.value).join(""));
+      const text = this.$vuewer.text.clean(
+        inputs.map(e => e.value).join("")
+      );
       this.text = text ? text : "";
     },
     onNext: function() {

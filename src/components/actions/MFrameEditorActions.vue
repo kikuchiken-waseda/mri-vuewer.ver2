@@ -17,7 +17,9 @@
         label="転記テキスト"
       >
         <template v-slot:append>
-          <v-btn icon @click="addEvent"><v-icon>mdi-send</v-icon></v-btn>
+          <v-btn icon @click="addEvent"
+            ><v-icon>mdi-send</v-icon></v-btn
+          >
         </template>
       </v-text-field>
       <v-spacer />
@@ -40,7 +42,12 @@
     </v-toolbar>
     <v-toolbar dense>
       <v-btn-toggle v-model="filter" dense group color="primary">
-        <v-btn :value="f.name" text v-for="f in filters" :key="f.name">
+        <v-btn
+          :value="f.name"
+          text
+          v-for="f in filters"
+          :key="f.name"
+        >
           {{ $vuetify.lang.t(f.name) }}
         </v-btn>
       </v-btn-toggle>

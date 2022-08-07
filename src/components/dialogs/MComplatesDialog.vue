@@ -24,7 +24,12 @@
             <v-list-item-content>
               <v-list-item-title>
                 {{ key }}
-                <v-chip v-if="items.length > 0" small class="ml-2" color="info">
+                <v-chip
+                  v-if="items.length > 0"
+                  small
+                  class="ml-2"
+                  color="info"
+                >
                   {{ items.length }}
                 </v-chip>
               </v-list-item-title>

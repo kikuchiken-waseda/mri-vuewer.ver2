@@ -24,19 +24,31 @@
         <v-tab-item>
           <v-card flat>
             <v-card-title class="headline">LOG</v-card-title>
-            <v-data-table :headers="headers" :items="logs" :search="search" />
+            <v-data-table
+              :headers="headers"
+              :items="logs"
+              :search="search"
+            />
           </v-card>
         </v-tab-item>
         <v-tab-item>
           <v-card flat>
             <v-card-title class="headline">DB LOG</v-card-title>
-            <v-data-table :headers="headers" :items="dblogs" :search="search" />
+            <v-data-table
+              :headers="headers"
+              :items="dblogs"
+              :search="search"
+            />
           </v-card>
         </v-tab-item>
         <v-tab-item>
           <v-card flat>
             <v-card-title class="headline">ERRORS</v-card-title>
-            <v-data-table :headers="headers" :items="errors" :search="search" />
+            <v-data-table
+              :headers="headers"
+              :items="errors"
+              :search="search"
+            />
           </v-card>
         </v-tab-item>
       </v-tabs-items>

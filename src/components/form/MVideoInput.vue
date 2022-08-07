@@ -40,7 +40,8 @@ export default {
               });
             } catch (e) {
               this.video.errors.fps = "$vuetify.io.video.error.fps";
-              this.video.errors.duration = "$vuetify.io.video.error.duration";
+              this.video.errors.duration =
+                "$vuetify.io.video.error.duration";
               this.video.errors.originSize.width =
                 "$vuetify.io.video.error.originSize.width";
               this.video.errors.originSize.height =

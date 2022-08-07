@@ -31,7 +31,11 @@
           </v-list-item-title>
         </v-list-item-content>
       </template>
-      <v-list-item v-for="(item, i) in ver1" :key="i" @click="onClick(item)">
+      <v-list-item
+        v-for="(item, i) in ver1"
+        :key="i"
+        @click="onClick(item)"
+      >
         <v-list-item-title>{{ item.text }}</v-list-item-title>
       </v-list-item>
     </v-list-group>
@@ -43,7 +47,11 @@
           </v-list-item-title>
         </v-list-item-content>
       </template>
-      <v-list-item v-for="(item, i) in point" :key="i" @click="onClick(item)">
+      <v-list-item
+        v-for="(item, i) in point"
+        :key="i"
+        @click="onClick(item)"
+      >
         <v-list-item-title>{{ item.text }}</v-list-item-title>
       </v-list-item>
     </v-list-group>

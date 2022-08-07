@@ -8,10 +8,16 @@
     absolute
     shaped
   >
-    <v-icon v-if="type == 'error'" class="mr-1">mdi-alert-octagram</v-icon>
+    <v-icon v-if="type == 'error'" class="mr-1"
+      >mdi-alert-octagram</v-icon
+    >
     <v-icon v-if="type == 'warning'" class="mr-1">mdi-alert</v-icon>
-    <v-icon v-if="type == 'info'" class="mr-1">mdi-information</v-icon>
-    <v-icon v-if="type == 'success'" class="mr-1">mdi-check-circle</v-icon>
+    <v-icon v-if="type == 'info'" class="mr-1"
+      >mdi-information</v-icon
+    >
+    <v-icon v-if="type == 'success'" class="mr-1"
+      >mdi-check-circle</v-icon
+    >
     <span class="subtitle"> {{ $vuetify.lang.t(message) }} </span>
     <template v-slot:action="{ attrs }">
       <v-btn icon color="white" v-bind="attrs" @click="show = false">
@@ -39,7 +45,9 @@ export default {
       return this.$store.state.snackbar.color;
     },
     message: function() {
-      return this.$store.state.snackbar.message || "THIS IS DEBUG MASSAGE";
+      return (
+        this.$store.state.snackbar.message || "THIS IS DEBUG MASSAGE"
+      );
     },
     timeout: function() {
       return this.$store.state.snackbar.timeout;

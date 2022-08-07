@@ -1,5 +1,9 @@
 <template>
-  <v-card v-bind="$attrs" :class="classes" class="v-card--material pa-3">
+  <v-card
+    v-bind="$attrs"
+    :class="classes"
+    class="v-card--material pa-3"
+  >
     <div class="d-flex grow flex-wrap">
       <v-avatar
         v-if="avatar"
@@ -33,7 +37,11 @@
 
         <v-icon v-else-if="icon" size="32" v-text="icon" />
 
-        <div v-if="text" class="headline font-weight-thin" v-text="text" />
+        <div
+          v-if="text"
+          class="headline font-weight-thin"
+          v-text="text"
+        />
       </v-sheet>
 
       <div v-if="$slots['after-heading']" class="ml-6">
@@ -96,7 +104,9 @@ export default {
       return Boolean(this.$slots.heading || this.title || this.icon);
     },
     hasAltHeading() {
-      return Boolean(this.$slots.heading || (this.title && this.icon));
+      return Boolean(
+        this.$slots.heading || (this.title && this.icon)
+      );
     }
   }
 };

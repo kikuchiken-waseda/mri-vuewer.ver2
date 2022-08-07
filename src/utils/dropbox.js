@@ -24,7 +24,10 @@ const setToken = function(text) {
     const token = text.split("&")[0].split("=")[1];
     conf.token = token;
     storages.dropbox.set("token", token);
-    CLIENT = new Dropbox({ clientId: conf.key, accessToken: conf.token });
+    CLIENT = new Dropbox({
+      clientId: conf.key,
+      accessToken: conf.token
+    });
   }
 };
 
@@ -37,7 +40,11 @@ const get = function(path) {
 };
 const write = function(path, file) {
   return new Promise((resolve, reject) => {
-    CLIENT.filesUpload({ path: "/" + path, contents: file, mode: "overwrite" })
+    CLIENT.filesUpload({
+      path: "/" + path,
+      contents: file,
+      mode: "overwrite"
+    })
       .then(res => resolve(res))
       .catch(error => reject(error));
   });

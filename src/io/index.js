@@ -11,4 +11,15 @@ import xy from "@/io/xy.js";
 
 const obj = { ver1, ver2 };
 const download = file.download;
-export default { video, file, json, zip, obj, xlsx, image, download, tg, xy };
+export default {
+  video,
+  file,
+  json,
+  zip,
+  obj,
+  xlsx,
+  image,
+  download,
+  tg,
+  xy
+};

@@ -12,7 +12,10 @@
   >
     <template v-slot:item.name="{ item }">
       <v-row align-content="center">
-        <span class="d-inline-block text-truncate" style="max-width: 100px;">
+        <span
+          class="d-inline-block text-truncate"
+          style="max-width: 100px;"
+        >
           {{ item.name }}
         </span>
         <v-chip
@@ -39,14 +42,26 @@
           </v-btn>
         </v-col>
         <v-col cols="3" class="px-0">
-          <v-btn color="green" fab dark x-small @click="editItem(item)">
+          <v-btn
+            color="green"
+            fab
+            dark
+            x-small
+            @click="editItem(item)"
+          >
             <v-icon>
               mdi-pencil
             </v-icon>
           </v-btn>
         </v-col>
         <v-col cols="3" class="px-0">
-          <v-btn color="error" fab dark x-small @click="deleteItem(item)">
+          <v-btn
+            color="error"
+            fab
+            dark
+            x-small
+            @click="deleteItem(item)"
+          >
             <v-icon>
               mdi-delete
             </v-icon>
@@ -75,8 +90,16 @@
             v-model="tierTemplate"
             type="text"
             append-icon="mdi-send"
-            :label="$vuetify.lang.t('$vuetify.table.file.forms.setTier.label')"
-            :hint="$vuetify.lang.t('$vuetify.table.file.forms.setTier.hint')"
+            :label="
+              $vuetify.lang.t(
+                '$vuetify.table.file.forms.setTier.label'
+              )
+            "
+            :hint="
+              $vuetify.lang.t(
+                '$vuetify.table.file.forms.setTier.hint'
+              )
+            "
             @keydown.enter="onClickAddTiers"
             @click:append="onClickAddTiers"
           />
@@ -140,7 +163,9 @@ export default {
       // 検索フィールドおよび表示フィールドを作成
       files = files.map(x => {
         x.size = `${x.originSize.width} * ${x.originSize.height}`;
-        x.lastModifiedText = moment(x.lastModifiedAt).format(this.dformat);
+        x.lastModifiedText = moment(x.lastModifiedAt).format(
+          this.dformat
+        );
         x.search = {
           name: x.name,
           fps: String(x.fps),
@@ -274,7 +299,10 @@ export default {
         for (const file of this.selected) {
           const textgrid = file.textgrid || {};
           for (const tier of tiers) {
-            if (Object.keys(textgrid).findIndex(x => x == tier.key) == -1) {
+            if (
+              Object.keys(textgrid).findIndex(x => x == tier.key) ==
+              -1
+            ) {
               textgrid[tier.key] = {
                 type: tier.type,
                 parent: null,

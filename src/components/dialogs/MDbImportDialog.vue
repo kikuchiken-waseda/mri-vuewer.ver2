@@ -51,7 +51,9 @@ export default {
     close: function() {
       this.dialog = false;
       if (!this.loaded) {
-        this.$vuewer.snackbar.warning("$vuetify.forms.db.messages.stop");
+        this.$vuewer.snackbar.warning(
+          "$vuetify.forms.db.messages.stop"
+        );
       }
       if (this.$route.name !== "Home") {
         this.$router.push({ name: "Home" });
@@ -64,13 +66,17 @@ export default {
     onLoaded: function() {
       this.loaded = true;
       this.close();
-      this.$vuewer.snackbar.success("$vuetify.forms.db.messages.success");
+      this.$vuewer.snackbar.success(
+        "$vuetify.forms.db.messages.success"
+      );
     },
     onError: function(error) {
       this.loaded = true;
       this.close();
       if (~error.message.indexOf("out of memory")) {
-        this.$vuewer.snackbar.error("$vuetify.forms.db.messages.outofmemory");
+        this.$vuewer.snackbar.error(
+          "$vuetify.forms.db.messages.outofmemory"
+        );
       } else {
         this.$vuewer.snackbar.error(error);
       }

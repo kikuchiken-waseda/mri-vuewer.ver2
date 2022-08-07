@@ -4,7 +4,9 @@
       class="mt-0"
       hide-details
       v-model="$shouldGetVideoInfo"
-      :label="t(`$vuetify.setting.form.loading.shouldGetVideoInfo.label`)"
+      :label="
+        t(`$vuetify.setting.form.loading.shouldGetVideoInfo.label`)
+      "
     />
     <v-checkbox
       class="mt-0"

@@ -3,7 +3,9 @@
     <v-text-field
       v-model="name"
       :rules="nameRule"
-      :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.name')}`"
+      :label="
+        `${$vuetify.lang.t('$vuetify.textgrid.tier.option.name')}`
+      "
     />
     <v-autocomplete
       :items="typeChoice"
@@ -11,28 +13,38 @@
       v-model="type"
       item-text="name"
       item-value="val"
-      :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.type')}`"
+      :label="
+        `${$vuetify.lang.t('$vuetify.textgrid.tier.option.type')}`
+      "
     />
     <v-checkbox
       v-model="checkbox"
-      :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.showRef')}`"
+      :label="
+        `${$vuetify.lang.t('$vuetify.textgrid.tier.option.showRef')}`
+      "
     />
     <v-autocomplete
       v-if="checkbox"
       v-model="refName"
       :rules="refRule"
       :items="tiers"
-      :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.ref')}`"
+      :label="
+        `${$vuetify.lang.t('$vuetify.textgrid.tier.option.ref')}`
+      "
     />
     <v-checkbox
       v-if="checkbox"
       v-model="withText"
-      :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.withText')}`"
+      :label="
+        `${$vuetify.lang.t('$vuetify.textgrid.tier.option.withText')}`
+      "
     />
     <v-checkbox
       v-if="checkbox"
       v-model="asParent"
-      :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.asParent')}`"
+      :label="
+        `${$vuetify.lang.t('$vuetify.textgrid.tier.option.asParent')}`
+      "
     />
   </v-form>
 </template>
@@ -57,7 +69,9 @@ export default {
       if (val !== old) {
         if (val) {
           this.refName = val;
-          const ref = this.$store.state.current.textgrid[this.current];
+          const ref = this.$store.state.current.textgrid[
+            this.current
+          ];
           this.name = `${this.current}-copy`;
           this.type = ref.type;
           this.checkbox = true;
@@ -71,7 +85,9 @@ export default {
       const locale = this.$vuetify.lang.current;
       return [
         {
-          name: this.$vuetify.lang.t("$vuetify.textgrid.tier.interval"),
+          name: this.$vuetify.lang.t(
+            "$vuetify.textgrid.tier.interval"
+          ),
           rubi: locale == "ja" ? "kyoukaitenkisou" : "interval tier",
           val: "interval"
         },
@@ -84,14 +100,18 @@ export default {
     },
     nameRule: function() {
       const rules = [
-        v => !!v || this.$vuetify.lang.t("$vuetify.validations.required"),
+        v =>
+          !!v ||
+          this.$vuetify.lang.t("$vuetify.validations.required"),
         v => this.checkName(v)
       ];
       return rules;
     },
     refRule: function() {
       const rules = [
-        v => !!v || this.$vuetify.lang.t("$vuetify.validations.required"),
+        v =>
+          !!v ||
+          this.$vuetify.lang.t("$vuetify.validations.required"),
         v => this.checkNameNotExist(v)
       ];
       return rules;
@@ -99,7 +119,9 @@ export default {
     required: function() {
       if (this.$vuetify) {
         return [
-          v => !!v || this.$vuetify.lang.t("$vuetify.validations.required")
+          v =>
+            !!v ||
+            this.$vuetify.lang.t("$vuetify.validations.required")
         ];
       }
       return [];
@@ -115,7 +137,9 @@ export default {
     checkName: function(v) {
       if (v) {
         if (this.tiers.indexOf(v) > -1) {
-          return this.$vuetify.lang.t("$vuetify.validations.alreadyExists");
+          return this.$vuetify.lang.t(
+            "$vuetify.validations.alreadyExists"
+          );
         }
         return true;
       }
@@ -124,7 +148,9 @@ export default {
     checkNameNotExist: function(v) {
       if (v) {
         if (this.tiers.indexOf(v) == -1) {
-          return this.$vuetify.lang.t("$vuetify.validations.notExist");
+          return this.$vuetify.lang.t(
+            "$vuetify.validations.notExist"
+          );
         }
         return true;
       }

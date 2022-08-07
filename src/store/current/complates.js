@@ -16,7 +16,10 @@ export default {
       context.state.complates = {};
     },
     updateAutocompletes: function(context, payload) {
-      context.state.completes = Object.assign(context.state.completes, payload);
+      context.state.completes = Object.assign(
+        context.state.completes,
+        payload
+      );
     },
     deleteAutocompletes: function(context, key) {
       Vue.delete(context.state.complates, key);

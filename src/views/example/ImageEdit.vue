@@ -1,7 +1,11 @@
 <template>
   <m-view-layout :heading="heading" :desc="desc">
     <v-card>
-      <v-file-input @change="onChange" accept="image/*" label="image file" />
+      <v-file-input
+        @change="onChange"
+        accept="image/*"
+        label="image file"
+      />
     </v-card>
 
     <v-card v-if="src" class="mx-auto mt-5" max-width="400">

@@ -6,7 +6,10 @@
     item-key="id"
   >
     <template v-slot:item.time="{ item }">
-      <span class="d-inline-block text-truncate" style="max-width: 30px;">
+      <span
+        class="d-inline-block text-truncate"
+        style="max-width: 30px;"
+      >
         {{ item.time }}
       </span>
     </template>
@@ -30,7 +33,12 @@
       </v-row>
     </template>
     <template v-slot:footer>
-      <m-video-dialog v-model="dialog" :src="src" :start="start" :end="end" />
+      <m-video-dialog
+        v-model="dialog"
+        :src="src"
+        :start="start"
+        :end="end"
+      />
     </template>
   </v-data-table>
 </template>
@@ -89,7 +97,9 @@ export default {
       const _start = start > 0 ? start : 0;
       const _end = end < item.duration ? end : item.duration;
       const info =
-        String(math.round(_start, 3)) + "-" + String(math.round(_end, 3));
+        String(math.round(_start, 3)) +
+        "-" +
+        String(math.round(_end, 3));
       const name = `${bname}-${info}.mp4`;
       const buff = io.file.toBuff(src);
       const result = io.video.trim(buff, _start, _end);
@@ -98,7 +108,9 @@ export default {
       io.file.download(blob, name);
     },
     openItem: function(item) {
-      this.$router.push({ path: `/files/${item.fileId}?start=${item.time}` });
+      this.$router.push({
+        path: `/files/${item.fileId}?start=${item.time}`
+      });
     }
   }
 };

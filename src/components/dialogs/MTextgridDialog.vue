@@ -12,7 +12,9 @@
     </template>
     <template v-slot:toolbar-actions>
       <m-video-upload-menu @click="$emit('upload-click', $event)" />
-      <m-video-download-menu @click="$emit('download-click', $event)" />
+      <m-video-download-menu
+        @click="$emit('download-click', $event)"
+      />
       <v-btn icon @click="detail = !detail" color="white">
         <v-icon>{{ icon }}</v-icon>
       </v-btn>
@@ -30,9 +32,15 @@
         :color="color"
       />
       <v-divider v-if="detail" inset> </v-divider>
-      <m-video-stream-list v-if="detail" :video-stream="videoStream" />
+      <m-video-stream-list
+        v-if="detail"
+        :video-stream="videoStream"
+      />
       <v-divider inset v-if="detail"></v-divider>
-      <m-audio-stream-list v-if="detail" :audio-stream="audioStream" />
+      <m-audio-stream-list
+        v-if="detail"
+        :audio-stream="audioStream"
+      />
     </v-card>
   </m-card-dialog>
 </template>

@@ -28,13 +28,25 @@
         :config="canvas"
       >
         <v-layer v-if="$store.state.setting.showPointsInVideo">
-          <v-circle v-for="(x, i) in frame.circles" :key="i" :config="x" />
+          <v-circle
+            v-for="(x, i) in frame.circles"
+            :key="i"
+            :config="x"
+          />
         </v-layer>
         <v-layer v-if="$store.state.setting.showRectsInVideo">
-          <v-rect v-for="(x, i) in frame.rects" :key="i" :config="x" />
+          <v-rect
+            v-for="(x, i) in frame.rects"
+            :key="i"
+            :config="x"
+          />
         </v-layer>
         <v-layer>
-          <v-text v-for="(x, i) in frame.texts" :key="i" :config="x" />
+          <v-text
+            v-for="(x, i) in frame.texts"
+            :key="i"
+            :config="x"
+          />
         </v-layer>
         <v-layer v-if="$store.state.setting.showFrameInVideo">
           <v-text :config="label" />

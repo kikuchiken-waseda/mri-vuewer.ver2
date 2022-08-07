@@ -27,6 +27,7 @@
               :config="background"
             />
           </v-layer>
+
           <!-- 編集済みのポリゴン -->
           <v-layer ref="layer" v-for="_p in polygons" :key="_p.id">
             <v-line
@@ -38,7 +39,8 @@
                 line_id: x.id,
                 points: x.points,
                 stroke: _p.color || polygon.conf.color,
-                strokeWidth: mode == 'pen' ? 3 : _p.size || polygon.conf.size,
+                strokeWidth:
+                  mode == 'pen' ? 3 : _p.size || polygon.conf.size,
                 lineCap: 'round',
                 lineJoin: 'round'
               }"
@@ -55,7 +57,8 @@
                 y: x.y,
                 stroke: 'white',
                 strokeWidth: mode == 'pen' ? 0 : 1,
-                radius: mode == 'pen' ? 0 : x.size || polygon.conf.size,
+                radius:
+                  mode == 'pen' ? 0 : x.size || polygon.conf.size,
                 fill: _p.color || polygon.conf.color
               }"
               @click="onPolygonPointClick"
@@ -63,6 +66,7 @@
               @mouseleave="onPolygonPointMouseLeave"
             />
           </v-layer>
+
           <v-layer ref="layer">
             <!-- ルーラー -->
             <v-circle
@@ -135,6 +139,7 @@
               @mouseleave="onPolygonMouseLeave"
               @click="onClickPolygonsPoint"
             />
+
             <!-- 矩形 -->
             <v-rect
               v-for="x in rects"
@@ -158,6 +163,7 @@
               @dragend="onRectDragEnd"
               @transformend="onTransformEnd"
             />
+
             <!-- 点群 -->
             <v-circle
               v-for="(x, i) in points"
@@ -192,8 +198,12 @@
       <template v-slot:table>
         <m-frame-editor-tab
           :isLoading="syncing"
-          @update-point="$store.dispatch('current/frame/updatePoint', $event)"
-          @update-rect="$store.dispatch('current/frame/updateRect', $event)"
+          @update-point="
+            $store.dispatch('current/frame/updatePoint', $event)
+          "
+          @update-rect="
+            $store.dispatch('current/frame/updateRect', $event)
+          "
         />
       </template>
     </m-frame-editor-layout>
@@ -254,14 +264,17 @@ export default {
       return this.$store.state.current.frame.oh;
     },
     points: function() {
-      return this.$store.getters["current/frame/points"];
+      const items = this.$store.getters["current/frame/points"];
+      return items.map(x => {
+        if (x.size) return x;
+        return { ...x, size: 5 };
+      });
     },
     rects: function() {
       return this.$store.getters["current/frame/rects"];
     },
     polygons: function() {
       const items = this.$store.getters["current/frame/polygons"];
-      console.log(items);
       return items;
     },
     mode: {
@@ -348,7 +361,10 @@ export default {
     loadImage: async function(src) {
       let $src = src;
       if (this.filter) {
-        $src = await this.filter(src, { width: this.ow, height: this.oh });
+        $src = await this.filter(src, {
+          width: this.ow,
+          height: this.oh
+        });
       }
       const img = await this.$vuewer.io.image.load($src);
       this.onResize();
@@ -378,7 +394,9 @@ export default {
       if (this.isPointReserved) {
         const tmp = this.reservedPoints.shift();
         if (tmp) {
-          if (this.points.findIndex(p => p.label == tmp.label) == -1) {
+          if (
+            this.points.findIndex(p => p.label == tmp.label) == -1
+          ) {
             item.label = tmp.label;
             item.color = tmp.color;
           }
@@ -484,14 +502,19 @@ export default {
       const concavosColor = "#3E2723";
       const convexesColor = "#BF360C";
       const _conv = (obj, i, type) => {
-        obj.color = type == "concavos" ? concavosColor : convexesColor;
-        obj.label = type == "concavos" ? `concavo-${i}` : `convex-${i}`;
+        obj.color =
+          type == "concavos" ? concavosColor : convexesColor;
+        obj.label =
+          type == "concavos" ? `concavo-${i}` : `convex-${i}`;
         return obj;
       };
-      const defects = await this.$vuewer.image.convexDefects(this.src, {
-        width: this.ow,
-        height: this.oh
-      });
+      const defects = await this.$vuewer.image.convexDefects(
+        this.src,
+        {
+          width: this.ow,
+          height: this.oh
+        }
+      );
       const points = defects
         .map(res => {
           const concav = res.concavos.map((obj, i) =>
@@ -547,7 +570,10 @@ export default {
           "$vuetify.iFilter.adaptiveThreshold"
         );
       } else if (payload == "FILTER/CANNY") {
-        this.$store.commit("current/frame/filter", "$vuetify.iFilter.canny");
+        this.$store.commit(
+          "current/frame/filter",
+          "$vuetify.iFilter.canny"
+        );
       } else if (payload == "FILTER/BILATERAL") {
         this.$store.commit(
           "current/frame/filter",
@@ -603,7 +629,9 @@ export default {
     },
     onDownload: function(payload) {
       if (payload == "image") {
-        const bname = this.$store.state.current.video.filename.split(".")[0];
+        const bname = this.$store.state.current.video.filename.split(
+          "."
+        )[0];
         const name = `${bname}-f${this.idx}.png`;
         const stage = this.$refs.stage.getStage();
         const dataURL = stage.toDataURL();
@@ -633,7 +661,8 @@ export default {
         const idx = modes.findIndex(m => m.val == this.mode);
         if (idx !== -1) {
           const next = idx + 1;
-          this.mode = next == modes.length ? modes[0].val : modes[next].val;
+          this.mode =
+            next == modes.length ? modes[0].val : modes[next].val;
         }
       } else if (key == "c" && xKey == "ctrl") {
         this.copyImage();
@@ -650,9 +679,11 @@ export default {
       } else if (key == "Escape" && xKey == "default") {
         this.cursor.show = false;
       } else if (key == "h" && xKey == "default") {
-        if (this.cursor.show) this.cursor.x = this.cursor.x - this.cw / 100;
+        if (this.cursor.show)
+          this.cursor.x = this.cursor.x - this.cw / 100;
       } else if (key == "l" && xKey == "default") {
-        if (this.cursor.show) this.cursor.x = this.cursor.x + this.cw / 100;
+        if (this.cursor.show)
+          this.cursor.x = this.cursor.x + this.cw / 100;
       } else if (key == "j" && xKey == "default") {
         if (this.cursor.show) {
           this.cursor.y = this.cursor.y - this.ch / 100;
@@ -779,7 +810,10 @@ export default {
             frameId: polygon.frameId,
             points: _points
           };
-          await this.$store.dispatch("current/frame/addPolygon", item);
+          await this.$store.dispatch(
+            "current/frame/addPolygon",
+            item
+          );
           await this.$store.dispatch("current/frame/deletePolygon", {
             polygon_id
           });
@@ -794,8 +828,12 @@ export default {
       if (idx != -1) {
         const line = this.ruler.lines[idx];
         if (this.mode == "eras") {
-          const a = this.ruler.points.findIndex(p => p.x == line.points[0]);
-          const b = this.ruler.points.findIndex(p => p.x == line.points[2]);
+          const a = this.ruler.points.findIndex(
+            p => p.x == line.points[0]
+          );
+          const b = this.ruler.points.findIndex(
+            p => p.x == line.points[2]
+          );
           this.ruler.points.splice(a, 1);
           this.ruler.points.splice(b, 1);
           this.ruler.lines.splice(idx, 1);
@@ -841,7 +879,8 @@ export default {
     onPointMouseLeave: function(e) {
       if (this.mode == "eras" || this.mode == "circ") {
         const id = e.target.attrs.id;
-        if (id) this.$store.dispatch("current/frame/inactivePoint", id);
+        if (id)
+          this.$store.dispatch("current/frame/inactivePoint", id);
       }
     },
     onPointDragStart: function(e) {
@@ -920,7 +959,9 @@ export default {
       console.log("onStageTouchStart", e);
     },
     onTransformEnd(e) {
-      const idx = this.rects.findIndex(r => r.name == this.selectedShapeName);
+      const idx = this.rects.findIndex(
+        r => r.name == this.selectedShapeName
+      );
       if (idx !== -1) {
         const rect = this.rects[idx];
         rect.rotation = e.target.rotation();
@@ -974,7 +1015,10 @@ export default {
               x: p.x,
               y: p.y
             };
-            await this.$store.dispatch("current/frame/addPoint", item);
+            await this.$store.dispatch(
+              "current/frame/addPoint",
+              item
+            );
           }
           this.syncing = false;
         }

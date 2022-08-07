@@ -3,13 +3,20 @@
     <m-view-layout :heading="heading" :desc="$vuetify.lang.t(desc)">
       <v-col :class="colClass">
         <v-card class="mt-6">
-          <v-tabs v-model="tab" fixed-tabs background-color="primary" dark>
+          <v-tabs
+            v-model="tab"
+            fixed-tabs
+            background-color="primary"
+            dark
+          >
             <v-tab>File</v-tab>
             <v-tab>
               {{ $vuetify.lang.t("$vuetify.textgrid.tier.interval") }}
             </v-tab>
             <v-tab>
-              {{ this.$vuetify.lang.t("$vuetify.textgrid.tier.point") }}
+              {{
+                this.$vuetify.lang.t("$vuetify.textgrid.tier.point")
+              }}
             </v-tab>
           </v-tabs>
           <v-tabs-items v-model="tab">
@@ -25,7 +32,15 @@
           </v-tabs-items>
         </v-card>
 
-        <v-btn dark fab fixed bottom right color="primary" @click="fileAdd">
+        <v-btn
+          dark
+          fab
+          fixed
+          bottom
+          right
+          color="primary"
+          @click="fileAdd"
+        >
           <v-icon>mdi-plus</v-icon>
         </v-btn>
         <m-file-upload-dialog v-model="dialog" />
@@ -72,10 +87,14 @@ export default {
       return this.$store.getters["files/records"];
     },
     intervals: function() {
-      return this.records ? this.records.filter(x => x.type == "interval") : [];
+      return this.records
+        ? this.records.filter(x => x.type == "interval")
+        : [];
     },
     points: function() {
-      return this.records ? this.records.filter(x => x.type == "point") : [];
+      return this.records
+        ? this.records.filter(x => x.type == "point")
+        : [];
     }
   },
   mounted: function() {

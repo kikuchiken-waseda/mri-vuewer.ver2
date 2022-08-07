@@ -58,7 +58,9 @@ export default {
     onLoaded: function(payload) {
       if (payload) {
         this.video = payload;
-        const total = Math.floor(this.video.duration * this.video.fps);
+        const total = Math.floor(
+          this.video.duration * this.video.fps
+        );
         const frameRate = 1 / this.video.fps;
 
         let step = 0;

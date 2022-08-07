@@ -8,7 +8,11 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </template>
-    <m-video-regist-from @loaded="onLoaded" @error="onError" v-if="dialog" />
+    <m-video-regist-from
+      @loaded="onLoaded"
+      @error="onError"
+      v-if="dialog"
+    />
   </m-card-dialog>
 </template>
 <script>
@@ -44,12 +48,16 @@ export default {
     close: function() {
       this.dialog = false;
       if (!this.loaded) {
-        this.$vuewer.snackbar.warning("$vuetify.forms.video.messages.stop");
+        this.$vuewer.snackbar.warning(
+          "$vuetify.forms.video.messages.stop"
+        );
       }
     },
     onLoaded: function(id) {
       this.loaded = true;
-      this.$vuewer.snackbar.success("$vuetify.forms.video.messages.success");
+      this.$vuewer.snackbar.success(
+        "$vuetify.forms.video.messages.success"
+      );
       if (this.$store.state.setting.shouldMovePageAferAddingFile) {
         this.dialog = false;
         this.$router.push({ path: `/files/${id}` });

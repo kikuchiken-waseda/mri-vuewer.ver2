@@ -19,7 +19,10 @@
       @click:append="rec"
     />
     <v-spacer v-if="$vuetify.breakpoint.smAndUp" />
-    <v-toolbar-title class="mr-3" v-if="!$store.state.current.layout.mini">
+    <v-toolbar-title
+      class="mr-3"
+      v-if="!$store.state.current.layout.mini"
+    >
       {{ fileInfo }}
     </v-toolbar-title>
     <v-btn
@@ -103,7 +106,11 @@ export default {
       }
     },
     recog: function() {
-      return window.webkitSpeechRecognition || window.SpeechRecognition || null;
+      return (
+        window.webkitSpeechRecognition ||
+        window.SpeechRecognition ||
+        null
+      );
     },
     recIcon: function() {
       return this.recog ? "mdi-microphone" : null;
@@ -114,7 +121,8 @@ export default {
       if (this.recog) {
         this.keyword = "";
         const rec = new this.recog();
-        rec.lang = this.$vuetify.lang.current == "ja" ? "ja-JP" : "en-US";
+        rec.lang =
+          this.$vuetify.lang.current == "ja" ? "ja-JP" : "en-US";
         rec.onresult = e => {
           if (e.results[0].isFinal) {
             this.keyword = e.results[0][0].transcript;

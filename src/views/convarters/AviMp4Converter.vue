@@ -3,7 +3,9 @@
     <v-card>
       <v-card-text>
         <v-file-input
-          :label="`${$vuetify.lang.t('$vuetify.io.mVideoInput.title')}*`"
+          :label="
+            `${$vuetify.lang.t('$vuetify.io.mVideoInput.title')}*`
+          "
           accept=".avi,.AVI,video/x-msvideo"
           @change="onChange"
         />

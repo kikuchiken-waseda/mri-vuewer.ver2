@@ -26,13 +26,16 @@ const toParam = str => {
 };
 
 const toQuery = param => {
-  return [...new URLSearchParams(param).entries()].reduce((obj, e) => {
-    const val = e[1].indexOf(" ") > -1 ? e[1].split(" ") : e[1];
-    return {
-      ...obj,
-      [e[0]]: val ? val : true
-    };
-  }, {});
+  return [...new URLSearchParams(param).entries()].reduce(
+    (obj, e) => {
+      const val = e[1].indexOf(" ") > -1 ? e[1].split(" ") : e[1];
+      return {
+        ...obj,
+        [e[0]]: val ? val : true
+      };
+    },
+    {}
+  );
 };
 
 const query = str => {
@@ -86,7 +89,8 @@ const opronunciation = function(text) {
   return new Promise((resolve, reject) => {
     tokenize(text)
       .then(res => {
-        if (res) resolve(res.map(x => x.pronunciation || x.surface_form));
+        if (res)
+          resolve(res.map(x => x.pronunciation || x.surface_form));
         resolve([]);
       })
       .catch(error => reject(error));

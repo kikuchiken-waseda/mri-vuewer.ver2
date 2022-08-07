@@ -13,7 +13,14 @@
           color
           <v-icon>mdi-palette</v-icon>
         </v-btn>
-        <v-btn v-else dark icon :color="picker" v-bind="attrs" v-on="on">
+        <v-btn
+          v-else
+          dark
+          icon
+          :color="picker"
+          v-bind="attrs"
+          v-on="on"
+        >
           <v-icon>mdi-palette</v-icon>
         </v-btn>
       </div>

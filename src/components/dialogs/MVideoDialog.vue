@@ -55,7 +55,8 @@ export default {
   },
   computed: {
     $src: function() {
-      if (this.end !== 0) return `${this.src}#t=${this.start},${this.end}`;
+      if (this.end !== 0)
+        return `${this.src}#t=${this.start},${this.end}`;
       return this.src;
     },
     dialog: {

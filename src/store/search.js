@@ -39,14 +39,19 @@ export default {
   },
   getters: {
     args: function(state) {
-      return Object.keys(state.query).filter(x => state.query[x] === true);
+      return Object.keys(state.query).filter(
+        x => state.query[x] === true
+      );
     },
     norargs: function(state) {
       const keys = Object.keys(state.query).filter(
         x => ~x.indexOf("!") && state.query[x] !== true
       );
       return keys.reduce(
-        (obj, k) => ({ ...obj, [k.replace("!", "")]: state.query[k] }),
+        (obj, k) => ({
+          ...obj,
+          [k.replace("!", "")]: state.query[k]
+        }),
         {}
       );
     },
@@ -54,7 +59,10 @@ export default {
       const keys = Object.keys(state.query).filter(
         x => !~x.indexOf("!") && state.query[x] !== true
       );
-      return keys.reduce((obj, k) => ({ ...obj, [k]: state.query[k] }), {});
+      return keys.reduce(
+        (obj, k) => ({ ...obj, [k]: state.query[k] }),
+        {}
+      );
     }
   }
 };

@@ -4,7 +4,9 @@
       :rules="nameRule"
       v-model="names"
       :items="tiers || []"
-      :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.name')}`"
+      :label="
+        `${$vuetify.lang.t('$vuetify.textgrid.tier.option.name')}`
+      "
       multiple
     />
   </v-form>
@@ -23,7 +25,9 @@ export default {
   computed: {
     nameRule: function() {
       const rules = [
-        v => !!v || this.$vuetify.lang.t("$vuetify.validations.required"),
+        v =>
+          !!v ||
+          this.$vuetify.lang.t("$vuetify.validations.required"),
         v => this.checkName(v)
       ];
       return rules;
@@ -34,7 +38,9 @@ export default {
       if (v) {
         for (const x of v) {
           if (this.tiers.indexOf(x) == -1) {
-            return this.$vuetify.lang.t("$vuetify.validations.notExist");
+            return this.$vuetify.lang.t(
+              "$vuetify.validations.notExist"
+            );
           }
         }
         return true;

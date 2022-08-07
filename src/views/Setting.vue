@@ -12,7 +12,12 @@
         </v-card-text>
       </m-t-card>
 
-      <v-btn class="my-5" block @click="setDefaultSetting" color="error">
+      <v-btn
+        class="my-5"
+        block
+        @click="setDefaultSetting"
+        color="error"
+      >
         Reset setting
       </v-btn>
     </v-col>

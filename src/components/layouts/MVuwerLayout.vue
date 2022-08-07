@@ -3,7 +3,12 @@
     <v-col class="pa-0">
       <v-card flat tile>
         <v-row dense v-resize="onResize">
-          <v-col ref="videoArray" :cols="$videoCols" dense class="pa-0">
+          <v-col
+            ref="videoArray"
+            :cols="$videoCols"
+            dense
+            class="pa-0"
+          >
             <slot name="video"></slot>
           </v-col>
           <v-col :cols="$videoCols" dense class="pa-0 pl-2">
@@ -93,7 +98,9 @@ export default {
               }
             }
             this.maxHeight = Math.round(height);
-            this.wsMaxHeight = Math.round(window.innerHeight - height - 128);
+            this.wsMaxHeight = Math.round(
+              window.innerHeight - height - 128
+            );
             this.$emit("resize", this.maxHeight);
           }
         }
@@ -101,7 +108,8 @@ export default {
     }
   },
   mounted: function() {
-    this.$videoCols = this.$vuetify.breakpoint.mdAndUp == false ? 12 : 6;
+    this.$videoCols =
+      this.$vuetify.breakpoint.mdAndUp == false ? 12 : 6;
   },
   beforeDestroy: function() {
     this.$store.dispatch("current/layout/init");

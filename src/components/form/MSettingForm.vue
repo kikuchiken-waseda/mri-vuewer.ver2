@@ -19,7 +19,8 @@
         </v-col>
         <v-col sm="4" class="text-truncate">
           <label>
-            {{ t(`${locale}.waveform.waveColor.label`) }}: {{ $waveColor }}
+            {{ t(`${locale}.waveform.waveColor.label`) }}:
+            {{ $waveColor }}
           </label>
           <v-color-picker v-model="$waveColor" show-swatches />
         </v-col>
@@ -169,15 +170,21 @@ export default {
     addRecordKeyChoice: function() {
       return [
         {
-          text: this.t("$vuetify.setting.form.textgrid.addRecordKey.dbl"),
+          text: this.t(
+            "$vuetify.setting.form.textgrid.addRecordKey.dbl"
+          ),
           val: "dbl"
         },
         {
-          text: this.t(`$vuetify.setting.form.textgrid.addRecordKey.ctrl`),
+          text: this.t(
+            `$vuetify.setting.form.textgrid.addRecordKey.ctrl`
+          ),
           val: "ctrl"
         },
         {
-          text: this.t(`$vuetify.setting.form.textgrid.addRecordKey.alt`),
+          text: this.t(
+            `$vuetify.setting.form.textgrid.addRecordKey.alt`
+          ),
           val: "alt"
         }
       ];
@@ -185,15 +192,21 @@ export default {
     deleteRecordKeyChoice: function() {
       return [
         {
-          text: this.t("$vuetify.setting.form.textgrid.deleteRecordKey.delete"),
+          text: this.t(
+            "$vuetify.setting.form.textgrid.deleteRecordKey.delete"
+          ),
           val: "delete"
         },
         {
-          text: this.t(`$vuetify.setting.form.textgrid.deleteRecordKey.ctrl`),
+          text: this.t(
+            `$vuetify.setting.form.textgrid.deleteRecordKey.ctrl`
+          ),
           val: "ctrl"
         },
         {
-          text: this.t(`$vuetify.setting.form.textgrid.deleteRecordKey.alt`),
+          text: this.t(
+            `$vuetify.setting.form.textgrid.deleteRecordKey.alt`
+          ),
           val: "alt"
         }
       ];

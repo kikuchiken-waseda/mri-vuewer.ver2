@@ -4,13 +4,17 @@
       v-model="oldName"
       :rules="nameRule"
       :items="tiers"
-      :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.name')}`"
+      :label="
+        `${$vuetify.lang.t('$vuetify.textgrid.tier.option.name')}`
+      "
     />
 
     <v-text-field
       v-model="name"
       :rules="newNameRUle"
-      :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.name')}`"
+      :label="
+        `${$vuetify.lang.t('$vuetify.textgrid.tier.option.name')}`
+      "
     />
 
     <v-autocomplete
@@ -18,7 +22,9 @@
       v-model="type"
       item-text="name"
       item-value="val"
-      :label="`${$vuetify.lang.t('$vuetify.textgrid.tier.option.type')}`"
+      :label="
+        `${$vuetify.lang.t('$vuetify.textgrid.tier.option.type')}`
+      "
     />
   </v-form>
 </template>
@@ -55,7 +61,9 @@ export default {
     typeChoice: function() {
       return [
         {
-          name: this.$vuetify.lang.t("$vuetify.textgrid.tier.interval"),
+          name: this.$vuetify.lang.t(
+            "$vuetify.textgrid.tier.interval"
+          ),
           val: "interval"
         },
         {
@@ -66,14 +74,18 @@ export default {
     },
     nameRule: function() {
       const rules = [
-        v => !!v || this.$vuetify.lang.t("$vuetify.validations.required"),
+        v =>
+          !!v ||
+          this.$vuetify.lang.t("$vuetify.validations.required"),
         v => this.checkNameNotExist(v)
       ];
       return rules;
     },
     newNameRUle: function() {
       const rules = [
-        v => !!v || this.$vuetify.lang.t("$vuetify.validations.required"),
+        v =>
+          !!v ||
+          this.$vuetify.lang.t("$vuetify.validations.required"),
         v => this.checkName(v)
       ];
       return rules;
@@ -81,7 +93,9 @@ export default {
     required: function() {
       if (this.$vuetify) {
         return [
-          v => !!v || this.$vuetify.lang.t("$vuetify.validations.required")
+          v =>
+            !!v ||
+            this.$vuetify.lang.t("$vuetify.validations.required")
         ];
       }
       return [];
@@ -91,7 +105,9 @@ export default {
     checkNameNotExist: function(v) {
       if (v) {
         if (this.tiers.indexOf(v) == -1) {
-          return this.$vuetify.lang.t("$vuetify.validations.notExist");
+          return this.$vuetify.lang.t(
+            "$vuetify.validations.notExist"
+          );
         }
         return true;
       }
@@ -101,7 +117,9 @@ export default {
       if (v) {
         if (this.tiers.indexOf(v) > -1) {
           if (v !== this.oldName) {
-            return this.$vuetify.lang.t("$vuetify.validations.alreadyExists");
+            return this.$vuetify.lang.t(
+              "$vuetify.validations.alreadyExists"
+            );
           }
         }
         return true;

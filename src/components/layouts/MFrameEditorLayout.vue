@@ -1,5 +1,11 @@
 <template>
-  <v-card :style="`max-height: ${height}`" flat tile ref="card" color="grey">
+  <v-card
+    :style="`max-height: ${height}`"
+    flat
+    tile
+    ref="card"
+    color="grey"
+  >
     <slot name="toolbar"></slot>
     <v-card
       flat

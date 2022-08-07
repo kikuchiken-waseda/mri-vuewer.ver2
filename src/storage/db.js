@@ -113,7 +113,13 @@ const add_points = async function(data) {
   const items = data.map(x => {
     const p = x.data;
     const frameId = x.frameId;
-    return { x: p.x, y: p.y, size: p.size, color: p.color, frameId: frameId };
+    return {
+      x: p.x,
+      y: p.y,
+      size: p.size,
+      color: p.color,
+      frameId: frameId
+    };
   });
   await db.points.bulkPut(items);
 };
@@ -154,7 +160,9 @@ const add_frames = async function(fileId, obj) {
       }
     }
     if (rects.length > 0 || points.length > 0) {
-      const frames = await db.frames.where({ fileId: fileId }).toArray();
+      const frames = await db.frames
+        .where({ fileId: fileId })
+        .toArray();
       const point_datas = points.map(x => {
         return { data: x.data, frameId: frames[x.idx].id };
       });

@@ -52,7 +52,9 @@ export default {
     playOffset: Number(S.get("playOffset")) || DS.playOffset,
     progressColor: S.get("progressColor") || DS.progressColor,
     syncDropbox:
-      S.get("syncDropbox") == null ? DS.syncDropbox : S.get("syncDropbox"),
+      S.get("syncDropbox") == null
+        ? DS.syncDropbox
+        : S.get("syncDropbox"),
     shouldGetFrameInfo:
       S.get("shouldGetFrameInfo") == null
         ? DS.shouldGetFrameInfo
@@ -87,7 +89,9 @@ export default {
         ? DS.showSpectrogram
         : S.get("showSpectrogram"),
     showTimeLine:
-      S.get("showTimeLine") == null ? DS.showTimeLine : S.get("showTimeLine"),
+      S.get("showTimeLine") == null
+        ? DS.showTimeLine
+        : S.get("showTimeLine"),
     spectrogramHeight:
       Number(S.get("spectrogramHeight")) || DS.spectrogramHeight,
     targetChannel: Number(S.get("targetChannel")) || DS.targetChannel,

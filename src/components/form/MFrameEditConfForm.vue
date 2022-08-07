@@ -13,7 +13,11 @@
         :items="targetTiers"
         label="対象イベント転記層"
       />
-      <v-text-field v-model="text" v-if="targetTier" label="転記テキスト" />
+      <v-text-field
+        v-model="text"
+        v-if="targetTier"
+        label="転記テキスト"
+      />
     </div>
 
     <div class="my-5">
@@ -22,7 +26,9 @@
         hide-details
         v-model="$syncPrevPoints"
         :label="
-          $vuetify.lang.t('$vuetify.setting.form.video.syncPrevPoints.label')
+          $vuetify.lang.t(
+            '$vuetify.setting.form.video.syncPrevPoints.label'
+          )
         "
       />
       <v-text-field
@@ -55,7 +61,9 @@
             <v-btn icon><v-icon>mdi-chevron-down</v-icon></v-btn>
           </v-list-item-action>
           <v-list-item-action @click="deletePoint(i)">
-            <v-btn icon><v-icon color="error">mdi-delete</v-icon> </v-btn>
+            <v-btn icon
+              ><v-icon color="error">mdi-delete</v-icon>
+            </v-btn>
           </v-list-item-action>
         </v-list-item>
       </v-list>
@@ -67,7 +75,9 @@
         hide-details
         v-model="$syncPrevRects"
         :label="
-          $vuetify.lang.t('$vuetify.setting.form.video.syncPrevRects.label')
+          $vuetify.lang.t(
+            '$vuetify.setting.form.video.syncPrevRects.label'
+          )
         "
       />
 
@@ -101,7 +111,9 @@
           </v-list-item-action>
 
           <v-list-item-action @click="deleteRect(i)">
-            <v-btn icon><v-icon color="error">mdi-delete</v-icon> </v-btn>
+            <v-btn icon
+              ><v-icon color="error">mdi-delete</v-icon>
+            </v-btn>
           </v-list-item-action>
         </v-list-item>
       </v-list>
@@ -191,7 +203,9 @@ export default {
   },
   methods: {
     addPoint() {
-      if (this.points.findIndex(p => p.label == this.point.label) == -1) {
+      if (
+        this.points.findIndex(p => p.label == this.point.label) == -1
+      ) {
         if (this.point.label) {
           const point = JSON.parse(JSON.stringify(this.point));
           this.$store.commit("current/frameConf/pushPoint", point);
@@ -204,7 +218,9 @@ export default {
       this.$store.commit("current/frameConf/deletePoint", idx);
     },
     addRect() {
-      if (this.rects.findIndex(r => r.label == this.rect.label) == -1) {
+      if (
+        this.rects.findIndex(r => r.label == this.rect.label) == -1
+      ) {
         if (this.rect.label) {
           const rect = JSON.parse(JSON.stringify(this.rect));
           this.$store.commit("current/frameConf/pushRect", rect);

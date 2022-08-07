@@ -24,8 +24,14 @@ export default {
         const buff = "arrayBuffer";
         return [
           v => !!v || t(vm, `${locale}.required`),
-          v => !v || v.size < maxSize * mb || t(vm, `${locale}.maxVideoSize`),
-          v => !v || hasValue(buff, v) || t(vm, `${locale}.hasArrayBuffer`)
+          v =>
+            !v ||
+            v.size < maxSize * mb ||
+            t(vm, `${locale}.maxVideoSize`),
+          v =>
+            !v ||
+            hasValue(buff, v) ||
+            t(vm, `${locale}.hasArrayBuffer`)
         ];
       }
       return [];
@@ -40,7 +46,9 @@ export default {
           rules[`${key}Rules`] = [
             v => !!v || t(vm, `${locale}.required`),
             function(v) {
-              return checkers[key].test(v) || t(vm, `${locale}.${key}`);
+              return (
+                checkers[key].test(v) || t(vm, `${locale}.${key}`)
+              );
             }
           ];
         }

@@ -32,12 +32,19 @@
       </v-btn>
       <m-video-upload-menu @click="onUploadClick" />
       <v-spacer />
-      <v-btn dark icon :class="`elevation-${hover ? 4 : 0}`" @click="playPause">
+      <v-btn
+        dark
+        icon
+        :class="`elevation-${hover ? 4 : 0}`"
+        @click="playPause"
+      >
         <v-icon dark>mdi-play-pause</v-icon>
       </v-btn>
       <v-spacer />
 
-      <m-video-download-menu @click="$emit('download-click', $event)" />
+      <m-video-download-menu
+        @click="$emit('download-click', $event)"
+      />
       <v-btn
         dark
         icon

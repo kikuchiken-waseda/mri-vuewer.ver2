@@ -11,7 +11,9 @@
     </template>
     <slot name="toolbar">
       <v-toolbar v-if="title" dense :color="color" dark>
-        <v-toolbar-title>{{ $vuetify.lang.t(title) }}</v-toolbar-title>
+        <v-toolbar-title>{{
+          $vuetify.lang.t(title)
+        }}</v-toolbar-title>
       </v-toolbar>
     </slot>
     <slot name="menu">

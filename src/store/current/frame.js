@@ -27,7 +27,8 @@ export default {
         name: "$vuetify.iFilter.adaptiveThreshold"
       },
       {
-        func: async (src, originSize) => await cv.canny(src, originSize),
+        func: async (src, originSize) =>
+          await cv.canny(src, originSize),
         name: "$vuetify.iFilter.canny"
       },
       {
@@ -110,7 +111,8 @@ export default {
       }
     },
     id: (state, payload) => (state.id = Math.round(Number(payload))),
-    idx: (state, payload) => (state.idx = Math.round(Number(payload))),
+    idx: (state, payload) =>
+      (state.idx = Math.round(Number(payload))),
     time: (state, payload) => (state.time = Number(payload)),
     cw: (state, val) => {
       state.cw = Number(val) > 0 ? Number(val) : 700;
@@ -159,9 +161,15 @@ export default {
         context.commit("id", payload.id || context.state.id);
         context.commit("time", payload.time || context.state.time);
 
-        context.commit("points", payload.points || context.state.points);
+        context.commit(
+          "points",
+          payload.points || context.state.points
+        );
 
-        context.commit("polygons", payload.polygons || context.state.polygons);
+        context.commit(
+          "polygons",
+          payload.polygons || context.state.polygons
+        );
         context.commit("rects", payload.rects || context.state.rects);
         context.commit("texts", payload.texts || context.state.texts);
       }
@@ -205,7 +213,9 @@ export default {
       const i = state.polygons.findIndex(x => x.id == polygon_id);
       if (i != -1) {
         const points = state.polygons[i].points.map(x => {
-          return x.id == point_id ? Object.assign(x, state.activeStyle) : x;
+          return x.id == point_id
+            ? Object.assign(x, state.activeStyle)
+            : x;
         });
         if (mode == "eras") {
           const active = Object.assign(state.polygons[i], {
@@ -266,7 +276,9 @@ export default {
       });
       try {
         await db.points.bulkPut($points);
-        state.points = await db.points.where({ frameId: state.id }).toArray();
+        state.points = await db.points
+          .where({ frameId: state.id })
+          .toArray();
         const frame = { id: state.id, points: state.points };
         dispatch("current/updateFrames", frame, { root: true });
       } catch (error) {
@@ -292,7 +304,9 @@ export default {
               dispatch("current/updateFrames", frame, { root: true });
             })
             .catch(error => {
-              dispatch("snackbar/error", error.message, { root: true });
+              dispatch("snackbar/error", error.message, {
+                root: true
+              });
             });
         }
       }
@@ -315,7 +329,10 @@ export default {
     activePoint({ state }, pk) {
       const i = state.points.findIndex(p => p.id == pk);
       if (i != -1) {
-        const active = Object.assign(state.points[i], state.activeStyle);
+        const active = Object.assign(
+          state.points[i],
+          state.activeStyle
+        );
         Vue.set(state.points, i, active);
       }
     },
@@ -360,7 +377,9 @@ export default {
               dispatch("current/updateFrames", frame, { root: true });
             })
             .catch(error => {
-              dispatch("snackbar/error", error.message, { root: true });
+              dispatch("snackbar/error", error.message, {
+                root: true
+              });
             });
         }
       }
@@ -383,7 +402,10 @@ export default {
     activeRect({ state }, pk) {
       const i = state.rects.findIndex(r => r.id == pk);
       if (i != -1) {
-        const active = Object.assign(state.rects[i], state.activeStyle);
+        const active = Object.assign(
+          state.rects[i],
+          state.activeStyle
+        );
         Vue.set(state.rects, i, active);
       }
     },
@@ -398,7 +420,8 @@ export default {
   getters: {
     rects: function(state) {
       const rects =
-        state.rects.filter(r => r.x && r.y && r.width && r.height) || [];
+        state.rects.filter(r => r.x && r.y && r.width && r.height) ||
+        [];
       return rects.map(r => {
         return {
           id: r.id || rects.length,
@@ -417,8 +440,8 @@ export default {
       });
     },
     points: function(state) {
-      console.log(state.points);
-      const points = state.points.filter(p => p.id && p.x && p.y) || [];
+      const points =
+        state.points.filter(p => p.id && p.x && p.y) || [];
       return points.map(p => {
         return {
           id: p.id,

@@ -10,17 +10,26 @@
     class="overflow-y-auto"
   >
     <template v-slot:item.time="{ item }">
-      <span class="d-inline-block text-truncate" style="max-width: 30px;">
+      <span
+        class="d-inline-block text-truncate"
+        style="max-width: 30px;"
+      >
         {{ item.time }}
       </span>
     </template>
     <template v-slot:item.start="{ item }">
-      <span class="d-inline-block text-truncate" style="max-width: 30px;">
+      <span
+        class="d-inline-block text-truncate"
+        style="max-width: 30px;"
+      >
         {{ item.start }}
       </span>
     </template>
     <template v-slot:item.end="{ item }">
-      <span class="d-inline-block text-truncate" style="max-width: 30px;">
+      <span
+        class="d-inline-block text-truncate"
+        style="max-width: 30px;"
+      >
         {{ item.end }}
       </span>
     </template>
@@ -194,9 +203,13 @@ export default {
     },
     trimVideo(start, end) {
       const src = this.$store.state.current.video.source;
-      const bname = this.$store.state.current.video.filename.split(".")[0];
+      const bname = this.$store.state.current.video.filename.split(
+        "."
+      )[0];
       const info =
-        String(math.round(start, 3)) + "-" + String(math.round(end, 3));
+        String(math.round(start, 3)) +
+        "-" +
+        String(math.round(end, 3));
       const name = `${bname}-${info}.mp4`;
       if (src) {
         const buff = io.file.toBuff(src);

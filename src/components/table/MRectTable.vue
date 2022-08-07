@@ -1,7 +1,10 @@
 <template>
   <v-data-table item-key="id" :headers="headers" :items="rects">
     <template v-slot:item.label="{ item }">
-      <v-edit-dialog :return-value.sync="item.label" @close="close(item)">
+      <v-edit-dialog
+        :return-value.sync="item.label"
+        @close="close(item)"
+      >
         {{ item.label }}
         <template v-slot:input>
           <v-text-field
@@ -21,7 +24,10 @@
       {{ Math.round(item.y) }}
     </template>
     <template v-slot:item.width="{ item }">
-      <span class="d-inline-block text-truncate" style="max-width: 30px;">
+      <span
+        class="d-inline-block text-truncate"
+        style="max-width: 30px;"
+      >
         {{
           item.scaleX
             ? Math.round(item.scaleX * item.width)
@@ -30,7 +36,10 @@
       </span>
     </template>
     <template v-slot:item.height="{ item }">
-      <span class="d-inline-block text-truncate" style="max-width: 30px;">
+      <span
+        class="d-inline-block text-truncate"
+        style="max-width: 30px;"
+      >
         {{
           item.scaleY
             ? Math.round(item.scaleY * item.height)
@@ -39,17 +48,26 @@
       </span>
     </template>
     <template v-slot:item.rotation="{ item }">
-      <span class="d-inline-block text-truncate" style="max-width: 30px;">
+      <span
+        class="d-inline-block text-truncate"
+        style="max-width: 30px;"
+      >
         {{ item.rotation || 0 }}
       </span>
     </template>
     <template v-slot:item.scaleX="{ item }">
-      <span class="d-inline-block text-truncate" style="max-width: 30px;">
+      <span
+        class="d-inline-block text-truncate"
+        style="max-width: 30px;"
+      >
         {{ item.scaleX }}
       </span>
     </template>
     <template v-slot:item.scaleY="{ item }">
-      <span class="d-inline-block text-truncate" style="max-width: 30px;">
+      <span
+        class="d-inline-block text-truncate"
+        style="max-width: 30px;"
+      >
         {{ item.scaleY }}
       </span>
     </template>

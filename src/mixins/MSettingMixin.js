@@ -80,7 +80,10 @@ export default {
           this.$store.commit("setting/setMaxVideoSize", val);
         } else if (type == "string") {
           if (Number(val)) {
-            this.$store.commit("setting/setMaxVideoSize", Number(val));
+            this.$store.commit(
+              "setting/setMaxVideoSize",
+              Number(val)
+            );
           }
         }
       }
@@ -91,7 +94,10 @@ export default {
         return this.$store.state.setting.shouldMovePageAferAddingFile;
       },
       set(val) {
-        this.$store.commit("setting/shouldMovePageAferAddingFile", val);
+        this.$store.commit(
+          "setting/shouldMovePageAferAddingFile",
+          val
+        );
       }
     },
     //

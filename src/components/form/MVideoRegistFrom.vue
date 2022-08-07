@@ -15,7 +15,10 @@
             <m-help text="$vuetify.forms.video.desc.select" />
           </v-card-title>
           <v-card-text>
-            <m-video-file-form v-if="e1 == 1" @validated="onValidateVideo" />
+            <m-video-file-form
+              v-if="e1 == 1"
+              @validated="onValidateVideo"
+            />
           </v-card-text>
         </v-card>
       </v-stepper-content>
@@ -40,7 +43,9 @@
             </v-btn>
             <v-spacer />
             <v-btn color="error" @click="resetCodecForm">reset</v-btn>
-            <v-btn color="primary" @click="validateCodecForm">ok</v-btn>
+            <v-btn color="primary" @click="validateCodecForm"
+              >ok</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-stepper-content>
@@ -83,8 +88,12 @@
               {{ t("$vuetify.prev") }}
             </v-btn>
             <v-spacer />
-            <v-btn color="error" @click="resetMetaDataForm">reset</v-btn>
-            <v-btn color="primary" @click="validateMetaDataForm">ok</v-btn>
+            <v-btn color="error" @click="resetMetaDataForm"
+              >reset</v-btn
+            >
+            <v-btn color="primary" @click="validateMetaDataForm"
+              >ok</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-stepper-content>
@@ -154,14 +163,18 @@ export default {
       return 0;
     },
     stepName: function() {
-      return this.t(`$vuetify.forms.video.steps.${this.steps[this.e1 - 1]}`);
+      return this.t(
+        `$vuetify.forms.video.steps.${this.steps[this.e1 - 1]}`
+      );
     },
     nSteps: function() {
       return this.steps.length;
     },
     metadata: function() {
       if (this.video.name) {
-        const data = this.$store.getters["setting/fname2meta"](this.video.name);
+        const data = this.$store.getters["setting/fname2meta"](
+          this.video.name
+        );
         if (data) return data;
       }
       return {};
@@ -202,7 +215,9 @@ export default {
       this.converting.status = `converting video to images...`;
       this.video.frames = [];
       this.converting.step = 0;
-      this.converting.total = Math.floor(this.video.duration * this.video.fps);
+      this.converting.total = Math.floor(
+        this.video.duration * this.video.fps
+      );
 
       const frameRate = 1 / this.video.fps;
       let currentTime = 0;

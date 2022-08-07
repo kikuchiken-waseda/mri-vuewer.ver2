@@ -1,5 +1,9 @@
 <template>
-  <div class="fill-height" @dragenter="onDragEnter" @dragleave="onDragLeave">
+  <div
+    class="fill-height"
+    @dragenter="onDragEnter"
+    @dragleave="onDragLeave"
+  >
     <div
       ref="overlay"
       v-if="overlay"
@@ -65,12 +69,19 @@ export default {
               video.frames.push({ idx, time });
             }
             // メタデータの追加
-            const metadata = this.$store.getters["setting/fname2meta"](f.name);
+            const metadata = this.$store.getters[
+              "setting/fname2meta"
+            ](f.name);
             if (metadata) video.metaData = metadata;
-            const vid = await this.$store.dispatch("files/push", video);
+            const vid = await this.$store.dispatch(
+              "files/push",
+              video
+            );
             if (i == videos.length - 1) {
               this.$vuewer.loading.end();
-              if (this.$store.state.setting.shouldMovePageAferAddingFile) {
+              if (
+                this.$store.state.setting.shouldMovePageAferAddingFile
+              ) {
                 this.$router.push({ path: `/files/${vid}` });
               }
             }

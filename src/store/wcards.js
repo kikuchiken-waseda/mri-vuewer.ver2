@@ -10,7 +10,9 @@ export default {
     },
     closing(state, payload) {
       if (payload._uid) {
-        const idx = state.closings.findIndex(x => x._uid == payload._uid);
+        const idx = state.closings.findIndex(
+          x => x._uid == payload._uid
+        );
         if (idx == -1) state.closings.push(payload);
       } else {
         const idx = state.closings.findIndex(x => x.title == payload);
@@ -19,7 +21,9 @@ export default {
     },
     open(state, payload) {
       if (payload._uid) {
-        const idx = state.closings.findIndex(x => x._uid == payload._uid);
+        const idx = state.closings.findIndex(
+          x => x._uid == payload._uid
+        );
         if (idx > -1) state.closings.splice(idx, 1);
       } else {
         const idx = state.closings.findIndex(x => x.title == payload);

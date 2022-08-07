@@ -75,7 +75,10 @@ export default {
     deleteTier: function(key) {
       if (this.$ws) {
         this.$ws.deleteTier(key);
-        this.$vuewer.console.log("mixin:vuewer", `delete tier (key=${key})`);
+        this.$vuewer.console.log(
+          "mixin:vuewer",
+          `delete tier (key=${key})`
+        );
       }
     },
     copyTier: function(ref, key, type, parent, withText = true) {
@@ -119,12 +122,16 @@ export default {
       if (this.$ws) {
         const el = this.$ws.wavesurfer;
         if (el) {
-          const i = Object.keys(el.handlers || {}).findIndex(x => x == event);
+          const i = Object.keys(el.handlers || {}).findIndex(
+            x => x == event
+          );
           if (i != -1) {
             el.fireEvent(event);
           } else {
             const el = this.$ws.wavesurfer.drawer;
-            const i = Object.keys(el.handlers || {}).findIndex(x => x == event);
+            const i = Object.keys(el.handlers || {}).findIndex(
+              x => x == event
+            );
             if (i != -1) {
               el.fireEvent(event);
             }

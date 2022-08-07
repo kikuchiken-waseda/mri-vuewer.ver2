@@ -96,7 +96,8 @@ export default {
     less: "この項目は {0} より小さい必要があります",
     times: "この項目は {0} の倍数です",
     maxVideoSize: `登録可能な ${VIDEO} ファイルサイズは ${store.state.setting.maxVideoSize} MB までです!`,
-    hasArrayBuffer: "想定外の ${VIDEO} ファイルです [No Array buffer]!",
+    hasArrayBuffer:
+      "想定外の ${VIDEO} ファイルです [No Array buffer]!",
     shorter: "この値は {0} 文字以下です.",
     alreadyExists: "この値は既に存在しています.",
     notExist: "この値は存在しません"
@@ -143,7 +144,8 @@ export default {
       messages: {
         stop: "データベースのインポートを停止しました",
         success: "データベースのインポートに成功しました",
-        outofmemory: "データベースのインポートに失敗しました [out of memory]"
+        outofmemory:
+          "データベースのインポートに失敗しました [out of memory]"
       }
     },
     video: {
@@ -240,10 +242,13 @@ export default {
     },
     video: {
       error: {
-        fps: "動画 fps の取得に失敗しました. 対象動画の fps を入力してください",
-        duration: "時間の取得に失敗しました. 対象動画の時間を入力してください",
+        fps:
+          "動画 fps の取得に失敗しました. 対象動画の fps を入力してください",
+        duration:
+          "時間の取得に失敗しました. 対象動画の時間を入力してください",
         originSize: {
-          width: "動画幅の取得に失敗しました. 対象動画の幅を入力してください",
+          width:
+            "動画幅の取得に失敗しました. 対象動画の幅を入力してください",
           height:
             "動画高さの取得に失敗しました. 対象動画の高さを入力してください"
         }
@@ -531,7 +536,8 @@ export default {
   sended: "ドロップボックスへのデータ送信が終了しました",
   notFound: "ファイルは存在しません",
   notAcceptable: "不正なファイルです",
-  browserError: "このブラウザでは, 該当の機能を使用することはできません.",
+  browserError:
+    "このブラウザでは, 該当の機能を使用することはできません.",
   annotation: ANNOTATION,
   ver1: "MRI Vuewer ver.1 系",
   actions: "操作",

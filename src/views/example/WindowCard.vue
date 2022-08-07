@@ -1,6 +1,11 @@
 <template>
   <m-view-layout :heading="heading" :desc="desc">
-    <m-window-card :x="0" :y="0" title="window-card" max-width="400px">
+    <m-window-card
+      :x="0"
+      :y="0"
+      title="window-card"
+      max-width="400px"
+    >
       <v-img
         class="white--text align-end"
         height="200px"

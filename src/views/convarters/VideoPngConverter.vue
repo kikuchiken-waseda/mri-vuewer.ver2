@@ -11,10 +11,18 @@
             <v-text-field type="number" v-model="crop.y" label="y" />
           </v-col>
           <v-col cols="12" md="3">
-            <v-text-field type="number" v-model="crop.w" label="width" />
+            <v-text-field
+              type="number"
+              v-model="crop.w"
+              label="width"
+            />
           </v-col>
           <v-col cols="12" md="3">
-            <v-text-field type="number" v-model="crop.h" label="height" />
+            <v-text-field
+              type="number"
+              v-model="crop.h"
+              label="height"
+            />
           </v-col>
         </v-row>
         <v-text-field type="number" v-model="frame" label="frame" />
@@ -71,7 +79,9 @@ export default {
             const files = [];
             for (const out of result.MEMFS) {
               const blob = new Blob([out.data], { type: out.type });
-              const base64 = await this.$vuewer.io.file.toBase64(blob);
+              const base64 = await this.$vuewer.io.file.toBase64(
+                blob
+              );
               files.push({ name: out.name, base64 });
             }
             const zip = await this.$vuewer.io.zip.toZip(files);

@@ -16,7 +16,9 @@
           <v-img :src="require('../assets/logo2.svg')" />
         </v-list-item-avatar>
         <v-list-item-content>
-          <v-list-item-title>{{ $store.state.appName }}</v-list-item-title>
+          <v-list-item-title>{{
+            $store.state.appName
+          }}</v-list-item-title>
           <v-list-item-subtitle>
             Copyright &copy; {{ $store.state.devYear }} by
             {{ $store.state.author }}
@@ -66,7 +68,10 @@
           </v-list-item-content>
         </v-list-item>
         <v-list dense nav class="pa-0">
-          <v-list-item link @click="$store.commit('logging/show', true)">
+          <v-list-item
+            link
+            @click="$store.commit('logging/show', true)"
+          >
             <v-list-item-icon>
               <v-icon> mdi-console </v-icon>
             </v-list-item-icon>
@@ -99,7 +104,12 @@
         <template v-slot:activator>
           <v-list-item-title>
             FILES
-            <v-chip v-if="!open.files" small class="ml-2" color="info">
+            <v-chip
+              v-if="!open.files"
+              small
+              class="ml-2"
+              color="info"
+            >
               {{ files.length }}
             </v-chip>
           </v-list-item-title>
@@ -156,7 +166,9 @@
           </v-list-item-content>
           <v-list-item-action>
             <v-chip v-if="hasToken" small color="success">
-              {{ $vuetify.lang.t("$vuetify.pages.dropbox.connected") }}
+              {{
+                $vuetify.lang.t("$vuetify.pages.dropbox.connected")
+              }}
             </v-chip>
           </v-list-item-action>
         </v-list-item>
@@ -277,7 +289,11 @@
       </v-list-group>
       <v-divider />
 
-      <v-list-group v-model="open.docs" prepend-icon="mdi-library" sub-group>
+      <v-list-group
+        v-model="open.docs"
+        prepend-icon="mdi-library"
+        sub-group
+      >
         <template v-slot:activator>
           <v-list-item-title>Docs</v-list-item-title>
         </template>
@@ -333,7 +349,9 @@ export default {
   computed: {
     query: function() {
       const util = this.$vuewer.text;
-      const query = util.toQuery(util.toParam(util.trim(this.keyword)));
+      const query = util.toQuery(
+        util.toParam(util.trim(this.keyword))
+      );
       const args = Object.keys(query).filter(x => query[x] === true);
       return args;
     },
@@ -390,7 +408,9 @@ export default {
     },
     diff: function() {
       const cnames = this.chaches.map(x => x.name.split(".")[0]);
-      const fnames = this.files.map(x => (x.name ? x.name.split(".")[0] : ""));
+      const fnames = this.files.map(x =>
+        x.name ? x.name.split(".")[0] : ""
+      );
       return cnames.filter(c => {
         return fnames.indexOf(c) == -1;
       });
@@ -564,7 +584,9 @@ export default {
       this.$store
         .dispatch("files/dump")
         .then(() => {
-          const message = this.$vuetify.lang.t("$vuetify.pages.on.dump");
+          const message = this.$vuetify.lang.t(
+            "$vuetify.pages.on.dump"
+          );
           this.$store.dispatch("snackbar/success", message);
         })
         .catch(error => {
@@ -578,7 +600,9 @@ export default {
       this.$store
         .dispatch("files/clear")
         .then(() => {
-          const message = this.$vuetify.lang.t("$vuetify.pages.on.clear");
+          const message = this.$vuetify.lang.t(
+            "$vuetify.pages.on.clear"
+          );
           this.$store.dispatch("snackbar/success", message);
           this.drawer = false;
           this.to({ name: "Home" });

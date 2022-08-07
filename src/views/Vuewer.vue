@@ -66,7 +66,10 @@ export default {
     downloadJson: async function() {
       try {
         const file = await this.$vuewer.db.get(Number(this.id));
-        const blob = this.$vuewer.io.json.toFile(`${file.bname}.json`, file);
+        const blob = this.$vuewer.io.json.toFile(
+          `${file.bname}.json`,
+          file
+        );
         io.file.download(blob, blob.name);
       } catch (error) {
         if (error.name == "DataError") {
@@ -189,7 +192,8 @@ export default {
     onUnload: function(event) {
       if (this.isChange && this.syncDropbox) {
         if (this.$vuewer.dropbox.hasToken()) {
-          const msg = "Data you've inputted won't be synced in dropbox.";
+          const msg =
+            "Data you've inputted won't be synced in dropbox.";
           event.returnValue = msg;
         }
       }

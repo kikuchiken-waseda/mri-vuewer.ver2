@@ -562,53 +562,57 @@ export default {
       }
     },
     nextRecord(key, idx, focus) {
-      if (idx + 1 < this.$textgrid[key].values.length) {
-        const next = this.$textgrid[key].values[idx + 1];
-        if (next) {
-          if (focus) this.lazyFocusTextField = true;
-          const tg = this.wavesurfer.wavesurfer.textgrid;
-          tg.setCurrent(key, next);
-          this.$store.dispatch("current/seekTo", {
-            time: next.time,
-            center: true
-          });
-        }
-      } else {
-        const next = this.$textgrid[key].values[0];
-        if (next) {
-          if (focus) this.lazyFocusTextField = true;
-          const tg = this.wavesurfer.wavesurfer.textgrid;
-          tg.setCurrent(key, next);
-          this.$store.dispatch("current/seekTo", {
-            time: next.time,
-            center: true
-          });
+      if (key) {
+        if (idx + 1 < this.$textgrid[key].values.length) {
+          const next = this.$textgrid[key].values[idx + 1];
+          if (next) {
+            if (focus) this.lazyFocusTextField = true;
+            const tg = this.wavesurfer.wavesurfer.textgrid;
+            tg.setCurrent(key, next);
+            this.$store.dispatch("current/seekTo", {
+              time: next.time,
+              center: true
+            });
+          }
+        } else {
+          const next = this.$textgrid[key].values[0];
+          if (next) {
+            if (focus) this.lazyFocusTextField = true;
+            const tg = this.wavesurfer.wavesurfer.textgrid;
+            tg.setCurrent(key, next);
+            this.$store.dispatch("current/seekTo", {
+              time: next.time,
+              center: true
+            });
+          }
         }
       }
     },
     prevRecord(key, idx, focus) {
-      if (idx - 1 > -1) {
-        const prev = this.$textgrid[key].values[idx - 1];
-        if (prev) {
-          if (focus) this.lazyFocusTextField = true;
-          const tg = this.wavesurfer.wavesurfer.textgrid;
-          tg.setCurrent(key, prev);
-          this.$store.dispatch("current/seekTo", {
-            time: prev.time,
-            center: true
-          });
-        }
-      } else {
-        const values = this.$textgrid[key].values;
-        const prev = this.$textgrid[key].values[values.length - 1];
-        if (prev) {
-          if (focus) this.lazyFocusTextField = true;
-          const tg = this.wavesurfer.wavesurfer.textgrid;
-          tg.setCurrent(key, prev);
-          this.$store.dispatch("current/seekTo", {
-            time: prev.time,
-            center: true
-          });
+      if (key) {
+        if (idx - 1 > -1) {
+          const prev = this.$textgrid[key].values[idx - 1];
+          if (prev) {
+            if (focus) this.lazyFocusTextField = true;
+            const tg = this.wavesurfer.wavesurfer.textgrid;
+            tg.setCurrent(key, prev);
+            this.$store.dispatch("current/seekTo", {
+              time: prev.time,
+              center: true
+            });
+          }
+        } else {
+          const values = this.$textgrid[key].values;
+          const prev = this.$textgrid[key].values[values.length - 1];
+          if (prev) {
+            if (focus) this.lazyFocusTextField = true;
+            const tg = this.wavesurfer.wavesurfer.textgrid;
+            tg.setCurrent(key, prev);
+            this.$store.dispatch("current/seekTo", {
+              time: prev.time,
+              center: true
+            });
+          }
         }
       }
     },

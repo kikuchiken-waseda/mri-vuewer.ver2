@@ -1,5 +1,9 @@
 <template>
-  <v-container fluid class="pa-0 transparent" @mouseover="$emit('mouseover')">
+  <v-container
+    fluid
+    class="pa-0 transparent"
+    @mouseover="$emit('mouseover')"
+  >
     <m-key-context @keyup="$emit('keyup', $event)">
       <v-tabs
         v-model="tab"
@@ -11,7 +15,9 @@
       >
         <v-tab v-for="(item, i) in tabs" :key="i">
           {{ item.text }}
-          <v-icon small v-if="item.icon" class="ml-2">{{ item.icon }}</v-icon>
+          <v-icon small v-if="item.icon" class="ml-2">{{
+            item.icon
+          }}</v-icon>
         </v-tab>
         <v-tabs-slider color="yellow" />
       </v-tabs>

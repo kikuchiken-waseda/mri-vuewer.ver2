@@ -13,7 +13,10 @@ export default {
         return this.$store.state.current.frame.idx;
       },
       set(val) {
-        this.$store.commit("current/frame/setIdx", Math.round(Number(val)));
+        this.$store.commit(
+          "current/frame/setIdx",
+          Math.round(Number(val))
+        );
       }
     },
     frameTime: {

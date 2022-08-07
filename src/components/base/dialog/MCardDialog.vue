@@ -93,7 +93,9 @@ export default {
         const close = () => {
           vm.dialog = false;
         };
-        return this.fullscreen ? [{ icon: "mdi-close", action: close }] : [];
+        return this.fullscreen
+          ? [{ icon: "mdi-close", action: close }]
+          : [];
       }
     },
     persistent: {

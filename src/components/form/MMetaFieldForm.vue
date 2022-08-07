@@ -21,7 +21,9 @@ export default {
     checkName(v) {
       if (v) {
         if (this.fields.indexOf(v) > -1) {
-          return this.$vuetify.lang.t("$vuetify.validations.alreadyExists");
+          return this.$vuetify.lang.t(
+            "$vuetify.validations.alreadyExists"
+          );
         }
         return true;
       }

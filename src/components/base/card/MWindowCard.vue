@@ -169,19 +169,29 @@ export default {
     },
     setOffset: function(e) {
       const position = this.$refs.window.$el.getBoundingClientRect();
-      if (this.offset.x == null) this.offset.x = position.x - e.clientX;
-      if (this.offset.y == null) this.offset.y = position.y - e.clientY;
+      if (this.offset.x == null)
+        this.offset.x = position.x - e.clientX;
+      if (this.offset.y == null)
+        this.offset.y = position.y - e.clientY;
       if (this.offset.top == null) this.offset.top = position.y;
       if (this.offset.left == null) this.offset.left = position.x;
-      if (this.offset.width == null) this.offset.width = position.width;
-      if (this.offset.height == null) this.offset.height = position.height;
+      if (this.offset.width == null)
+        this.offset.width = position.width;
+      if (this.offset.height == null)
+        this.offset.height = position.height;
     },
     setPosition: function(e) {
       if (this.isMaximize == false) {
         const x =
-          e.pageX + this.offset.x - this.offset.left + this.firstPosition.x;
+          e.pageX +
+          this.offset.x -
+          this.offset.left +
+          this.firstPosition.x;
         const y =
-          e.pageY + this.offset.y - this.offset.top + this.firstPosition.y;
+          e.pageY +
+          this.offset.y -
+          this.offset.top +
+          this.firstPosition.y;
         this.position.x = this.right ? -x : x;
         this.position.y = this.bottom ? -y : y;
       }
@@ -189,20 +199,47 @@ export default {
     onMouseDown: function(e) {
       e.preventDefault();
       this.setOffset(e);
-      document.body.addEventListener("mousemove", this.onMouseMove, false);
-      document.body.addEventListener("mouseleave", this.onMouseUp, false);
-      document.body.addEventListener("mouseup", this.onMouseUp, false);
+      document.body.addEventListener(
+        "mousemove",
+        this.onMouseMove,
+        false
+      );
+      document.body.addEventListener(
+        "mouseleave",
+        this.onMouseUp,
+        false
+      );
+      document.body.addEventListener(
+        "mouseup",
+        this.onMouseUp,
+        false
+      );
       this.isDraging = true;
       this.isDraged = false;
     },
     onMouseUp: function(e) {
       e.preventDefault();
-      document.body.removeEventListener("mousemove", this.onMouseMove, false);
-      document.body.removeEventListener("mouseleave", this.onMouseUp, false);
-      document.body.removeEventListener("mouseup", this.onMouseUp, false);
+      document.body.removeEventListener(
+        "mousemove",
+        this.onMouseMove,
+        false
+      );
+      document.body.removeEventListener(
+        "mouseleave",
+        this.onMouseUp,
+        false
+      );
+      document.body.removeEventListener(
+        "mouseup",
+        this.onMouseUp,
+        false
+      );
       this.isDraging = false;
       this.isDraged = true;
-      this.$store.dispatch("wcards/setZIndex", { id: this.id, zIndex: 3 });
+      this.$store.dispatch("wcards/setZIndex", {
+        id: this.id,
+        zIndex: 3
+      });
     },
     onMouseMove: function(e) {
       if (this.isDraging == true) {

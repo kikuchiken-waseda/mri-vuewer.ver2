@@ -2,7 +2,12 @@
   <m-drag-context>
     <m-view-layout ref="layout" :heading="heading" :desc="desc">
       <v-row>
-        <v-col cols="12" :md="cardCols" v-for="(nav, key) in navs" :key="key">
+        <v-col
+          cols="12"
+          :md="cardCols"
+          v-for="(nav, key) in navs"
+          :key="key"
+        >
           <m-h-card
             :class="mhClass"
             :color="nav.color"
@@ -48,7 +53,10 @@ export default {
         return this.fileRegistDialog;
       },
       set(val) {
-        if (val == false && this.$store.state.hash.info["file-update"]) {
+        if (
+          val == false &&
+          this.$store.state.hash.info["file-update"]
+        ) {
           this.$store.state.hash.info["file-update"] = false;
         }
         this.fileRegistDialog = val;
@@ -121,7 +129,8 @@ export default {
   mounted: function() {
     this.$nextTick(() => {
       if (this.$route.query.nextpage) {
-        const path = "/" + this.$route.query.nextpage.replace("-", "/");
+        const path =
+          "/" + this.$route.query.nextpage.replace("-", "/");
         this.$router.push({ path });
       }
       if (this.$store.state.hash.info["drawer"] || false) {

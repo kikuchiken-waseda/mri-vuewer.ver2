@@ -15,7 +15,9 @@
     </div>
     <v-checkbox
       v-model="$shouldMovePageAferAddingFile"
-      :label="t(`${locale}.loading.shouldMovePageAferAddingFile.label`)"
+      :label="
+        t(`${locale}.loading.shouldMovePageAferAddingFile.label`)
+      "
     />
     <v-text-field
       v-model="$nameFormat"
@@ -76,11 +78,15 @@ export default {
     filesOrderKeyChoices: function() {
       return [
         {
-          text: this.t(`${this.locale}.app.filesOrderKey.choices.default`),
+          text: this.t(
+            `${this.locale}.app.filesOrderKey.choices.default`
+          ),
           val: "default"
         },
         {
-          text: this.t(`${this.locale}.app.filesOrderKey.choices.name`),
+          text: this.t(
+            `${this.locale}.app.filesOrderKey.choices.name`
+          ),
           val: "name"
         },
         {

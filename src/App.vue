@@ -30,7 +30,8 @@ export default {
   data: () => ({}),
   watch: {
     "$route.hash": function(val, old) {
-      if (val != old) this.$store.dispatch("hash/text", this.$route.hash);
+      if (val != old)
+        this.$store.dispatch("hash/text", this.$route.hash);
     }
   },
   mounted: function() {

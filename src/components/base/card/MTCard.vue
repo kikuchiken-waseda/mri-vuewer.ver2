@@ -15,7 +15,11 @@
       </v-icon>
     </v-system-bar>
     <v-toolbar :dense="dense" :color="titleColor" dark v-if="title">
-      <v-icon class="mr-2" :color="prependIconColor" v-if="prependIcon">
+      <v-icon
+        class="mr-2"
+        :color="prependIconColor"
+        v-if="prependIcon"
+      >
         {{ prependIcon }}
       </v-icon>
       <v-toolbar-title>{{ title }}</v-toolbar-title>

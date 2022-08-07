@@ -7,12 +7,18 @@
     show-select
   >
     <template v-slot:item.start="{ item }">
-      <span class="d-inline-block text-truncate" style="max-width: 30px;">
+      <span
+        class="d-inline-block text-truncate"
+        style="max-width: 30px;"
+      >
         {{ item.start }}
       </span>
     </template>
     <template v-slot:item.end="{ item }">
-      <span class="d-inline-block text-truncate" style="max-width: 30px;">
+      <span
+        class="d-inline-block text-truncate"
+        style="max-width: 30px;"
+      >
         {{ item.end }}
       </span>
     </template>
@@ -37,7 +43,12 @@
     </template>
     <template v-slot:footer>
       <v-card flat>
-        <m-video-dialog v-model="dialog" :src="src" :start="start" :end="end" />
+        <m-video-dialog
+          v-model="dialog"
+          :src="src"
+          :start="start"
+          :end="end"
+        />
         <v-card-actions v-if="selected.length > 1">
           <v-spacer />
           <v-btn color="primary" @click="resynthesis">
@@ -96,7 +107,9 @@ export default {
         const kwargs = this.query.kwargs;
         if (args.length) {
           records = records.filter(x => {
-            const search = [...new Set(Object.values(x.search))].join(" ");
+            const search = [...new Set(Object.values(x.search))].join(
+              " "
+            );
             return args
               .map(x => search.indexOf(x) !== -1)
               .every(val => val === true);
@@ -130,7 +143,9 @@ export default {
       const start = item.start;
       const end = item.end;
       const info =
-        String(math.round(start, 3)) + "-" + String(math.round(end, 3));
+        String(math.round(start, 3)) +
+        "-" +
+        String(math.round(end, 3));
       const name = `${bname}-${info}.mp4`;
       const buff = io.file.toBuff(src);
       const result = io.video.trim(buff, start, end);
@@ -139,7 +154,9 @@ export default {
       io.file.download(blob, name);
     },
     openItem: function(item) {
-      this.$router.push({ path: `/files/${item.fileId}?start=${item.start}` });
+      this.$router.push({
+        path: `/files/${item.fileId}?start=${item.start}`
+      });
     },
     resynthesisPng: async function() {
       const files = [];

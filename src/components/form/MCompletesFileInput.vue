@@ -44,7 +44,9 @@ export default {
                 .replace(/\s/g, "")
                 .split("&");
               const contents = srcs.map((x, i) => {
-                const rubi = yomi[i] ? t.toHebon(yomi[i]) : t.toHebon(x);
+                const rubi = yomi[i]
+                  ? t.toHebon(yomi[i])
+                  : t.toHebon(x);
                 return { name: x, val: x, rubi: rubi };
               });
               dict[key] = contents;

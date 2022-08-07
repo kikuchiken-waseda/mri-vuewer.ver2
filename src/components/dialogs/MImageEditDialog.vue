@@ -115,7 +115,8 @@ export default {
       if (id) {
         text = [`FRAME: ${id}`, text].join(": ");
         if (this.targetKey) {
-          const target = `${this.targetKey}: ${this.targetText || "null"}`;
+          const target = `${this.targetKey}: ${this.targetText ||
+            "null"}`;
           text = [target, text].join(": ");
         }
         if (this.refKey) {

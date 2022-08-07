@@ -79,7 +79,10 @@ export default {
     showTextGrid: false,
     showFrame: false,
     textgrid: [
-      { text: "$vuetify.downloads.textgrid.textgrid", value: "TEXTGRID" },
+      {
+        text: "$vuetify.downloads.textgrid.textgrid",
+        value: "TEXTGRID"
+      },
       { text: "$vuetify.downloads.textgrid.json", value: "JSON" },
       { text: "$vuetify.downloads.textgrid.xlsx", value: "XLSX" }
     ],
