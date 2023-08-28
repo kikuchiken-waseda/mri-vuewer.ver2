@@ -28,6 +28,7 @@ const initVideoObject = () => {
     source: null,
     fps: null,
     duration: null,
+    frames: [],
     videoStream: {
       codec_name: null,
       pix_fmt: null,

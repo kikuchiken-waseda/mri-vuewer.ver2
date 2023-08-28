@@ -41,7 +41,6 @@ export default {
         const videos = files.filter(x => {
           return (x.type == "video/mp4") | (x.type == "video/webm");
         });
-
         videos.forEach(async (f, i) => {
           if (i == 0) {
             this.$vuewer.loading.start("downloading video files ...");

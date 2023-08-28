@@ -5,6 +5,8 @@ import "@mdi/font/css/materialdesignicons.css";
 import store from "@/store";
 import ja from "@/locale/ja.js";
 import en from "@/locale/en.js";
+import vuewer from "../src/plugins/vuewer";
+import VueKonva from "vue-konva";
 
 Vue.use(Vuetify);
 const vuetify = new Vuetify({
@@ -20,12 +22,15 @@ export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" }
 };
 
+Vue.use(VueKonva);
+Vue.use(vuewer);
 export const decorators = [
   (story, context) => {
     const wrapped = story(context);
     return Vue.extend({
       store,
       vuetify,
+      vuewer,
       components: { wrapped },
       props: {
         locale: {
