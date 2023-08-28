@@ -50,6 +50,7 @@ const tokenize = function(text) {
   return new Promise((resolve, reject) => {
     try {
       builder.build(function(err, tokenizer) {
+        if (err) reject(err);
         try {
           const path = tokenizer.tokenize(text);
           resolve(path);
