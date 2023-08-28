@@ -14,7 +14,6 @@ git init
 git add -A
 git commit -m 'deploy-page'
 
-
 # if you are deploying to https://<USERNAME>.github.io/<REPO>
 git push -f git@github.com:kikuchiken-waseda/mri-vuewer.ver2.git master:gh-pages
 cd -
