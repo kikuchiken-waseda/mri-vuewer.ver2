@@ -15,6 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Create dot env file
+        uses: actions/setup-node@v1
+      - shell: bash
+        run: |
+          touch .env
+          echo 'VUE_APP_KUROMOJI_DICT="https://kikuchiken-waseda.github.io/mri-vuewer.ver2/dict/"' >> .env
+          echo 'VUE_APP_DROPBOX_REDIRECT="https://kikuchiken-waseda.github.io/mri-vuewer.ver2/"' >> .env
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
