@@ -5,7 +5,7 @@
       v-show="$vuetify.breakpoint.smAndUp"
       v-if="desc"
       class="font-weight-light subtitle-1"
-      v-text="desc"
+      v-html="desc"
     />
   </section>
 </template>
