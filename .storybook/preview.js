@@ -1,3 +1,4 @@
+import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
 import Vue from "vue";
 import Vuetify from "vuetify";
 import "vuetify/dist/vuetify.min.css";
@@ -19,7 +20,20 @@ const vuetify = new Vuetify({
   }
 });
 export const parameters = {
-  actions: { argTypesRegex: "^on[A-Z].*" }
+  actions: { argTypesRegex: "^on[A-Z].*" },
+  viewport: {
+    viewports: {
+      vDialog: {
+        name: "vDialog",
+        styles: {
+          width: "700px",
+          height: "660px"
+        },
+        type: "tablet"
+      },
+      ...INITIAL_VIEWPORTS
+    }
+  }
 };
 
 Vue.use(VueKonva);

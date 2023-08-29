@@ -286,7 +286,9 @@ export default {
       }
     },
     filter: function() {
-      return this.$store.state.current.frame.filter;
+      const value = this.$store.state.current.frame.filter;
+      if (value) return value.func;
+      return null;
     },
     color: function() {
       return this.$store.state.current.frame.color;
@@ -602,11 +604,8 @@ export default {
         } else {
           this.syncRects = [];
         }
-        this.$store.dispatch("current/skipForward");
-      } else {
-        this.$store.dispatch("current/skipBackward");
       }
-      this.$emit("skip");
+      this.$emit("skip", payload);
     },
     onZoom: function(payload) {
       if (payload == "out") {
