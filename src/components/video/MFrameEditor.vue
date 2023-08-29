@@ -121,7 +121,7 @@
               }"
             />
             <v-circle
-              v-for="x in polygon.points"
+              v-for="x in cpStartPoints"
               :key="x.id"
               :config="{
                 id: `polygon-${x.id}`,
@@ -138,6 +138,22 @@
               @mouseenter="onPolygonMouseEnter"
               @mouseleave="onPolygonMouseLeave"
               @click="onClickPolygonsPoint"
+            />
+            <v-circle
+              v-for="x in cpPoints"
+              :key="x.id"
+              :config="{
+                id: `polygon-${x.id}`,
+                x: x.x,
+                y: x.y,
+                stroke: 'white',
+                strokeWidth: 1,
+                radius: mode == 'pen' ? 0 : polygon.conf.size,
+                fill:
+                  polygon.active === true
+                    ? polygon.conf.activeColor
+                    : polygon.conf.color
+              }"
             />
 
             <!-- 矩形 -->
@@ -185,8 +201,10 @@
               @dragstart="onPointDragStart"
               @dragend="onPointDragEnd"
             />
+
             <v-transformer v-if="mode == 'rect'" ref="transformer" />
           </v-layer>
+
           <m-frame-editor-cursor
             @dblclick="onDblClick"
             v-if="cursor.show"
@@ -240,6 +258,7 @@ export default {
     }
   },
   computed: {
+    /* 背景画像 */
     src: {
       get() {
         return this.value;
@@ -251,18 +270,23 @@ export default {
     idx: function() {
       return this.$store.state.current.frame.idx;
     },
+    /* 画像表示幅 */
     cw: function() {
       return this.$store.state.current.frame.cw;
     },
+    /* 画像表示高 */
     ch: function() {
       return this.$store.state.current.frame.ch;
     },
+    /* 画像幅 */
     ow: function() {
       return this.$store.state.current.frame.ow;
     },
+    /* 画像高 */
     oh: function() {
       return this.$store.state.current.frame.oh;
     },
+    /* 登録ずみ点群 */
     points: function() {
       const items = this.$store.getters["current/frame/points"];
       return items.map(x => {
@@ -270,11 +294,23 @@ export default {
         return { ...x, size: 5 };
       });
     },
+    /* 登録ずみ矩形 */
     rects: function() {
       return this.$store.getters["current/frame/rects"];
     },
+    /* 登録ずみ多角形 */
     polygons: function() {
       const items = this.$store.getters["current/frame/polygons"];
+      return items;
+    },
+    /* 現在編集中の多角形始点ポイント */
+    cpStartPoints: function() {
+      const items = this.polygon.points.filter(x => x.isFirstPoint);
+      return items;
+    },
+    /* 現在編集中の多角形ポイント */
+    cpPoints: function() {
+      const items = this.polygon.points.filter(x => !x.isFirstPoint);
       return items;
     },
     mode: {
@@ -474,7 +510,8 @@ export default {
     addPolygonPoint: function(x, y) {
       const id = nanoid();
       const label = `polygon-point-${id}`;
-      this.polygon.points.push({ id, label, x, y });
+      const isFirstPoint = this.polygon.points.length === 0;
+      this.polygon.points.push({ id, label, x, y, isFirstPoint });
       if (id > 1) this.setPolygonLine();
     },
     setPolygonLine() {
