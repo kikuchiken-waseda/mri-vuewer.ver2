@@ -18,14 +18,11 @@
       </v-btn>
     </template>
     <m-frame-editor
-      ref="editor"
-      class="mx-auto overflow-y-auto"
-      :height="contentHeight"
       v-if="dialog && src"
+      ref="editor"
       v-model="src"
-      :origin-size="originSize"
+      :height="contentHeight"
       @skip="onSkip"
-      @update-max-width="onUpdateMaxWidth"
     />
   </m-card-dialog>
 </template>
@@ -42,12 +39,12 @@ export default {
     maxWidth: "700"
   }),
   methods: {
-    onUpdateMaxWidth: function(maxWidth) {
-      if (this.maxWidth != maxWidth) {
-        this.maxWidth = maxWidth;
+    onSkip: function(payload) {
+      if (payload == "next") {
+        this.$store.dispatch("current/skipForward");
+      } else {
+        this.$store.dispatch("current/skipBackward");
       }
-    },
-    onSkip: function() {
       this.maxWidth = "700";
     },
     close: function() {
@@ -66,9 +63,6 @@ export default {
       set(val) {
         this.$store.commit("current/frame/src", val);
       }
-    },
-    originSize: function() {
-      return this.$store.state.current.originSize;
     },
     contentHeight: function() {
       if (this.$store.state.current.layout.mini) return "90vh";
@@ -137,5 +131,4 @@ export default {
   }
 };
 </script>
-
 <style scoped></style>

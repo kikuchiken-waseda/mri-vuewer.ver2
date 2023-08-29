@@ -602,11 +602,8 @@ export default {
         } else {
           this.syncRects = [];
         }
-        this.$store.dispatch("current/skipForward");
-      } else {
-        this.$store.dispatch("current/skipBackward");
       }
-      this.$emit("skip");
+      this.$emit("skip", payload);
     },
     onZoom: function(payload) {
       if (payload == "out") {
