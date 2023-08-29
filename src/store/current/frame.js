@@ -12,7 +12,7 @@ export default {
       { val: "rect", icon: "mdi-shape-rectangle-plus" },
       { val: "ruler", icon: "mdi-ruler-square" },
       { val: "polygon", icon: "mdi-shape-polygon-plus" },
-      { val: "pen", icon: "mdi-pencil-plus" },
+      // { val: "pen", icon: "mdi-pencil-plus" },
       { val: "eras", icon: "mdi-eraser" }
     ],
     filters: [
@@ -85,7 +85,7 @@ export default {
     },
     filter: (state, name) => {
       const idx = state.filters.findIndex(f => f.name == name);
-      state.filter = idx == -1 ? null : state.filters[idx].func;
+      state.filter = idx == -1 ? null : state.filters[idx];
     },
     color: (state, str) => (state.color = str),
     src: (state, str) => (state.src = str),

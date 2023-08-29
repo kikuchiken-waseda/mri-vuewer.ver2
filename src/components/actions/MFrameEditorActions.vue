@@ -7,7 +7,7 @@
         </v-btn>
       </v-btn-toggle>
       <div class="mx-1"></div>
-      <m-color-menu icon v-model="color" />
+      <m-color-menu icon tile v-model="color" />
       <v-text-field
         ref="text"
         solo
@@ -17,28 +17,25 @@
         label="転記テキスト"
       >
         <template v-slot:append>
-          <v-btn icon @click="addEvent"
-            ><v-icon>mdi-send</v-icon></v-btn
-          >
+          <v-btn icon tile @click="addEvent">
+            <v-icon>mdi-send</v-icon>
+          </v-btn>
         </template>
       </v-text-field>
       <v-spacer />
-      <v-btn-toggle dense group color="primary">
-        <v-btn icon @click="$emit('skip', 'prev')">
-          <v-icon>mdi-skip-previous</v-icon>
-        </v-btn>
-        <v-btn icon @click="$emit('skip', 'next')">
-          <v-icon>mdi-skip-next</v-icon>
-        </v-btn>
-      </v-btn-toggle>
-      <v-btn-toggle dense group color="primary">
-        <v-btn icon @click="$emit('zoom', 'out')">
-          <v-icon>mdi-magnify-minus</v-icon>
-        </v-btn>
-        <v-btn icon @click="$emit('zoom', 'in')">
-          <v-icon>mdi-magnify-plus</v-icon>
-        </v-btn>
-      </v-btn-toggle>
+
+      <v-btn icon tile @click="$emit('skip', 'prev')">
+        <v-icon>mdi-skip-previous</v-icon>
+      </v-btn>
+      <v-btn icon tile @click="$emit('skip', 'next')">
+        <v-icon>mdi-skip-next</v-icon>
+      </v-btn>
+      <v-btn icon tile @click="$emit('zoom', 'out')">
+        <v-icon>mdi-magnify-minus</v-icon>
+      </v-btn>
+      <v-btn icon tile @click="$emit('zoom', 'in')">
+        <v-icon>mdi-magnify-plus</v-icon>
+      </v-btn>
     </v-toolbar>
     <v-toolbar dense>
       <v-btn-toggle v-model="filter" dense group color="primary">
@@ -119,7 +116,9 @@ export default {
     },
     filter: {
       get() {
-        return this.$store.state.current.frame.filter;
+        const filter = this.$store.state.current.frame.filter;
+        if (filter) return filter.name;
+        return null;
       },
       set(name) {
         this.$store.commit("current/frame/filter", name);

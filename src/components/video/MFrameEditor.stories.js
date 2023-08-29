@@ -33,8 +33,8 @@ const Template = (_, { argTypes }) => ({
   }
 });
 
-export const MImageEditDialogStory = Template.bind({});
-MImageEditDialogStory.args = {
+export const MFrameEditorStory = Template.bind({});
+MFrameEditorStory.args = {
   value: IMAGE_BASE64,
   height: "100%"
 };

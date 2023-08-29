@@ -5,6 +5,7 @@
         <v-btn
           v-if="icon == false"
           :text="text"
+          :tile="tile"
           :color="picker"
           dark
           v-bind="attrs"
@@ -17,6 +18,7 @@
           v-else
           dark
           icon
+          :tile="tile"
           :color="picker"
           v-bind="attrs"
           v-on="on"
@@ -36,6 +38,10 @@ export default {
       type: String
     },
     text: {
+      type: Boolean,
+      default: false
+    },
+    tile: {
       type: Boolean,
       default: false
     },
