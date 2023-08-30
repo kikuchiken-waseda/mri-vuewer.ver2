@@ -126,6 +126,7 @@ export default {
       state.points = points;
     },
     polygons(state, polygons) {
+      console.log("mutations", polygons);
       state.polygons = polygons;
     },
     rects(state, payload) {
@@ -182,6 +183,7 @@ export default {
       });
       const item = {
         frameId: state.id,
+        label: polygon.label,
         color: polygon.color,
         points: points,
         size: state.style.size
@@ -191,6 +193,22 @@ export default {
         state.polygons.push(item);
         const frame = { id: state.id, polygons: state.polygons };
         dispatch("current/updateFrames", frame, { root: true });
+      } catch (error) {
+        dispatch("snackbar/error", error.message, { root: true });
+      }
+    },
+    async updatePolygon({ state, commit, dispatch }, payload) {
+      const item = { ...payload };
+      console.log("updatePolygon", item.color);
+      try {
+        await db.polygons.put(item);
+        const newPolygons = state.polygons.map(x => {
+          if (x.id === payload.id) return item;
+          return x;
+        });
+        const frame = { id: state.id, polygons: newPolygons };
+        dispatch("current/updateFrames", frame, { root: true });
+        commit("polygons", newPolygons);
       } catch (error) {
         dispatch("snackbar/error", error.message, { root: true });
       }
@@ -207,7 +225,6 @@ export default {
         }
       }
     },
-
     activePolygonPoint({ state }, pyload) {
       const { polygon_id, point_id, mode } = pyload;
       const i = state.polygons.findIndex(x => x.id == polygon_id);
@@ -248,7 +265,6 @@ export default {
         }
       }
     },
-
     async addPoint({ state, dispatch }, item) {
       item.x = (item.x / state.cw) * state.ow;
       item.y = (item.y / state.ch) * state.oh;

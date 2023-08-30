@@ -626,7 +626,7 @@ export default {
       } else if (payload == "FILTER/CONCAVECONVEX") {
         this.convexDefects();
       } else {
-        console.log("onMenuClick", payload);
+        console.info("onMenuClick", payload);
       }
     },
     onSkip: function(payload) {
@@ -776,7 +776,6 @@ export default {
     onPolygonMouseLeave: function() {
       this.polygon.active = false;
     },
-
     onClickPolygonsPoint: function() {
       // ポリゴンの終了判定およびデータ追加.
       const item = this.polygon.points[0];
@@ -992,7 +991,7 @@ export default {
       }
     },
     onStageTouchStart(e) {
-      console.log("onStageTouchStart", e);
+      console.info("onStageTouchStart", e);
     },
     onTransformEnd(e) {
       const idx = this.rects.findIndex(

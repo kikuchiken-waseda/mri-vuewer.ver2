@@ -106,6 +106,7 @@ export default {
         const frame = state.frames[i];
         frame.points = payload.points || frame.points;
         frame.rects = payload.rects || frame.rects;
+        frame.polygons = payload.polygons || frame.polygons;
         Vue.set(state.frames, i, frame);
         state.item.lastModifiedAt = Date.now();
         state.item.frames = state.frames;
@@ -307,6 +308,38 @@ export default {
             p.color
           ];
           array.push(row);
+        }
+      }
+      return array;
+    },
+    polygonTable: function(state) {
+      const array = [
+        [
+          "polygon-id",
+          "id",
+          "index",
+          "time",
+          "label",
+          "x",
+          "y",
+          "color"
+        ]
+      ];
+      for (const f of state.frames) {
+        for (const polygon of f.polygons || []) {
+          for (const p of polygon.points || []) {
+            const row = [
+              polygon.id,
+              p.id,
+              f.idx,
+              f.time,
+              polygon.label,
+              p.x,
+              p.y,
+              polygon.color
+            ];
+            array.push(row);
+          }
         }
       }
       return array;
