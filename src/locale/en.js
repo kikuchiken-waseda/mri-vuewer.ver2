@@ -59,6 +59,7 @@ export default {
   table: {
     frame: {
       label: "Label",
+      polygonID: "Polygon ID",
       frame: "Frame ID",
       time: "Time",
       color: "Color",

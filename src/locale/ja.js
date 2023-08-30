@@ -105,6 +105,7 @@ export default {
   table: {
     frame: {
       label: "ラベル",
+      polygonID: "ポリゴン ID",
       frame: "フレーム ID",
       time: "時刻",
       color: "色",

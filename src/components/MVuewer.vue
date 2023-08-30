@@ -808,7 +808,8 @@ export default {
           records: this.$store.getters["current/tgTable"],
           frames: this.$store.getters["current/frameTable"],
           points: this.$store.getters["current/pointTable"],
-          rects: this.$store.getters["current/rectTable"]
+          rects: this.$store.getters["current/rectTable"],
+          polygons: this.$store.getters["current/polygonTable"]
         };
         const blob = this.$vuewer.io.xlsx.dump(obj);
         this.$vuewer.io.file.download(blob, `${bname}.xlsx`);
@@ -885,7 +886,8 @@ export default {
         const obj = {
           frames: this.$store.getters["current/frameTable"],
           points: this.$store.getters["current/pointTable"],
-          rects: this.$store.getters["current/rectTable"]
+          rects: this.$store.getters["current/rectTable"],
+          polygons: this.$store.getters["current/polygonTable"]
         };
         const blob = this.$vuewer.io.xlsx.dump(obj);
         this.$vuewer.io.file.download(blob, `${bname}.xlsx`);
