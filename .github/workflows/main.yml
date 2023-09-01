@@ -10,18 +10,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Create dot env file
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
       - shell: bash
         run: |
           touch .env
           echo 'VUE_APP_KUROMOJI_DICT="/mri-vuewer.ver2/dict/"' >> .env
           echo 'VUE_APP_DROPBOX_REDIRECT="https://kikuchiken-waseda.github.io/mri-vuewer.ver2"' >> .env
       - name: Use Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: "16.15.0"
+          node-version: "16"
       - name: Install dependencies
         run: yarn
       - name: CI
