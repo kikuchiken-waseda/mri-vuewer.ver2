@@ -104,7 +104,13 @@ export default {
   data: () => ({
     mode: 0,
     color: "#F44336",
-    oldColors: ["#FF7043", "#FF8A65", "#FFAB91", "#FFCCBC", "#FBE9E7"],
+    oldColors: [
+      "#FF7043",
+      "#FF8A65",
+      "#FFAB91",
+      "#FFCCBC",
+      "#FBE9E7"
+    ],
     size: 5,
     scale: 0,
     widthRate: 0,
@@ -154,7 +160,9 @@ export default {
       this.lines = [];
     },
     downloadImage: function() {
-      const bname = this.$store.state.current.video.filename.split(".")[0];
+      const bname = this.$store.state.current.video.filename.split(
+        "."
+      )[0];
       const name = `${bname}-f${this.idx}.png`;
       const stage = this.$refs.stage.getStage();
       const dataURL = stage.toDataURL();
@@ -175,7 +183,17 @@ export default {
       }
 
       const lines = [
-        ["label", "frame", "time", "x1", "y1", "x2", "y2", "distance", "color"]
+        [
+          "label",
+          "frame",
+          "time",
+          "x1",
+          "y1",
+          "x2",
+          "y2",
+          "distance",
+          "color"
+        ]
       ];
       for (const l of this.lines || []) {
         const p1 = {
@@ -202,7 +220,9 @@ export default {
       }
       const obj = { points: points, lines: lines };
       const blob = this.$vuewer.io.xlsx.dump(obj);
-      const bname = this.$store.state.current.video.filename.split(".")[0];
+      const bname = this.$store.state.current.video.filename.split(
+        "."
+      )[0];
       this.$vuewer.download.blob(blob, `${bname}-measurement.xlsx`);
     },
     skipNext: function() {
@@ -254,7 +274,9 @@ export default {
       if (this.mode == 2) {
         const i = e.target.index;
         if (this.points[i].mode == 0) {
-          const idx = this.lines.findIndex(x => x.ref[0] == i || x.ref[1] == i);
+          const idx = this.lines.findIndex(
+            x => x.ref[0] == i || x.ref[1] == i
+          );
           this.points.splice(this.lines[idx].ref[0], 2);
           this.lines.splice(idx, 1);
         } else {
@@ -347,7 +369,12 @@ export default {
     onDblClick: function() {
       if (this.mode != 2) {
         this.mouse = this.$refs.stage.getNode().getPointerPosition();
-        this.addPoint(this.mouse.x, this.mouse.y, this.color, this.size);
+        this.addPoint(
+          this.mouse.x,
+          this.mouse.y,
+          this.color,
+          this.size
+        );
         if (this.mode == 0) {
           const ps = this.points.length;
           if (ps % 2 == 0) {

@@ -12,7 +12,9 @@
       <v-tabs-slider :color="sliderColor"></v-tabs-slider>
       <v-tab v-for="(item, i) in tabs" :key="i">
         {{ item.text }}
-        <v-icon small v-if="item.icon" class="ml-2">{{ item.icon }}</v-icon>
+        <v-icon small v-if="item.icon" class="ml-2">{{
+          item.icon
+        }}</v-icon>
       </v-tab>
       <v-tabs-items v-model="tab">
         <v-tab-item v-for="(item, i) in tabs" :key="i">

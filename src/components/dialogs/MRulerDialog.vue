@@ -70,7 +70,10 @@ export default {
       const time = this.$store.state.current.frame.time;
       const id = this.$store.state.current.frame.id;
       if (id) {
-        return `FRAME: ${id}: ${this.$vuewer.math.round(time, 3)} sec`;
+        return `FRAME: ${id}: ${this.$vuewer.math.round(
+          time,
+          3
+        )} sec`;
       } else {
         return `${this.$vuewer.math.round(time, 3)} sec`;
       }

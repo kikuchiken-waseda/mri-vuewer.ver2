@@ -5,7 +5,9 @@ describe("utils/text.js", () => {
     expect(util.checker.isSafe("thisissafe")).toBe(true);
     expect(util.checker.isSafe("this is safe")).toBe(true);
     expect(util.checker.isSafe("this is safe 1")).toBe(true);
-    expect(util.checker.isSafe("これは安全ではありません")).toBe(false);
+    expect(util.checker.isSafe("これは安全ではありません")).toBe(
+      false
+    );
   });
   test("clean", () => {
     // 半角スペースの連続を一つのスペースに変換

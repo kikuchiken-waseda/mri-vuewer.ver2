@@ -19,7 +19,9 @@ describe("store/current/cache.js", () => {
       expect($store.state.textgrids).toEqual([]);
       const textgrid = { ipu: { values: [{ time: 0, text: "" }] } };
       $store.dispatch("setTextgrid", textgrid);
-      expect($store.state.textgrids).toEqual([JSON.stringify(textgrid)]);
+      expect($store.state.textgrids).toEqual([
+        JSON.stringify(textgrid)
+      ]);
     });
     test("cache/textgrids のデータ追加(同じデータの場合追加しない)", () => {
       expect($store.state.textgrids).toEqual([]);
