@@ -271,12 +271,22 @@ export default {
       return this.$store.state.current.frame.idx;
     },
     /* 画像表示幅 */
-    cw: function() {
-      return this.$store.state.current.frame.cw;
+    cw: {
+      get() {
+        return this.$store.state.current.frame.cw;
+      },
+      set(value) {
+        this.$store.commit("current/frame/cw", value);
+      }
     },
     /* 画像表示高 */
-    ch: function() {
-      return this.$store.state.current.frame.ch;
+    ch: {
+      get() {
+        return this.$store.state.current.frame.ch;
+      },
+      set(value) {
+        this.$store.commit("current/frame/ch", value);
+      }
     },
     /* 画像幅 */
     ow: function() {
@@ -405,6 +415,7 @@ export default {
         });
       }
       const img = await this.$vuewer.io.image.load($src);
+
       this.onResize();
       this.background.image = img;
       this.focus();
@@ -646,21 +657,13 @@ export default {
     },
     onZoom: function(payload) {
       if (payload == "out") {
-        if (this.scale > 0) this.scale = 0;
-        const cw = this.$refs.layout.getWidth();
-        const $cw = cw + 100 * this.scale;
-        if ($cw > 300) {
-          this.scale = this.scale - 0.5;
-          this.loadImage(this.src);
-        }
+        this.cw = this.cw - 2;
+        this.ch = this.ch - 2;
+        this.loadImage(this.src);
       } else {
-        if (this.scale < 0) this.scale = 0;
-        const cw = this.$refs.layout.getWidth();
-        const $cw = cw + 100 * this.scale;
-        if ($cw < 1000) {
-          this.scale = this.scale + 0.5;
-          this.loadImage(this.src);
-        }
+        this.cw = this.cw + 2;
+        this.ch = this.ch + 2;
+        this.loadImage(this.src);
       }
     },
     onDownload: function(payload) {
@@ -678,16 +681,9 @@ export default {
       }
     },
     onResize: function() {
-      const cw = this.$refs.layout.getWidth();
-      const ch = (this.oh * cw) / this.ow;
-      const $cw = cw + 100 * this.scale;
-      const $ch = ch + 100 * this.scale;
-
-      this.$store.commit("current/frame/cw", $cw);
-      this.$store.commit("current/frame/ch", $ch);
-
-      this.background.height = $cw;
-      this.background.width = $ch;
+      this.ch = (this.oh * this.cw) / this.ow;
+      this.background.width = this.cw;
+      this.background.height = this.ch;
     },
     // キー操作
     onKeyup: function(payload) {

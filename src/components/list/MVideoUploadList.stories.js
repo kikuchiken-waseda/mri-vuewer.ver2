@@ -9,10 +9,10 @@ export default {
   }
 };
 
-const Template = (args, { argTypes }) => ({
+const Template = (_, { argTypes }) => ({
   props: Object.keys(argTypes),
   components: { MVideoUploadList },
-  template: `<MVideoUploadList @click="onClick" v-bind="$props" />`
+  template: `<MVideoUploadList @click="click" v-bind="$props" />`
 });
 
 export const MVideoUploadListStory = Template.bind({});

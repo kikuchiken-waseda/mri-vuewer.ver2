@@ -1,13 +1,15 @@
 import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
 import Vue from "vue";
 import Vuetify from "vuetify";
+import VueKonva from "vue-konva";
+
 import "vuetify/dist/vuetify.min.css";
 import "@mdi/font/css/materialdesignicons.css";
+
 import store from "@/store";
 import ja from "@/locale/ja.js";
 import en from "@/locale/en.js";
 import vuewer from "../src/plugins/vuewer";
-import VueKonva from "vue-konva";
 
 Vue.use(Vuetify);
 const vuetify = new Vuetify({

@@ -115,9 +115,11 @@ export default {
       (state.idx = Math.round(Number(payload))),
     time: (state, payload) => (state.time = Number(payload)),
     cw: (state, val) => {
+      console.log(val);
       state.cw = Number(val) > 0 ? Number(val) : 700;
     },
     ch: (state, val) => {
+      console.log(val);
       state.ch = Number(val) > 0 ? Number(val) : 700;
     },
     ow: (state, payload) => (state.ow = Number(payload)),
@@ -126,7 +128,6 @@ export default {
       state.points = points;
     },
     polygons(state, polygons) {
-      console.log("mutations", polygons);
       state.polygons = polygons;
     },
     rects(state, payload) {
@@ -199,7 +200,6 @@ export default {
     },
     async updatePolygon({ state, commit, dispatch }, payload) {
       const item = { ...payload };
-      console.log("updatePolygon", item.color);
       try {
         await db.polygons.put(item);
         const newPolygons = state.polygons.map(x => {
