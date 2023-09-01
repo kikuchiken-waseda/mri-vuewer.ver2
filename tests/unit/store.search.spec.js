@@ -65,7 +65,10 @@ describe("store/search.js", () => {
       expect($store.getters.norargs).toEqual({ a: "1", b: "1" });
 
       $store.commit("input", "a!=1&b!=1,2");
-      expect($store.getters.norargs).toEqual({ a: "1", b: ["1", "2"] });
+      expect($store.getters.norargs).toEqual({
+        a: "1",
+        b: ["1", "2"]
+      });
 
       $store.commit("input", "a=1&b!=1");
       expect($store.getters.norargs).toEqual({ b: "1" });
@@ -80,7 +83,10 @@ describe("store/search.js", () => {
       $store.commit("input", "a=1&b=1");
       expect($store.getters.kwargs).toEqual({ a: "1", b: "1" });
       $store.commit("input", "a=1&b=1,2");
-      expect($store.getters.kwargs).toEqual({ a: "1", b: ["1", "2"] });
+      expect($store.getters.kwargs).toEqual({
+        a: "1",
+        b: ["1", "2"]
+      });
     });
   });
 });

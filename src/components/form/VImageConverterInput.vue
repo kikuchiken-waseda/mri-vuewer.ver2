@@ -47,8 +47,13 @@ export default {
       this.frames = [];
       if (payload) {
         this.video = payload;
-        this.frameNum = Math.floor(this.video.duration * this.video.fps);
-        this.$emit("loading-frames", { step: 0, total: this.frameNum });
+        this.frameNum = Math.floor(
+          this.video.duration * this.video.fps
+        );
+        this.$emit("loading-frames", {
+          step: 0,
+          total: this.frameNum
+        });
       } else {
         this.frameNum = 0;
         this.video = {};
@@ -60,7 +65,10 @@ export default {
       const nextTime = currentTime + frameRate;
       if (nextTime < this.video.duration) {
         this.step++;
-        this.$emit("loading-frames", { step: this.step, total: this.frameNum });
+        this.$emit("loading-frames", {
+          step: this.step,
+          total: this.frameNum
+        });
         this.$refs.video.currentTime = nextTime;
       } else {
         this.$emit("loaded-frames", this.frames);
