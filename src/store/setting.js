@@ -9,7 +9,7 @@ const DEFAULTSTATE = {
   cursorColor: "#333",
   deleteRecordKey: "delete",
   freqRate: 0.25,
-  maxVideoSize: 5,
+  maxVideoSize: 50,
   minPxPerSec: 100,
   playOffset: 5,
   progressColor: "#555",

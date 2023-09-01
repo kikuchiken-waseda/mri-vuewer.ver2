@@ -12,7 +12,7 @@ import example from "./example.js";
 
 Vue.use(VueRouter);
 
-let routes = [
+export const routes = [
   {
     path: "/",
     name: "Home",
@@ -48,9 +48,9 @@ let routes = [
     name: "About",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/About.vue")
-  }
+  },
+  ...example
 ];
-routes = routes.concat(example);
 
 const router = new VueRouter({
   mode: "history",

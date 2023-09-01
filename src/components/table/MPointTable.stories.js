@@ -4,9 +4,8 @@ export default {
   component: MPointTable
 };
 
-const Template = args => ({
+const Template = () => ({
   components: { MPointTable },
-  setup: () => ({ args }),
   mounted: function() {
     this.$store.commit("current/frame/points", [
       {
@@ -47,7 +46,7 @@ const Template = args => ({
       }
     ]);
   },
-  template: '<MPointTable v-bind="args" />'
+  template: "<MPointTable />"
 });
 
 export const Default = Template.bind({});

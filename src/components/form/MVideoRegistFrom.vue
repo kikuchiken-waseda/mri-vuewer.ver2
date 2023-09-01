@@ -43,9 +43,9 @@
             </v-btn>
             <v-spacer />
             <v-btn color="error" @click="resetCodecForm">reset</v-btn>
-            <v-btn color="primary" @click="validateCodecForm"
-              >ok</v-btn
-            >
+            <v-btn color="primary" @click="validateCodecForm">
+              ok
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-stepper-content>
@@ -88,12 +88,12 @@
               {{ t("$vuetify.prev") }}
             </v-btn>
             <v-spacer />
-            <v-btn color="error" @click="resetMetaDataForm"
-              >reset</v-btn
-            >
-            <v-btn color="primary" @click="validateMetaDataForm"
-              >ok</v-btn
-            >
+            <v-btn color="error" @click="resetMetaDataForm">
+              reset
+            </v-btn>
+            <v-btn color="primary" @click="validateMetaDataForm">
+              ok
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-stepper-content>

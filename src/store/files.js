@@ -145,6 +145,7 @@ export default {
       return new Promise((resolve, reject) => {
         context.commit("isLoading", true);
         Promise.all([
+          db.polygons.clear,
           db.points.clear,
           db.rects.clear,
           db.frames.clear,
