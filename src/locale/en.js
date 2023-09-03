@@ -28,7 +28,8 @@ const pages = {
 const homeActions = {
   upload: {
     title: pages.db.add,
-    hint: "Import your video file for annotation"
+    hint: "Import your video file for annotation",
+    value: "Storage"
   },
   manage: {
     title: pages.meta,

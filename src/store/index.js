@@ -11,20 +11,34 @@ import setting from "./setting.js";
 import current from "./current";
 import files from "./files";
 import hash from "./hash.js";
+import packageInfo from "../../package.json";
 
 Vue.use(Vuex);
+
+/* indexedDB で利用可能なストレージ容量を取得 */
+export const getStorageSize = async () => {
+  const estimation = await navigator.storage.estimate();
+  return {
+    quota: estimation.quota,
+    useage: estimation.usage
+  };
+};
 
 export default new Vuex.Store({
   state: {
     appName: "MRI Vuewer",
-    appVersion: "2.0",
+    appVersion: packageInfo.version,
     author: "qh73xe",
-    devYear: "2017-2020",
+    devYear: "2017-2023",
     github: "https://github.com/kikuchiken-waseda/mri-vuewer.ver2",
     lang: {
       t: null
     },
-    drawer: false
+    drawer: false,
+    storageSize: {
+      quota: null,
+      useage: null
+    }
   },
   mutations: {
     lang: function(state, val) {
@@ -35,6 +49,16 @@ export default new Vuex.Store({
     },
     drawer: function(state, val) {
       state.drawer = val;
+    },
+    storageSize: async state => {
+      try {
+        state.storageSize = await getStorageSize();
+      } catch {
+        state.storageSize = {
+          quota: null,
+          useage: null
+        };
+      }
     }
   },
   getters: {

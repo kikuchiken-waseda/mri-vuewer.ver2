@@ -112,16 +112,16 @@ export default {
 };
 </script>
 
-<style lang="sass">
-.v-card--material
-  &__avatar
-    position: relative
-    top: -64px
-    margin-bottom: -32px
-
-  &__heading
-    position: relative
-    top: -40px
-    transition: .3s ease
-    z-index: 1
+<style>
+.v-card--material__avatar {
+  position: relative;
+  top: -64px;
+  margin-bottom: -32px;
+}
+.v-card--material__heading {
+  position: relative;
+  top: -40px;
+  transition: 0.3s ease;
+  z-index: 1;
+}
 </style>

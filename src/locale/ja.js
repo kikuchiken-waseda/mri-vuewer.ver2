@@ -59,7 +59,8 @@ const pages = {
 const homeActions = {
   upload: {
     title: pages.db.add,
-    hint: `時系列転${ANNOTATION}の${VIDEO}ファイルをインポートします`
+    hint: `時系列転${ANNOTATION}の${VIDEO}ファイルをインポートします`,
+    value: "ストレージ容量"
   },
   manage: {
     title: pages.meta,
