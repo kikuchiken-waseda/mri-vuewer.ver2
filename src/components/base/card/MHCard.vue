@@ -10,9 +10,9 @@
     <template v-slot:after-heading>
       <div class="ml-auto text-right">
         <div class="body-3 font-weight-light" v-text="title" />
-        <h3 class="display-2 font-weight-light text--primary">
+        <div class="body-3 font-weight-light text--primary">
           {{ value }} <small>{{ smallValue }}</small>
-        </h3>
+        </div>
       </div>
     </template>
     <v-col cols="12" class="px-0">
@@ -112,28 +112,28 @@ export default {
   }
 };
 </script>
-
-<style lang="sass">
-.v-card--material-stats
-  display: flex
-  flex-wrap: wrap
-  position: relative
-
-  > div:first-child
-    justify-content: space-between
-
-  .v-card
-    border-radius: 4px
-    flex: 0 1 auto
-
-  .v-card__text
-    display: inline-block
-    flex: 1 0 calc(100% - 120px)
-    position: absolute
-    top: 0
-    right: 0
-    width: 100%
-
-  .v-card__actions
-    flex: 1 0 100%
+<style>
+.v-card--material-stats {
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+}
+.v-card--material-stats > div:first-child {
+  justify-content: space-between;
+}
+.v-card--material-stats .v-card {
+  border-radius: 4px;
+  flex: 0 1 auto;
+}
+.v-card--material-stats .v-card__text {
+  display: inline-block;
+  flex: 1 0 calc(100% - 120px);
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+}
+.v-card--material-stats .v-card__actions {
+  flex: 1 0 100%;
+}
 </style>

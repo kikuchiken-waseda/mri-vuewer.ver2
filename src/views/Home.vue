@@ -13,6 +13,7 @@
             :color="nav.color"
             :icon="nav.icon"
             :title="nav.title"
+            :small-value="nav.smallValue"
             sub-icon="mdi-information"
             :sub-text="nav.subText"
             :actions="nav.actions"
@@ -39,7 +40,8 @@ export default {
     MFileUploadDialog
   },
   data: () => ({
-    fileRegistDialog: false
+    fileRegistDialog: false,
+    timer: null
   }),
   computed: {
     mhClass: function() {
@@ -74,6 +76,29 @@ export default {
     desc: function() {
       return `${this.$vuewer.t("$vuetify.home.disc")}`;
     },
+    storageSize: function() {
+      const size = this.$store.state.storageSize;
+      const header = this.$vuetify.lang.t(
+        "$vuetify.home.upload.value"
+      );
+
+      if (size.quota && size.useage) {
+        const quotaMb = size.quota / (1024 * 1024);
+        const quota =
+          quotaMb < 1024
+            ? `${Math.floor(quotaMb)} Mb`
+            : `${Math.floor(quotaMb / 1024)} Gb`;
+
+        const useageMb = size.useage / (1023 * 1024);
+        const useage =
+          useageMb < 1024
+            ? `${Math.floor(useageMb)} Mb`
+            : `${Math.floor(useageMb / 1024)} Gb`;
+
+        return `${header}: ${useage}/${quota}`;
+      }
+      return "";
+    },
     navs: function() {
       const vm = this;
       return {
@@ -82,6 +107,7 @@ export default {
           color: "primary",
           title: this.$vuetify.lang.t("$vuetify.home.upload.title"),
           subText: this.$vuetify.lang.t("$vuetify.home.upload.hint"),
+          smallValue: this.storageSize,
           actions: [
             {
               icon: "mdi-plus",
@@ -96,6 +122,7 @@ export default {
           icon: "mdi-database-search",
           title: this.$vuetify.lang.t("$vuetify.home.manage.title"),
           subText: this.$vuetify.lang.t("$vuetify.home.manage.hint"),
+          smallValue: "",
           actions: [
             {
               icon: "mdi-dots-vertical",
@@ -110,6 +137,7 @@ export default {
           icon: "mdi-code-brackets",
           title: this.$vuetify.lang.t("$vuetify.home.demo.title"),
           subText: this.$vuetify.lang.t("$vuetify.home.demo.hint"),
+          smallValue: "",
           actions: [
             {
               icon: "mdi-dots-vertical",
@@ -126,6 +154,12 @@ export default {
       return Math.round(12 / navSize);
     }
   },
+  methods: {
+    setStorageSize: function() {
+      console.log("update Storage");
+      this.$store.commit("storageSize");
+    }
+  },
   mounted: function() {
     this.$nextTick(() => {
       if (this.$route.query.nextpage) {
@@ -136,6 +170,7 @@ export default {
       if (this.$store.state.hash.info["drawer"] || false) {
         this.$store.commit("drawer", true);
       }
+      this.setStorageSize();
     });
   }
 };
